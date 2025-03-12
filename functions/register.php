@@ -15,7 +15,6 @@
 </html>
 
 <?php
-
 // Function to register a new user
 function RegisterUser($username, $pass, $email) {
   require_once('.configDB.php');
