@@ -10,7 +10,7 @@
     global $connection;
     // Hash the password
     $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
-    $role = "customer"; // Corrected spelling
+    $role = "customer"; 
 
     // Prevents SQL injection
     $stmt = $connection->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
