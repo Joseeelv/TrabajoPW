@@ -22,7 +22,7 @@
   function Login($username, $pass){
     global $connection;
     //Prevents SQL injection
-    $stmt = $conn->prepare("SELECT id, password, role FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT password, role FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->bind_result($hashed_password);
@@ -45,7 +45,7 @@
       if($user){
         session_start();
         $_SESSION['id'] = $user['id'];
-        $_SESSION['rol'] = $user['rol'];
+        $_SESSION['role'] = $user['role'];
         header('Location: index.php');
       }
     }
