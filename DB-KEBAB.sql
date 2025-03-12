@@ -2,6 +2,9 @@ DROP DATABASE IF EXISTS DB_KEBAB;
 CREATE DATABASE DB_KEBAB;
 USE DB_KEBAB;
 
+CREATE USER 'root'@'localhost' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON DB_KEBAB.* TO 'root'@'localhost';
+
 /* Tabla de usuarios general */
 CREATE TABLE USERS (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -15,7 +18,7 @@ CREATE TABLE USERS (
 CREATE TABLE CUSTOMERS (
     user_id INT PRIMARY KEY,
     customer_address VARCHAR(255) NOT NULL,
-    points INT NOT NULL DEFAULT 100,
+    points INT NOT NULL DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
 
