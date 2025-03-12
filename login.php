@@ -22,7 +22,7 @@ function LoginUser($username, $pass) {
         die("Connection failed: " . mysqli_connect_error());
     }
 
-    // Obtener salt y hash almacenado
+    // Get user_secret and user_id in order to verify password & login
     $stmt = $connection->prepare("SELECT user_id, user_secret FROM USERS WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -38,26 +38,11 @@ function LoginUser($username, $pass) {
     $stmt->close();
     $connection->close();
 
-    // Verificar contraseña
+    // Verify password
     if (password_verify($pass, $user['user_secret'])) {
         return $user;
     } else {
         return false;
-    }
-}
-
-// Example of usage
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['login'])) {
-        $user = LoginUser($_POST['username'], $_POST['password']);
-        if ($user) {
-            session_start();
-            $_SESSION['user_id'] = $user['user_id'];
-            header('Location: dashboard.php');
-            exit();
-        } else {
-            echo "Credenciales inválidas";
-        }
     }
 }
 ?>
