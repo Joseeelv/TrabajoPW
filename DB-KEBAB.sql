@@ -100,8 +100,8 @@ CREATE TABLE PRODUCTS_NO_INGREDIENTS_ALLERGENS (
     FOREIGN KEY (allergen_id) REFERENCES ALLERGENS(allergen_id) ON DELETE CASCADE
 );
 
-/* Tabla de pedidos */
-CREATE TABLE ORDERS (aasd
+/* Tabla de pedidos */ prueba
+CREATE TABLE ORDERS (aasdas
     order_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     order_date DATE NOT NULL,
