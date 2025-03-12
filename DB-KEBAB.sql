@@ -2,8 +2,9 @@ DROP DATABASE IF EXISTS DB_KEBAB;
 CREATE DATABASE DB_KEBAB;
 USE DB_KEBAB;
 
-CREATE USER 'root'@'localhost' IDENTIFIED BY 'root';
-GRANT ALL PRIVILEGES ON DB_KEBAB.* TO 'root'@'localhost';
+CREATE USER 'root'@'localhost' IDENTIFIED BY 'password123';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 
 /* Tabla de usuarios general */
 CREATE TABLE USERS (
