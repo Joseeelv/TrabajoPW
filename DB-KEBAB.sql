@@ -2,7 +2,7 @@ DROP DATABASE IF EXISTS DB_KEBAB;
 CREATE DATABASE DB_KEBAB;
 USE DB_KEBAB;
 
-/* Tabla de usuarios general */
+/* General users table */
 CREATE TABLE USERS (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(30) NOT NULL UNIQUE,
@@ -11,7 +11,7 @@ CREATE TABLE USERS (
     img_src VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
 );
 
-/* Tabla de usuarios de tipo cliente */
+/* Customers users table */
 CREATE TABLE CUSTOMERS (
     user_id INT PRIMARY KEY,
     customer_address VARCHAR(255) NOT NULL,
@@ -19,14 +19,14 @@ CREATE TABLE CUSTOMERS (
     FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
 
-/* Tabla de usuarios de tipo manager */
+/* Managers users table */
 CREATE TABLE MANAGERS (
     user_id INT PRIMARY KEY,
     salary INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
 
-/* Tabla reviews */
+/* Reviews table */
 CREATE TABLE REVIEWS (
     review_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -39,24 +39,24 @@ CREATE TABLE REVIEWS (
     FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id)
 );
 
-/* Tabla ingredientes */
+/* Ingredients table */
 CREATE TABLE INGREDIENTS (
     ingredient_id INT PRIMARY KEY AUTO_INCREMENT,
     ingredient_name VARCHAR(30) NOT NULL,
-    cost DECIMAL(5,2) NOT NULL, /* Coste de compra del ingrediente */
+    cost DECIMAL(5,2) NOT NULL, /* Purchase cost of the ingredient */
     stock INT NOT NULL DEFAULT 0,
     vegan BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-/* Tabla de alergenos */
+/* Allergens table */
 CREATE TABLE ALLERGENS (
     allergen_id INT PRIMARY KEY AUTO_INCREMENT,
     allergen_name VARCHAR(30) NOT NULL,
     img_src VARCHAR(255)
 );
 
-/* Alergenos de cada ingrediente */
-/* Enlace ->  INGREDIENTS - ALLERGENS */
+/* Allergens for each ingredient */
+/* Link -> INGREDIENTS - ALLERGENS */
 CREATE TABLE INGREDIENTS_ALLERGENS (
     ingredient_id INT NOT NULL,
     allergen_id INT NOT NULL,
@@ -65,16 +65,16 @@ CREATE TABLE INGREDIENTS_ALLERGENS (
     FOREIGN KEY (allergen_id) REFERENCES ALLERGENS(allergen_id) ON DELETE CASCADE
 );
 
-/* Tabla de productos */
+/* Products table */
 CREATE TABLE PRODUCTS (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
     product_name VARCHAR(30) NOT NULL,
     product_price DECIMAL(5,2) NOT NULL,
-    category ENUM('Durum', 'Döner', 'Lahmacun', 'Entrantes', 'Bebida', 'Postres') NOT NULL,
+    category ENUM('Durum', 'Döner', 'Lahmacun', 'Appetizers', 'Drink', 'Desserts') NOT NULL,
     img_src VARCHAR(255)
 );
 
-/* Tabla de relación productos-ingredientes */
+/* Products-ingredients relationship table */
 CREATE TABLE PRODUCTS_INGREDIENTS (
     product_id INT NOT NULL,
     ingredient_id INT NOT NULL,
@@ -83,15 +83,15 @@ CREATE TABLE PRODUCTS_INGREDIENTS (
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE
 );
 
-/* Tabla de productos sin ingredientes */
+/* Table for products without ingredients */
 CREATE TABLE PRODUCTS_NO_INGREDIENTS (
     product_id INT PRIMARY KEY,
-    cost DECIMAL(5,2) NOT NULL, /* Coste de compra del producto */
+    cost DECIMAL(5,2) NOT NULL, /* Purchase cost of the product */
     stock INT NOT NULL DEFAULT 0,
     FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE
 );
 
-/* Tabla de alérgenos para productos sin ingredientes */
+/* Allergens for products without ingredients */
 CREATE TABLE PRODUCTS_NO_INGREDIENTS_ALLERGENS (
     product_id INT NOT NULL,
     allergen_id INT NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE PRODUCTS_NO_INGREDIENTS_ALLERGENS (
     FOREIGN KEY (allergen_id) REFERENCES ALLERGENS(allergen_id) ON DELETE CASCADE
 );
 
-/* Tabla de pedidos */
+/* Orders table */
 CREATE TABLE ORDERS (
     order_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -109,7 +109,7 @@ CREATE TABLE ORDERS (
     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE
 );
 
-/* Tabla de relación pedidos-productos */
+/* Orders-products relationship table */
 CREATE TABLE ORDERS_PRODUCTS (
     order_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -119,14 +119,14 @@ CREATE TABLE ORDERS_PRODUCTS (
     FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE
 );
 
-/* Ingredientes seleccionados/excluidos en un pedido */
-/* Enlace -> ORDERS_PRODUCTS - INGREDIENTS */
-/* Permite personalizar los ingredientes de cada producto en un pedido */
+/* Selected/excluded ingredients in an order */
+/* Link -> ORDERS_PRODUCTS - INGREDIENTS */
+/* Allows customization of ingredients for each product in an order */
 CREATE TABLE ORDERS_PRODUCTS_INGREDIENTS (
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     ingredient_id INT NOT NULL,
-    included BOOLEAN NOT NULL, /* TRUE si se incluye, FALSE si se excluye */
+    included BOOLEAN NOT NULL, /* TRUE if included, FALSE if excluded */
     PRIMARY KEY (order_id, product_id, ingredient_id),
     FOREIGN KEY (order_id, product_id) REFERENCES ORDERS_PRODUCTS(order_id, product_id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE
