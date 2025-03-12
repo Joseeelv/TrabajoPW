@@ -15,7 +15,7 @@ CREATE TABLE USERS (
 CREATE TABLE CUSTOMERS (
     user_id INT PRIMARY KEY,
     customer_address VARCHAR(255) NOT NULL,
-    points INT NOT NULL DEFAULT 100,
+    points INT NOT NULL DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES USERS(user_id)
 );
 
