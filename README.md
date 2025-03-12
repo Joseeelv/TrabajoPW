@@ -4,4 +4,3 @@ Este proyecto es parte de la asignatura de Programación Web. El objetivo es des
 
 
 ---
-# 04/03/2025 - 08:57 -> Ale entra en la branch
