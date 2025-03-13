@@ -79,7 +79,8 @@ CREATE TABLE INGREDIENTS_ALLERGENS (
 CREATE TABLE PRODUCTS (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
     product_name VARCHAR(30) NOT NULL UNIQUE,
-    product_price DECIMAL(5, 2) NOT NULL, -- Price at the time of creation (can change)
+    product_price DECIMAL(5, 2) NOT NULL,
+    -- Price at the time of creation (can change)
     category ENUM(
         'Menu',
         'Durum',
@@ -154,7 +155,8 @@ CREATE TABLE ORDER_ITEMS (
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     quantity INT NOT NULL,
-    price DECIMAL(5, 2) NOT NULL, -- Price at the time of the order (cant change)
+    price DECIMAL(5, 2) NOT NULL,
+    -- Price at the time of the order (cant change)
     FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
     FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id)
 );
