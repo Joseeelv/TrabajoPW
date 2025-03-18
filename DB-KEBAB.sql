@@ -29,27 +29,26 @@ CREATE TABLE MANAGERS (
 );
 
 /* Reviews table: Stores customer reviews and manager responses */
-CREATE TABLE REVIEWS (
-    review_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    review_date DATE NOT NULL,
-    review_text TEXT NOT NULL,
-    rating INT NOT NULL CHECK (
-        rating BETWEEN 1
-        AND 5
-    ),
-    manager_id INT DEFAULT NULL,
-    -- NULL if no response yet
-    answer TEXT DEFAULT NULL,
-    -- NULL if no response yet
-    FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE,
-    CHECK (
-        answer IS NOT NULL
-        OR manager_id IS NULL
-    ) -- If there is an answer, there must be a manager
-);
-
+-- CREATE TABLE REVIEWS (
+--     review_id INT PRIMARY KEY AUTO_INCREMENT,
+--     user_id INT NOT NULL,
+--     review_date DATE NOT NULL,
+--     review_text TEXT NOT NULL,
+--     rating INT NOT NULL CHECK (
+--         rating BETWEEN 1
+--         AND 5
+--     ),
+--     manager_id INT DEFAULT NULL,
+--     -- NULL if no response yet
+--     answer TEXT DEFAULT NULL,
+--     -- NULL if no response yet
+--     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE,
+--     FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE,
+--     CHECK (
+--         answer IS NOT NULL
+--         OR manager_id IS NULL
+--     ) -- If there is an answer, there must be a manager
+-- );
 /* Ingredients table: Stores ingredients available for products */
 CREATE TABLE INGREDIENTS (
     ingredient_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -86,28 +85,14 @@ CREATE TABLE PRODUCTS (
         'Durum',
         'Döner',
         'Lahmacun',
-        'Starters',
+        'Starter',
         'Drink',
-        'Desserts'
+        'Dessert'
     ) NOT NULL,
     img_src VARCHAR(255),
+    -- Only if category = 'Drink' or 'Dessert':
     cost DECIMAL(5, 2) DEFAULT NULL,
-    stock INT DEFAULT NULL,
-    CHECK (
-        (
-            category = 'Menu'
-            AND cost IS NULL
-            AND stock = 0
-        )
-    ),
-    CHECK (
-        (
-            category = 'Drink'
-            OR category = 'Desserts'
-        )
-        AND cost IS NOT NULL
-        AND stock IS NOT NULL
-    )
+    stock INT DEFAULT NULL
 );
 
 /* Links: PRODUCTS (Menus) - PRODUCTS (Items inside the menu) */
@@ -175,5 +160,62 @@ CREATE TABLE ORDER_ITEMS_INGREDIENTS (
             extra = TRUE
             AND removed = TRUE
         )
+    )
+);
+
+/* Offers table: Stores available offers */
+CREATE TABLE OFFERS(
+    offer_id INT PRIMARY KEY AUTO_INCREMENT,
+    prod_id INT NOT NULL,
+    cost INT NOT NULL DEFAULT 100,
+    discount DECIMAL(5, 2) NOT NULL,
+    offer_text TEXT 
+);
+
+/* Links: CUSTOMERS - OFFERS */
+CREATE TABLE CUSTOMERS_OFFERS (
+    user_id INT NOT NULL,
+    offer_id INT NOT NULL,
+    activation_date DATE NOT NULL,
+    PRIMARY KEY (user_id, offer_id),
+    FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (offer_id) REFERENCES OFFERS(offer_id) ON DELETE CASCADE
+);
+
+/* Replenishments table: Stores manager replenishment details */
+CREATE TABLE REPLENISHMENTS (
+    replenishment_id INT PRIMARY KEY AUTO_INCREMENT,
+    manager_id INT NOT NULL,
+    replenishment_date DATE NOT NULL,
+    FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE
+);
+
+/* Replenishments details table: Stores individual items within a replenishment */
+CREATE TABLE REPLENISHMENTS_DETAILS (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    replenishment_id INT NOT NULL,
+    ingredient_id INT ,
+    prod_id INT,
+    quantity INT NOT NULL,
+    FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
+    FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE,
+    FOREIGN KEY (prod_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
+    CHECK (
+        ingredient_id IS NOT NULL
+        OR prod_id IS NOT NULL
+    )
+);
+
+/* Transactions table: Stores transaction details */
+CREATE TABLE TRANSACTIONS (
+    transaction_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    replenishment_id INT NOT NULL,
+    transaction_money DECIMAL(5, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
+    CHECK (
+        order_id IS NOT NULL
+        OR replenishment_id IS NOT NULL
     )
 );
