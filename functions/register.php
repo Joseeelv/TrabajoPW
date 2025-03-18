@@ -3,9 +3,9 @@ session_start(); // Start the session
 
 // ************** SECURITY CONFIGURATION ************** //
 const SECURITY = [
-	'csrf_token_expire' => 3600, // 1 hora
-	'rate_limit' => 5, // Intentos máximos por hora
-	'password_min_strength' => 3 // Nivel de seguridad de contraseña (0-4)
+	'csrf_token_expire' => 3600, // 1 hour
+	'rate_limit' => 5, // Maximum attempts per hour
+	'password_min_strength' => 3 // Password security level (0-4)
 ];
 
 // ************** CSRF PROTECTION ************** //
@@ -72,14 +72,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	// Initialize an array to store validation errors
 	$errors = [];
 
-	// Collect and sanitize input data
-	$username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
-	$password = $_POST['password'];
-	$email = trim(htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'));
-
-	// Initialize an array to store validation errors
-	$errors = [];
-
 	// Validate username
 	if (empty($username)) {
 		$errors['username'] = "Username is required.";
@@ -87,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$errors['username'] = "Username must be between 3 and 20 characters long.";
 	} elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
 		$errors['username'] = "Username can only contain letters, numbers, and underscores.";
-	} elseif (usernameExists($username)) { // Very if the username already exists
+	} elseif (usernameExists($username)) { // Verify if the username already exists
 		$errors['username'] = "This username is already taken.";
 	}
 
@@ -114,47 +106,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	header("X-Content-Type-Options: nosniff");
 	header("X-Frame-Options: DENY");
 
-		// Validación CSRF
-		if (!validateCsrfToken($_POST['csrf_token'])) {
-			throw new Exception("Invalid CSRF token");
-		}
-		//Limitar intentos
-		// $_SESSION['attempts'] = ($_SESSION['attempts'] ?? 0) + 1;
-		// if ($_SESSION['attempts'] > 5) {
-		// 	die("Demasiados intentos. Intenta más tarde.");
-		// }
+	// CSRF validation
+	if (!validateCsrfToken($_POST['csrf_token'])) {
+		throw new Exception("Invalid CSRF token");
+	}
 
-		// Check for validation errors
-		if (empty($errors)) {
-			try {
-				RegisterUser($username, $password, $email);
-				// Successful registration
-				$_SESSION['success_message'] = "User registered successfully.";
-				header("Location: login.php");
-				exit();
-			} catch (Exception $e) {
-				error_log("Registration error: " . $e->getMessage());
-				$errors['registration'] = "An error occurred during registration. Please try again later.";
-			}
+	// Check for validation errors
+	if (empty($errors)) {
+		try {
+			RegisterUser($username, $password, $email);
+			// Successful registration
+			$_SESSION['success_message'] = "User registered successfully.";
+			header("Location: login.php");
+			exit();
+		} catch (Exception $e) {
+			error_log("Registration error: " . $e->getMessage());
+			$errors['registration'] = "An error occurred during registration. Please try again later.";
 		}
+	}
 
 	// Store errors in session to display them on the form
 	$_SESSION['register_errors'] = $errors;
+
+	// Force HTTPS
+	if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+		header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+		exit();
+	}
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Register</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 		<link rel="stylesheet" href="../assets/styles.css">
 </head>
 <body>
-    <h1>Register</h1>
+	<h1>Register</h1>
 
-    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 				<?php
 				// Display errors if any
 				if (isset($_SESSION['register_errors'])) {
@@ -165,30 +158,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 				}
 				?>
 				<input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
-        <input type="text" name="username" placeholder="Username" required>
-        <div>
-            <input type="password" name="password" id="password" placeholder="Password" required>
-            
-            <!-- Barra de fuerza -->
-            <div class="password-strength-meter">
-                <div class="password-strength-meter-fill"></div>
-            </div>
+		<input type="text" name="username" placeholder="Username" required>
+		<div>
+			<input type="password" name="password" id="password" placeholder="Password" required>
+			
+			<!-- Strength bar -->
+			<div class="password-strength-meter">
+				<div class="password-strength-meter-fill"></div>
+			</div>
 
-            <!-- Checklist -->
-            <ul class="password-checklist">
-                <li id="length">At least 8 characters long</li>
-                <li id="uppercase">Contains uppercase letter</li>
-                <li id="lowercase">Contains lowercase letter</li>
-                <li id="number">Contains number</li>
-                <li id="special">Contains special character</li>
-            </ul>
-        </div>
-        
-        <input type="text" name="email" placeholder="Email" required>
-        <button type="submit" name="register">Register</button>
-    </form>
+			<!-- Checklist -->
+			<ul class="password-checklist">
+				<li id="length">At least 8 characters long</li>
+				<li id="uppercase">Contains uppercase letter</li>
+				<li id="lowercase">Contains lowercase letter</li>
+				<li id="number">Contains number</li>
+				<li id="special">Contains special character</li>
+			</ul>
+		</div>
+		
+		<input type="text" name="email" placeholder="Email" required>
+		<button type="submit" name="register">Register</button>
+	</form>
 
-    <p>Already have an account? <a href="login.php">Login</a></p>
-    <script src="../assets/password-strength-meter.js"></script>
+	<p>Already have an account? <a href="login.php">Login</a></p>
+	<script src="../assets/password-strength-meter.js"></script>
 </body>
 </html>
