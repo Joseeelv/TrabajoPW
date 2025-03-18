@@ -154,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['success_message'] = "User logged in successfully.";
     $_SESSION['User_ID'] = $user['user_id'];
     $_SESSION['last_activity'] = time(); // For automatic session renewal
-    if( $_SESSION['User_ID'] == 1){
+    if ($username === 'admin') {
       header("Location: admin.php"); // Redirect to the admin page
     } else {
       header("Location: dashboard.php"); // Redirect to the dashboard
