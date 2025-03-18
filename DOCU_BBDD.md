@@ -327,3 +327,29 @@ En esta tabla se almacenan los detalles de los reabastecimientos de stock realiz
 
 - **item_id**: Identificador único del detalle del reabastecimiento.
 - **replenishment_id**: Identificador único del reabastecimiento, clave foránea de la tabla REPLENISHMENTS.
+- **ingredient_id**: Identificador único del ingrediente, clave foránea de la tabla INGREDIENTS.
+- **prod_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS.
+- **quantity**: Cantidad de unidades del ingrediente o producto que se reabastece.
+
+## Tabla TRANSACTIONS
+```sql
+CREATE TABLE TRANSACTIONS (
+    transaction_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    replenishment_id INT NOT NULL,
+    transaction_money DECIMAL(5, 2) NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
+    CHECK (
+        order_id IS NOT NULL
+        OR replenishment_id IS NOT NULL
+    )
+);
+```
+
+En esta tabla se almacenan las transacciones realizadas por los clientes y los managers.
+
+- **transaction_id**: Identificador único de la transacción.
+- **order_id**: Identificador único del pedido, clave foránea de la tabla ORDERS.
+- **replenishment_id**: Identificador único del reabastecimiento, clave foránea de la tabla REPLENISHMENTS.
+- **transaction_money**: Cantidad de dinero de la transacción.
