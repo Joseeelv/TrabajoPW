@@ -1,5 +1,4 @@
 <?php
-session_start(); // Start the session
 
 // Set secure cookie parameters
 session_set_cookie_params([
@@ -11,6 +10,7 @@ session_set_cookie_params([
   'samesite' => 'Strict'
 ]);
 
+session_start(); // Start the session
 // Security configuration
 const SECURITY = [
   'max_attempts' => 5,
@@ -154,7 +154,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['success_message'] = "User logged in successfully.";
     $_SESSION['User_ID'] = $user['user_id'];
     $_SESSION['last_activity'] = time(); // For automatic session renewal
-    header("Location: dashboard.php"); // Redirect to the dashboard
+    if( $_SESSION['User_ID'] == 1){
+      header("Location: admin.php"); // Redirect to the admin page
+    } else {
+      header("Location: dashboard.php"); // Redirect to the dashboard
+    }
     exit();
   } else {
     // Store errors in session to display them on the form

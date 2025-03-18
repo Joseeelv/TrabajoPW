@@ -19,9 +19,9 @@ El sistema utiliza una constante `SECURITY` para definir parámetros clave de se
 
 ```php
 const SECURITY = [
-	'csrf_token_expire' => 3600, // 1 hora
-	'rate_limit' => 5, // Intentos máximos por hora
-	'password_min_strength' => 3 // Nivel de seguridad de contraseña (0-4)
+	'csrf_token_expire' => 3600, // 1 hour
+	'rate_limit' => 5, // Maximum attempts per hour
+	'password_min_strength' => 3 // Password security level (0-4)
 ];
 ```
 
@@ -375,7 +375,7 @@ function isUserLocked($username)
 }
 ```
 
-## Función de Inicio de Sesión
+# Función de Inicio de Sesión
 
 La función `LoginUser($username, $pass)` maneja el proceso de autenticación de un usuario:
 

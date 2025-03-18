@@ -1,7 +1,5 @@
 <?php
 session_start(); // Start the session
-
-// ************** SECURITY CONFIGURATION ************** //
 const SECURITY = [
 	'csrf_token_expire' => 3600, // 1 hour
 	'rate_limit' => 5, // Maximum attempts per hour
