@@ -36,27 +36,33 @@ $stmt = $connection->prepare("INSERT INTO CUSTOMERS (user_id, customer_address) 
 ### Implementación de la función RegisterUser
 ```php
 function RegisterUser($username, $pass, $email) {
-require_once('.configDB.php');
-$connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);if (!$connection) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+  require_once('.configDB.php');
+  $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+  if (!$connection) {
+      die("Connection failed: " . mysqli_connect_error());
+  }
 
-// Hash the password
-$hashed_password = password_hash($pass, PASSWORD_BCRYPT);
+  // Hash the password
+  $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
 
-// Using prepared statement:
-// Insert into USERS table
-$stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
-$stmt->bind_param("sss", $username, $hashed_password, $email);
-$stmt->execute();
-$user_id = $connection->insert_id;
-$stmt->close();
+  // Insert into USERS table
+  $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
+  $stmt->bind_param("sss", $username, $hashed_password, $email);
+  if (!$stmt->execute()) {
+      throw new Exception("Error inserting into USERS table: " . $stmt->error);
+  }
+  $user_id = $connection->insert_id;
+  $stmt->close();
 
-// Insert into CUSTOMERS table
-$stmt = $connection->prepare("INSERT INTO CUSTOMERS (user_id, customer_address) VALUES (?, ?)");
-$address = "No address";
-$stmt->bind_param("is", $user_id, $address);
-$stmt->execute();
+  // Insert into CUSTOMERS table
+  $stmt = $connection->prepare("INSERT INTO CUSTOMERS (user_id, customer_address) VALUES (?, ?)");
+  $address = "No address";
+  $stmt->bind_param("is", $user_id, $address);
+  if (!$stmt->execute()) {
+      throw new Exception("Error inserting into CUSTOMERS table: " . $stmt->error);
+  }
+  $stmt->close();
+  $connection->close();
 }
 ```
 
@@ -80,14 +86,14 @@ Mediante el uso de funciones de validación se comprueban lo siguiente:
 
 ```php
 // Validate username
-if (empty($username)) {
-    $errors['username'] = "Username is required.";
-} elseif (strlen($username) < 3 || strlen($username) > 20) {
-    $errors['username'] = "Username must be between 3 and 20 characters long.";
-} elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-    $errors['username'] = "Username can only contain letters, numbers, and underscores.";
-} elseif (usernameExists($username)) { // Assume this function checks if the username already exists in the database
-    $errors['username'] = "This username is already taken.";
+  if (empty($username)) {
+      $errors['username'] = "Username is required.";
+  } elseif (strlen($username) < 3 || strlen($username) > 20) {
+      $errors['username'] = "Username must be between 3 and 20 characters long.";
+  } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+      $errors['username'] = "Username can only contain letters, numbers, and underscores.";
+  } elseif (usernameExists($username)) { // Very if the username already exists
+      $errors['username'] = "This username is already taken.";
 }
 ```
 
@@ -98,12 +104,12 @@ if (empty($username)) {
 
 ```php
 // Validate password
-if (empty($password)) {
-    $errors['password'] = "Password is required.";
-} elseif (strlen($password) < 8) {
-    $errors['password'] = "The password must be at least 8 characters long.";
-} elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
-    $errors['password'] = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
+  if (empty($password)) {
+      $errors['password'] = "Password is required.";
+  } elseif (strlen($password) < 8) {
+      $errors['password'] = "The password must be at least 8 characters long.";
+  } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])  [A-Za-z\d@$!%*?&]{8,}$/', $password)) {
+      $errors['password'] = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
 }
 ```
 
@@ -114,13 +120,13 @@ if (empty($password)) {
 
 ```php
 // Validate email
-if (empty($email)) {
-    $errors['email'] = "Email is required.";
-} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors['email'] = "Please enter a valid email address.";
-} elseif (emailExists($email)) { // Assume this function checks if the email already exists in the database
-    $errors['email'] = "This email is already registered.";
-}
+  if (empty($email)) {
+      $errors['email'] = "Email is required.";
+  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $errors['email'] = "Please enter a valid email address.";
+  } elseif (emailExists($email)) { // Verify if the email already exists
+      $errors['email'] = "This email is already registered.";
+  }
 ```
 
 ### Manejo de Errores
@@ -129,23 +135,24 @@ if (empty($email)) {
 - Impide el registro si hay errores presentes.
 
 ```php
-// Check if there are any validation errors
-if (empty($errors)) {
-    // If everything is OK, we call the function to register the user
-    if (RegisterUser($username, $password, $email)) {
-        echo "User registered successfully.";
-        // Redirect to login page or send confirmation email
-        header("Location: login.php");
-        exit();
-    } else {
-        echo "An error occurred during registration. Please try again later.";
+// Initialize an array to store validation errors
+  $errors = [];
+// Check for validation errors
+  if (empty($errors)) {
+    try {
+      RegisterUser($username, $password, $email);
+      // Successful registration
+      $_SESSION['success_message'] = "User registered successfully.";
+      header("Location: login.php");
+      exit();
+    } catch (Exception $e) {
+      error_log("Registration error: " . $e->getMessage());
+      $errors['registration'] = "An error occurred during registration. Please try again later.";
     }
-} else {
-    // Display validation errors
-    foreach ($errors as $field => $message) {
-        echo "<p class='error'>$field: $message</p>";
-    }
-}
+  }
+
+  // Store errors in session to display them on the form
+  $_SESSION['register_errors'] = $errors;
 ```
 
 ## Uso del sistema
@@ -154,12 +161,6 @@ if (empty($errors)) {
 3. Si la validación tiene éxito, se llama a `RegisterUser`.
 4. En caso de registro exitoso, el usuario es redirigido a la página de inicio de sesión.
 5. Si el registro falla, se muestra un mensaje de error.
-
-## Consideraciones de seguridad adicionales
-- Implementar protección CSRF.
-- Agregar proceso de verificación de correo electrónico.
-- Implementar límites de velocidad para intentos de registro.
-- Usar HTTPS para todas las transacciones.
 
 # Sistema de Inicio de Sesión
 
@@ -198,6 +199,7 @@ function LoginUser($username, $pass) {
   if (!$connection) {
       die("Connection failed: " . mysqli_connect_error());
   }
+
   // Get user_secret and user_id in order to verify password & login
   $stmt = $connection->prepare("SELECT user_id, user_secret FROM USERS WHERE username = ?");
   $stmt->bind_param("s", $username);
@@ -241,7 +243,7 @@ Mediante el uso de funciones de validación se comprueban lo siguiente:
 ```php
 // Validate username
 if (!usernameExists($username)) {
-  $errors['username'] = "Invalid username.";
+  $errors['username'] = "Username does not exist.";
 }
 ```
 
@@ -250,9 +252,12 @@ if (!usernameExists($username)) {
 - Verificación contra hash almacenado.
 
 ```php
-// Validate password
-if (!validatePassword($username, $password)) {
-  $errors['password'] = "Invalid password.";
+// If username exists, then validate password
+if (empty($errors)) {
+  $user = LoginUser($username, $password);
+  if ($user === false) {
+      $errors['password'] = "Invalid password.";
+  }
 }
 ```
 
@@ -262,25 +267,21 @@ if (!validatePassword($username, $password)) {
 Redirección condicional según resultado.
 - Mensajes genéricos para evitar información sensible:
 ```php
-    // Check if there are any validation errors
-  if (empty($errors)) {
-    // If everything is OK, we call the function to log inthe user
-    if (LoginUser($username, $password)) {
-      echo "User registered successfully.";
-        // Redirect to dashboard page
-        header("Location: dashboard.php");
-        session_start();
-        $_SESSION['User_ID'] = $username['user_id'];
-        exit();
-    } else {
-      echo "An error occurred during log in. Please try again later.";
-    }
-  } else {
-    // Display validation errors
-    foreach ($errors as $field => $message) {
-      echo "<p class='error'>$field: $message</p>";
-    }
-  }
+// Initialize an array to store validation errors
+$errors = [];
+// Check for validation errors
+if (empty($errors)) {
+  // Successful login
+  $_SESSION['success_message'] = "User logged in successfully.";
+  $_SESSION['User_ID'] = $user['user_id'];
+  header("Location: dashboard.php"); // Redirect to the dashboard
+  exit();
+} else {
+  // Store errors in session to display them on the form
+  $_SESSION['login_errors'] = $errors;
+  header("Location: login.php"); // Redirect back to the login page
+  exit();
+}
 ```
 
 ## Uso del sistema
