@@ -45,7 +45,7 @@ function LoginUser($username, $pass)
   }
 
   // Obtener user_secret y user_id para verificar la contraseña e iniciar sesión
-  $stmt = $connection->prepare("SELECT user_id, user_secret FROM USERS WHERE username = ?");
+  $stmt = $connection->prepare("SELECT user_id, user_secret, user_type FROM USERS WHERE username = ?");
   $stmt->bind_param("s", $username);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -149,24 +149,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   // Verificar errores de validación
-  if (empty($errors)) {
-    // Inicio de sesión exitoso
-    session_regenerate_id(true); // Regenerar ID de sesión
-    $_SESSION['success_message'] = "Usuario conectado con éxito.";
-    $_SESSION['User_ID'] = $user['user_id'];
-    $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
-    if ($username === 'admin') {
-      header("Location: admin.php"); // Redirigir a la página de administrador
-    } else {
-      header("Location: dashboard.php"); // Redirigir al panel de control
-    }
-    exit();
-  } else {
-    // Almacenar errores en la sesión para mostrarlos en el formulario
-    $_SESSION['login_errors'] = $errors;
-    header("Location: login.php"); // Redirigir de vuelta a la página de inicio de sesión
-    exit();
+if (empty($errors)) {
+  // Inicio de sesión exitoso
+  session_regenerate_id(true); // Regenerar ID de sesión
+  $_SESSION['User_ID'] = $user['user_id'];
+  $_SESSION['user_type'] = $user['user_type'];
+  $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
+
+  // Eliminar variables innecesarias
+  unset($_SESSION['failed_attempts']);
+  unset($_SESSION['csrf_token']);
+  unset($_SESSION['csrf_token_expire']);
+
+  // Redirección basada en el user_type
+  switch ($_SESSION['user_type']) {
+      case 'admin':
+          header("Location: admin.php");
+          break;
+      case 'manager':
+          header("Location: manager.php");
+          break;
+      default:
+          header("Location: dashboard.php");
   }
+  exit();
+} else {
+  // Almacenar errores en la sesión para mostrarlos en el formulario
+  $_SESSION['login_errors'] = $errors;
+  header("Location: login.php"); // Redirigir de vuelta a la página de inicio de sesión
+  exit();
+}
 }
 
 // Renovación automática de sesión
@@ -191,6 +203,17 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
   <title>Iniciar sesión</title>
   <link rel="stylesheet" href="../assets/styles.css">
 </head>
+<header>
+  <h1>Inicia Sesión</h1>
+  <nav>
+    <ul>
+      <li><a href="../index.php">Inicio</a></li>
+      <li><a href="">Menú</a></li>
+      <li><a href="">Contacto</a></li>
+      <li><a href="../functions/register.php">Regístrate</a></li>
+    </ul>
+  </nav>
+</header>
 
 <body>
   <?php
@@ -210,5 +233,15 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
   </form>
   <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
 </body>
-
+<footer>
+  <p>KEBAB - Todos los derechos reservados</p>
+  <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
+  <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
+  <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>
+  <p><strong>Síguenos en:</strong> 
+    <a href="https://facebook.com/kebab" target="_blank">Facebook</a> | 
+    <a href="https://twitter.com/kebab" target="_blank">Twitter</a> | 
+    <a href="https://instagram.com/kebab" target="_blank">Instagram</a>
+  </p>
+</footer>
 </html>

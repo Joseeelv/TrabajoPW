@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$errors['password'] = "La contraseña es obligatoria.";
 	} elseif (strlen($password) < 8) {
 		$errors['password'] = "La contraseña debe tener al menos 8 caracteres.";
-	} elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
+	} elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,}$/', $password)) {
 		$errors['password'] = "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
 	}
 
@@ -143,6 +143,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 	<link rel="stylesheet" href="../assets/styles.css">
 </head>
+<header>
+  <h1>Regístrate</h1>
+  <nav>
+    <ul>
+      <li><a href="../index.php">Inicio</a></li>
+      <li><a href="">Menú</a></li>
+      <li><a href="">Contacto</a></li>
+      <li><a href="../functions/login.php">Inicia Sesión</a></li>
+    </ul>
+  </nav>
+</header>
 
 <body>
 	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -176,11 +187,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		</div>
 
 		<input type="text" name="email" placeholder="Email" required>
+		<input type="text" name="address" placeholder="Dirección" required>
 		<button type="submit" name="register">Registrarse</button>
 	</form>
 
 	<p>¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
-	<script src="../assets/password-strength-meter.js"></script>
+	<script src="../assets/js/password-strength-meter.js"></script>
 </body>
-
+<footer>
+  <p>KEBAB - Todos los derechos reservados</p>
+  <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
+  <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
+  <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>
+  <p><strong>Síguenos en:</strong> 
+    <a href="https://facebook.com/kebab" target="_blank">Facebook</a> | 
+    <a href="https://twitter.com/kebab" target="_blank">Twitter</a> | 
+    <a href="https://instagram.com/kebab" target="_blank">Instagram</a>
+  </p>
+</footer>
 </html>

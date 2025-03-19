@@ -55,3 +55,48 @@ button {
   border: none;
   cursor: pointer;
 }
+
+.carousel-container {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.carousel-images {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+.carousel-images img {
+  width: 100%;
+  height: auto;
+}
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+.carousel-button.prev { left: 10px; }
+.carousel-button.next { right: 10px; }
+.carousel-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+.indicator.active {
+  background: white;
+}
