@@ -6,7 +6,8 @@
 
 <body>
     <h1>Manager Dashboard</h1>
-
+    <a href='./functions/logout.php'>Cerrar sesión</a>
+    <h2>Reabastecer ingredientes y productos</h2>
     <?php
     require_once('./functions/.configDB.php');
     $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
@@ -96,11 +97,11 @@
             } else {
                 echo "<tr><td colspan='6'>No hay productos en stock</td></tr>";
             }
-    
+
             echo "</table>";
 
-        $connection->close();
-        ?>
+            $connection->close();
+            ?>
 </body>
 
 </html>
