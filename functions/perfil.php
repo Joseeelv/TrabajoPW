@@ -11,16 +11,7 @@ session_start();
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
 	<link rel="stylesheet" href="../assets/styles.css">
 </head>
-<header>
-  <nav>
-    <ul>
-      <li><a href="../functions/dashboard.php">Inicio</a></li>
-      <li><a href="">Carta</a></li>
-      <li><a href="../functions/puntos.php">Puntos Obtenidos</a></li>
-      <li><a href="../index.php">Cerrar Sesión</a></li>
-    </ul>
-  </nav>
-</header>
+<?php include('header.php'); ?>
 <body>
   <div class="container">
     <h2>Modificar Perfil</h2>
@@ -41,15 +32,5 @@ session_start();
     </form>
   </div>
 </body>
-<footer>
-  <p>KEBAB - Todos los derechos reservados</p>
-  <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
-  <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
-  <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>
-  <p><strong>Síguenos en:</strong> 
-    <a href="https://facebook.com/kebab" target="_blank">Facebook</a> | 
-    <a href="https://twitter.com/kebab" target="_blank">Twitter</a> | 
-    <a href="https://instagram.com/kebab" target="_blank">Instagram</a>
-  </p>
-</footer>
+<?php include('footer.php'); ?>
 </html>
