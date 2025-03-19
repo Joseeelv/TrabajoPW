@@ -1,22 +1,22 @@
--- Insert statements for Kebab database
--- Insert users
-INSERT INTO USERS (username, user_secret, email, img_src) VALUES
-('cliente1', 'P@ssword123', 'cliente1@example.com', 'cliente1.jpg'),
-('cliente2', 'S3guro!456', 'cliente2@example.com', 'cliente2.jpg'),
-('gerente1', 'M@nager789', 'gerente1@example.com', 'gerente1.jpg'),
-('gerente2', 'Adm1n*2024', 'gerente2@example.com', 'gerente2.jpg');
+-- Scrip maestro de datos iniciales para la base de datos Kebab
+-- Insertar usuarios
+INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
+('cliente1', 'P@ssword123', 'cliente1@example.com', 'customer', 'cliente1.jpg'),
+('cliente2', 'S3guro!456', 'cliente2@example.com', 'customer', 'cliente2.jpg'),
+('gerente1', 'M@nager789', 'gerente1@example.com', 'manager', 'gerente1.jpg'),
+('gerente2', 'Adm1n*2024', 'gerente2@example.com', 'manager', 'gerente2.jpg');
 
--- Insert customers
+-- Insertar clientes
 INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUES
 (1, 'Calle Falsa 123, Ciudad A', 50),
 (2, 'Avenida Real 456, Ciudad B', 100);
 
--- Insert managers
+-- Insertar managers
 INSERT INTO MANAGERS (user_id, salary) VALUES
 (3, 2500),
 (4, 3000);
 
--- Insert products
+-- Insertar productos
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES
 ('Döner de pollo', 6.00, 'Döner', 'döner_pollo.jpg', NULL, NULL),
 ('Döner de ternera', 6.00, 'Döner', 'döner_ternera.jpg', NULL, NULL),
@@ -41,7 +41,7 @@ INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stoc
 ('Baklava', 2.00, 'Dessert', 'baklava.jpg', 1.00, 20),
 ('Helado', 2.00, 'Dessert', 'helado.jpg', 1.00, 20);
 
--- Insert ingredients
+-- Insertar ingredientes
 INSERT INTO INGREDIENTS (ingredient_name, cost, stock, vegan) VALUES
 ('Pan de pita', 0.50, 100, TRUE),
 ('Tortillas', 0.50, 100, TRUE),
@@ -62,6 +62,7 @@ INSERT INTO INGREDIENTS (ingredient_name, cost, stock, vegan) VALUES
 ('Aceite de oliva', 0.50, 100, TRUE),
 ('Sal', 0.10, 100, TRUE);
 
+-- Insertar alergenos
 INSERT INTO ALLERGENS
 (allergen_name, img_src) VALUES
 ('Gluten', 'gluten.jpg'),
@@ -79,7 +80,7 @@ INSERT INTO ALLERGENS
 ('Altramuz', 'altramuz.jpg'),
 ('Moluscos', 'moluscos.jpg');
 
--- Insert ingredients_allergens
+-- Insertar ingredientes_alergenos
 INSERT INTO INGREDIENTS_ALLERGENS (ingredient_id, allergen_id) VALUES
 -- Pan de pita, Tortillas y Base de lahmacun contienen gluten
 (1, 1),  -- Pan de pita - Gluten
@@ -115,7 +116,7 @@ INSERT INTO PRODUCTS_NO_INGREDIENTS_ALLERGENS (product_id, allergen_id) VALUES
 (8, 8)   -- Helado - Frutos secos
 ;
 
--- Insert products_ingredients
+-- Insertar productos_ingredientes
 INSERT INTO PRODUCTS_INGREDIENTS (product_id, ingredient_id) VALUES
 -- Döner de pollo
 (1, 1),  -- Pan de pita

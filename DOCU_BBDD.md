@@ -294,26 +294,10 @@ CREATE TABLE REPLENISHMENTS (
     replenishment_id INT PRIMARY KEY AUTO_INCREMENT,
     manager_id INT NOT NULL,
     replenishment_date DATE NOT NULL,
-    FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE
-);
-```
-
-En esta tabla se almacenan los reabastecimientos de stock realizados por los managers.
-
-- **replenishment_id**: Identificador único del reabastecimiento.
-- **manager_id**: Identificador único del manager, clave foránea de la tabla MANAGERS.
-ánea de la tabla MANAGERS.
-- **replenishment_date**: Fecha en la que se realizó el reabastecimiento.
-
-## Tabla REPLENISHMENTS_DETAILS
-```sql
-CREATE TABLE REPLENISHMENTS_DETAILS (
-    item_id INT AUTO_INCREMENT PRIMARY KEY,
-    replenishment_id INT NOT NULL,
-    ingredient_id INT ,
+    ingredient_id INT,
     prod_id INT,
     quantity INT NOT NULL,
-    FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
+    FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE,
     FOREIGN KEY (prod_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
     CHECK (
@@ -323,13 +307,15 @@ CREATE TABLE REPLENISHMENTS_DETAILS (
 );
 ```
 
-En esta tabla se almacenan los detalles de los reabastecimientos de stock realizados por los managers.
+En esta tabla se almacenan los reabastecimientos de stock realizados por los managers.
 
-- **item_id**: Identificador único del detalle del reabastecimiento.
-- **replenishment_id**: Identificador único del reabastecimiento, clave foránea de la tabla REPLENISHMENTS.
+- **replenishment_id**: Identificador único del reabastecimiento.
+- **manager_id**: Identificador único del manager, clave foránea de la tabla MANAGERS.
+ánea de la tabla MANAGERS.
+- **replenishment_date**: Fecha en la que se realizó el reabastecimiento.
 - **ingredient_id**: Identificador único del ingrediente, clave foránea de la tabla INGREDIENTS.
 - **prod_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS.
-- **quantity**: Cantidad de unidades del ingrediente o producto que se reabastece.
+- **quantity**: Cantidad de unidades reabastecidas.
 
 ## Tabla TRANSACTIONS
 ```sql
