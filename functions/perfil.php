@@ -12,14 +12,7 @@ session_start();
 	<link rel="stylesheet" href="../assets/styles.css">
 </head>
 <header>
-  <nav>
-    <ul>
-      <li><a href="../functions/dashboard.php">Inicio</a></li>
-      <li><a href="">Carta</a></li>
-      <li><a href="../functions/puntos.php">Puntos Obtenidos</a></li>
-      <li><a href="../index.php">Cerrar Sesión</a></li>
-    </ul>
-  </nav>
+  <?php include('../functions/navbar.php'); ?>
 </header>
 <body>
   <div class="container">

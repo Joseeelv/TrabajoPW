@@ -41,15 +41,8 @@ $row = $result->fetch_assoc();
     ?>
     <img src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
   </h1>
-  <nav>
-    <ul>
-      <li><a href="">Inicio</a></li>
-      <li><a href="">Carta</a></li>
-      <li><a href="../functions/perfil.php">Perfil</a></li>
-      <li><a href="../functions/logout.php">Cerrar Sesión</a></li>
-    </ul>
+    <?php include('../functions/navbar.php'); ?>
     <a href="../functions/puntos.php">Puntos Obtenidos</a>
-  </nav>
 </header>
 <body>
   <div class="carousel">
