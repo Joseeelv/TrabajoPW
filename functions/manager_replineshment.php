@@ -51,18 +51,19 @@
                 echo "<td>" . $row["cost"] . "</td>";
                 echo "<td>" . $row["stock"] . "</td>";
                 echo "<td>";
-        ?>
+                ?>
                 <form action='replenishment.php' method='POST'>
                     <input type='hidden' name='ingredient_id' value='<?php echo $row["ingredient_id"]; ?>'>
                     <input type='hidden' name='cost' value='<?php echo $row["cost"]; ?>'>
-                    <input type='number' name='quantity' value='10' min='1' required>
+                    <?php $max_items = 999.99 / $row["cost"]; ?>
+                    <input type='number' name='quantity' value='10' min='1' max='<?php echo $max_items ?>' required>
                     </td>
                     <td>
                         <input type='submit' value='+'>
                 </form>
                 </td>
                 </tr>
-        <?php
+                <?php
             }
         } else {
             echo "<tr><td colspan='6'>No hay ingredientes en stock</td></tr>";
@@ -89,18 +90,19 @@
                     echo "<td>" . $row["cost"] . "</td>";
                     echo "<td>" . $row["stock"] . "</td>";
                     echo "<td>";
-            ?>
+                    ?>
                     <form action='replenishment.php' method='POST'>
                         <input type='hidden' name='product_id' value='<?php echo $row["product_id"]; ?>'>
                         <input type='hidden' name='cost' value='<?php echo $row["cost"]; ?>'>
-                        <input type='number' name='quantity' value='10' min='1' required>
+                        <?php $max_items = 999.99 / $row["cost"]; ?>
+                        <input type='number' name='quantity' value='10' min='1' max='<?php echo $max_items ?>' required>
                         </td>
                         <td>
                             <input type='submit' value='+'>
                     </form>
                     </td>
                     </tr>
-            <?php
+                    <?php
                 }
             } else {
                 echo "<tr><td colspan='6'>No hay productos en stock</td></tr>";
@@ -111,7 +113,7 @@
             $connection->close();
             include('footer.php');
             ?>
-        
+
 </body>
 
 </html>
