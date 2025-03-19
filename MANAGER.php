@@ -82,7 +82,7 @@
                     echo "<td>" . $row["stock"] . "</td>";
                     echo "<td>";
                     ?>
-                    <form action='./functions/order_ingredients.php' method='POST'>
+                    <form action='./functions/replenishment.php' method='POST'>
                         <input type='hidden' name='product_id' value='<?php echo $row["product_id"]; ?>'>
                         <input type='hidden' name='cost' value='<?php echo $row["cost"]; ?>'>
                         <input type='number' name='quantity' value='10' min='1' required>

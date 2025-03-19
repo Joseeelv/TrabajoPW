@@ -1,8 +1,8 @@
 # Funciones realizadas por Ale
 
-## order_ingredients.php
+## replenishment.php
 
-Archivo que se encarga de pedir los ingredientes de un producto a la base de datos.
+Archivo que se encarga de pedir los ingredientes de un producto y los productos que tengan stock a la base de datos.
 
 ### Precondiciones
 
@@ -12,40 +12,38 @@ Archivo que se encarga de pedir los ingredientes de un producto a la base de dat
 $_SESSION['user_id'] // debe ser manager
 ```
 
-- Se debe haber enviado un POST con el id del ingrediente y su cantidad.
+- Se debe haber enviado un POST con el id del ingrediente o de producto, su cantidad y su coste.
 
 ```php
 $_POST['ingredient_id']
+$_POST['product_id']
 $_POST['quantity']
+$_POST['cost']
 ```
 
 ### Postcondiciones
 
-- Crea la reposición en la tabla REPLENISHMENTS
-
+- Crea la reposición en la tabla 
 ```sql
-INSERT INTO REPLENISHMENTS (manager_id, replenishment_date) VALUES ($_SESSION['user_id'], NOW())
--- Guardamos el id de la reposición en $replenishment_id
-```
-
-- Crea la reposición en la tabla REPLENISHMENTS_DETAILS
-
-```sql
-INSERT INTO REPLENISHMENTS_DETAILS (replenishment_id, ingredient_id, quantity) VALUES ($replenishment_id;, $_POST['ingredient_id'], $_POST['quantity'])
+INSERT INTO REPLENISHMENTS (manager_id, replenishment_date, ingredient_id/product_id, quantity) VALUES ($manager_id, NOW(), $ingredient_id/$product_id, $quantity)
 ```
 
 - Añade la transaccion a la tabla TRANSACTIONS
 
 ```sql
+$total_cost = $quantity * $cost;
+
 INSERT INTO TRANSACTIONS (order_id, replenishment_id, transaction_money)
-VALUES (NULL, $replenishment_id, (SELECT cost * $_POST['quantity'] FROM INGREDIENTS WHERE ingredient_id = $_POST['ingredient_id']))
+VALUES (NULL, $replenishment_id, $total_cost)
 ```
 
-- Actualiza el stock de la tabla INGREDIENTS
+- Actualiza el stock de la tabla INGREDIENTS o PRODUCTS
 
 ```sql
 UPDATE INGREDIENTS SET stock = stock + $_POST['quantity'] WHERE ingredient_id = $_POST['ingredient_id']
 ```
-
+```sql
+UPDATE PRODUCTS SET stock = stock + $_POST['quantity'] WHERE product_id = $_POST['product_id']
+```
 - Te redirige a manager.php
 
