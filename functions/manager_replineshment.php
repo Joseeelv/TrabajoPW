@@ -1,15 +1,23 @@
 <html>
 
 <head>
-    <title>Manager Dashboard</title>
+    <title>Manager Replineshment</title>
 </head>
 
 <body>
-    <h1>Manager Dashboard</h1>
-    <a href='./functions/logout.php'>Cerrar sesión</a>
-    <h2>Reabastecer ingredientes y productos</h2>
     <?php
-    require_once('./functions/.configDB.php');
+    include('./manager_header.php');
+
+    session_start();
+    if (isset($_SESSION['success_message'])) {
+        echo '<div class="alert alert-success">' . $_SESSION['success_message'] . '</div>';
+        unset($_SESSION['success_message']); // Eliminar mensaje después de mostrarlo
+    }
+
+    ?>
+    <h1>Reabastecer productos</h1>
+    <?php
+    require_once('.configDB.php');
     $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
     if (!$connection) {
         die("Connection failed: " . mysqli_connect_error());
@@ -43,8 +51,8 @@
                 echo "<td>" . $row["cost"] . "</td>";
                 echo "<td>" . $row["stock"] . "</td>";
                 echo "<td>";
-                ?>
-                <form action='./functions/order_ingredients.php' method='POST'>
+        ?>
+                <form action='replenishment.php' method='POST'>
                     <input type='hidden' name='ingredient_id' value='<?php echo $row["ingredient_id"]; ?>'>
                     <input type='hidden' name='cost' value='<?php echo $row["cost"]; ?>'>
                     <input type='number' name='quantity' value='10' min='1' required>
@@ -54,7 +62,7 @@
                 </form>
                 </td>
                 </tr>
-                <?php
+        <?php
             }
         } else {
             echo "<tr><td colspan='6'>No hay ingredientes en stock</td></tr>";
@@ -81,8 +89,8 @@
                     echo "<td>" . $row["cost"] . "</td>";
                     echo "<td>" . $row["stock"] . "</td>";
                     echo "<td>";
-                    ?>
-                    <form action='./functions/replenishment.php' method='POST'>
+            ?>
+                    <form action='replenishment.php' method='POST'>
                         <input type='hidden' name='product_id' value='<?php echo $row["product_id"]; ?>'>
                         <input type='hidden' name='cost' value='<?php echo $row["cost"]; ?>'>
                         <input type='number' name='quantity' value='10' min='1' required>
@@ -92,7 +100,7 @@
                     </form>
                     </td>
                     </tr>
-                    <?php
+            <?php
                 }
             } else {
                 echo "<tr><td colspan='6'>No hay productos en stock</td></tr>";
@@ -101,7 +109,9 @@
             echo "</table>";
 
             $connection->close();
+            include('footer.php');
             ?>
+        
 </body>
 
 </html>
