@@ -193,25 +193,24 @@ CREATE TABLE TRANSACTIONS (
         OR replenishment_id IS NOT NULL
     )
 );
-
 -- Scrip maestro de datos iniciales para la base de datos Kebab
 -- Insertar usuarios
+
 INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
-('cliente1', 'P@ssword123', 'cliente1@example.com', 'customer', 'cliente1.jpg'),
-('cliente2', 'S3guro!456', 'cliente2@example.com', 'customer', 'cliente2.jpg'),
-('gerente1', 'M@nager789', 'gerente1@example.com', 'manager', 'gerente1.jpg'),
-('admin', 'admin', 'admin@example.com', 'admin', 'admin.jpg'),
-('gerente2', 'Adm1n*2024', 'gerente2@example.com', 'manager', 'gerente2.jpg');
+('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'default.jpg'),
+('user1', '$2y$10$fD2Z7brBG3z/piz6bIcP1OxY1BEuz3IylAm.57A7StxY09Ra2NUd2', 'user1@gmail.com', 'customer', 'default.jpg'),
+('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@gmail.com', 'manager', 'default.jpg');
+-- Admin123_
+-- Useruser1_
+-- Managermanager1_
 
 -- Insertar clientes
-INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUES
-(1, 'Calle Falsa 123, Ciudad A', 50),
+INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUE
 (2, 'Avenida Real 456, Ciudad B', 100);
 
 -- Insertar managers
 INSERT INTO MANAGERS (user_id, salary) VALUES
-(3, 2500),
-(4, 3000);
+(3, 2500);
 
 -- Insertar productos
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES
