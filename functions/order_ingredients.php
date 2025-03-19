@@ -1,6 +1,7 @@
 <?php
 require_once('.configDB.php');
 $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+// CAMBIAR POR $_SESSION["$BD_Conection"]
 if (!$connection) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -16,12 +17,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["ingredient_id"]) || i
 
     // Crear la reposición en REPLENISHMENTS si es un ingrediente
     if (isset($_POST["ingredient_id"])) {
-
         $sql_replenishment = "INSERT INTO REPLENISHMENTS (manager_id, replenishment_date, ingredient_id, quantity) VALUES (?, NOW(), ?, ?)";
         $stmt = $connection->prepare($sql_replenishment);
         $stmt->bind_param("iii", $manager_id, $ingredient_id, $quantity);
     } else if (isset($_POST["product_id"])) {
-
         $sql_replenishment = "INSERT INTO REPLENISHMENTS (manager_id, replenishment_date, product_id, quantity) VALUES (?, NOW(), ?, ?)";
         $stmt = $connection->prepare($sql_replenishment);
         $stmt->bind_param("iii", $manager_id, $product_id, $quantity);
