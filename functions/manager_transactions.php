@@ -10,37 +10,56 @@
     session_start();
     require_once('.configDB.php');
 
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-    if (!$connection) {
-        die("Error de conexión: " . mysqli_connect_error());
+    $connection = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if ($connection->connect_error) {
+        die("Error de conexión: " . $connection->connect_error);
     }
 
-    // Consulta para obtener las transacciones con la fecha adecuada
+    // Consulta para obtener las transacciones con la fecha y el manager asociado
     $query = "
         SELECT 
             T.transaction_id, 
+            -- COALESCE selecciona la primera fecha no nula entre la fecha de orden y la de reposición
             COALESCE(O.order_date, R.replenishment_date) AS transaction_date, 
+            
+            -- COALESCE selecciona el nombre del manager de la orden o reposición
+            COALESCE(O.user_id, R.manager_id) AS user_id,
+
+            -- CASE determina si la transacción es una Venta o una Compra
             CASE 
                 WHEN T.order_id IS NOT NULL THEN 'Venta' 
                 ELSE 'Compra' 
             END AS transaction_type,
+            
+            -- CASE ajusta el signo del balance según si es reposición (negativo) o venta (positivo)
             CASE 
                 WHEN T.replenishment_id IS NOT NULL THEN -T.transaction_money 
                 ELSE T.transaction_money 
             END AS balance
         FROM TRANSACTIONS T
+        
+        -- LEFT JOIN para unir las órdenes y obtener su fecha si existen
         LEFT JOIN ORDERS O ON T.order_id = O.order_id
+        
+         -- LEFT JOIN para unir los usuarios y obtener su nombre si existen
+        LEFT JOIN USERS U ON O.user_id = U.user_id
+        
+
+        -- LEFT JOIN para unir las reposiciones y obtener su fecha si existen
         LEFT JOIN REPLENISHMENTS R ON T.replenishment_id = R.replenishment_id
+        
         ORDER BY transaction_date DESC;
     ";
 
-    $result = mysqli_query($connection, $query);
+    $stmt = $connection->prepare($query);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     // Calcular el resumen de todas las transacciones
     $total_ventas = 0;
     $total_compras = 0;
 
-    while ($row = mysqli_fetch_assoc($result)) {
+    while ($row = $result->fetch_assoc()) {
         if ($row['balance'] > 0) {
             $total_ventas += $row['balance'];
         } else {
@@ -51,7 +70,7 @@
     $balance_final = $total_ventas - $total_compras;
 
     // Reiniciar el puntero del resultado para recorrerlo de nuevo
-    mysqli_data_seek($result, 0);
+    $result->data_seek(0);
     ?>
 
     <h1>Resumen de Transacciones</h1>
@@ -70,8 +89,8 @@
         </tr>
 
         <?php
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
                 echo "<tr>";
                 echo "<td>" . $row["transaction_date"] . "</td>";
                 echo "<td>" . $row["transaction_type"] . "</td>";
@@ -85,7 +104,8 @@
     </table>
 
     <?php
-    mysqli_close($connection);
+    $stmt->close();
+    $connection->close();
     ?>
 </body>
 
