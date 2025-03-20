@@ -5,18 +5,23 @@ $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
 if (!$connection) {
   die("Conexión fallida: " . mysqli_connect_error());
 }
-//Obtener la imagen del usuario
-$stmt = $connection->prepare("SELECT img_src, user_id FROM USERS WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-
+$user_id = htmlspecialchars($_SESSION['user_id']);
 //Obtener los puntos de un usuario
 $stmt = $connection->prepare("SELECT points FROM CUSTOMERS WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
+$_SESSION['points'] = $row['points'];
+
+
+// Obtener la imagen del usuario
+$stmt = $connection->prepare("SELECT img_src FROM USERS WHERE user_id = ?");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
 
 ?>
 <!DOCTYPE html>
@@ -29,22 +34,27 @@ $row = $result->fetch_assoc();
 	<link rel="stylesheet" href="../assets/styles.css">
 </head>
 <header>
-  <h1>
+    <?php include('./navbar.php');?>
+</header>
+<body>
+<h1>
     Hola
     <?php 
       // Verificar si el usuario está logueado
-      if (isset($_SESSION['username'])) {
-        echo htmlspecialchars($_SESSION['username']);
-      }else{
+      if (isset($_SESSION['username']) && isset($_SESSION['user_id'])) {
+        $username = $_SESSION['username'];
+        echo htmlspecialchars($username);
+        $image = "../assets/images/perfiles/".$row['img_src'] ?? '../assets/images/perfiles/default.jpg'; // Imagen por defecto si no hay imagen
+      } else {
         echo "Invitado!";
+        $image = '../assets/images/perfiles/default.jpg'; // Imagen por defecto para invitados
       }
-    ?>
-    <img src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
+      ?>
   </h1>
-    <?php include('../functions/navbar.php'); ?>
-    <a href="../functions/puntos.php">Puntos Obtenidos</a>
-</header>
-<body>
+    <div style="text-align: right;">
+      <img src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser" style="width: 50px; height: 50px; border-radius: 50%; vertical-align: middle; margin-left: 10px; position: absolute; top: 50px; right: 10px;">
+    </div>
+    <p style="margin: 0 auto; text-align: center;">Tienes <?php echo htmlspecialchars($_SESSION['points']);?> puntos</p>
   <div class="carousel">
     <div class="carousel-images">
       <img src="../assets/images/image1.jpeg" alt="Imagen 1">
@@ -55,7 +65,6 @@ $row = $result->fetch_assoc();
   <script href="../assets/js/carrousel.js"></script>
 </body>
 <footer>
-  <p>KEBAB - Todos los derechos reservados</p>
   <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
   <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
   <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>

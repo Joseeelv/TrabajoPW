@@ -11,7 +11,7 @@ CREATE TABLE USERS (
     user_secret VARCHAR(100) NOT NULL,
     email VARCHAR(30) NOT NULL UNIQUE,
     user_type ENUM('customer', 'manager', 'admin') NOT NULL,
-    img_src VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
+    img_src VARCHAR(255) NOT NULL
 );
 
 /* Tabla de clientes: Almacena información adicional para los clientes */
@@ -197,20 +197,7 @@ CREATE TABLE TRANSACTIONS (
 -- Insertar usuarios
 
 INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
-('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'default.jpg'),
-('user1', '$2y$10$fD2Z7brBG3z/piz6bIcP1OxY1BEuz3IylAm.57A7StxY09Ra2NUd2', 'user1@gmail.com', 'customer', 'default.jpg'),
-('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@gmail.com', 'manager', 'default.jpg');
--- Admin123_
--- Useruser1_
--- Managermanager1_
-
--- Insertar clientes
-INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUE
-(2, 'Avenida Real 456, Ciudad B', 100);
-
--- Insertar managers
-INSERT INTO MANAGERS (user_id, salary) VALUES
-(3, 2500);
+('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'admin.jpg');
 
 -- Insertar productos
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES
@@ -486,12 +473,3 @@ INSERT INTO MENUS_CONTENTS (menu_product_id, product_id, quantity) VALUES
  (SELECT product_id FROM PRODUCTS WHERE product_name = 'Patatas Fritas'), 1),
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Ahorro'), 
  (SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Pequeño'), 1);
-
--- Insertar ofertas en la tabla OFFERS
-INSERT INTO OFFERS (prod_id, cost, discount, offer_text) VALUES
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de pollo'), 300, 20.00, '¡20% de descuento en Döner de pollo esta semana!'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Familiar'), 500, 15.00, 'Menú Familiar con un 15% de descuento por tiempo limitado.'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Grande'), 100, 10.00, 'Refresco Grande con 10% de descuento al pedir cualquier menú.'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Durum de ternera'), 50, 25.00, '¡OFERTA FLASH! 25% de descuento en Durum de ternera solo hoy.'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú 3x2 Döner'), 1000, 18.00, 'Pide el Menú 3x2 Döner y ahorra un 18% en tu compra.'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Lahmacun de pollo'), 200, 30.00, 'Lahmacun de pollo con un 30% de descuento esta semana.');

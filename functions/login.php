@@ -152,7 +152,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 if (empty($errors)) {
   // Inicio de sesión exitoso
   session_regenerate_id(true); // Regenerar ID de sesión
-  $_SESSION['User_ID'] = $user['user_id'];
+  $_SESSION['user_id'] = $user['user_id'];
+  $_SESSION['username'] = $username;
   $_SESSION['user_type'] = $user['user_type'];
   $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
 
@@ -204,18 +205,16 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
   <link rel="stylesheet" href="../assets/styles.css">
 </head>
 <header>
-  <h1>Inicia Sesión</h1>
-  <nav>
-    <ul>
-      <li><a href="../index.php">Inicio</a></li>
-      <li><a href="">Menú</a></li>
-      <li><a href="">Contacto</a></li>
-      <li><a href="../functions/register.php">Regístrate</a></li>
-    </ul>
+  <nav class="navbar">
+      <h1><a href="../index.html" class="menu-link">Kebab</a></h1> 
+      <a href="../index.html" class="menu-link">Inicio</a>
+      <a href="" class="menu-link">Carta</a>
+      <a href="" class="menu-link">Contacto</a>
+      <a href="./register.php" class="menu-link">Regístrate</a>
   </nav>
 </header>
 
-<body>
+<body class="body-login">
   <?php
   // Mostrar errores si los hay
   if (isset($_SESSION['login_errors'])) {
@@ -225,6 +224,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
     unset($_SESSION['login_errors']); // Limpiar los errores después de mostrarlos
   }
   ?>
+  <h1>Inicia Sesión</h1> 
   <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
     <input type="text" name="username" placeholder="Nombre de usuario" required>
     <input type="password" name="password" placeholder="Contraseña" required>
