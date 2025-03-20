@@ -54,12 +54,9 @@ $row = $result->fetch_assoc();
     <div style="text-align: right;">
       <img src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser" style="width: 50px; height: 50px; border-radius: 50%; vertical-align: middle; margin-left: 10px; position: absolute; top: 50px; right: 10px;">
     </div>
-    <p style="margin: 0 auto; text-align: center;">Tienes <?php echo htmlspecialchars($_SESSION['points']);?> puntos</p>
   <div class="carousel">
     <div class="carousel-images">
-      <img src="../assets/images/image1.jpeg" alt="Imagen 1">
       <img src="../assets/images/image2.jpg" alt="Imagen 2">
-      <img src="../assets/images/image3.jpeg" alt="Imagen 3">
     </div>
   </div>
   <script href="../assets/js/carrousel.js"></script>

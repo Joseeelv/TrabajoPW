@@ -206,7 +206,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
 </head>
 <header>
   <nav class="navbar">
-      <h1><a href="../index.html" class="menu-link">Kebab</a></h1> 
+      <h1>Kebab</h1> 
       <a href="../index.html" class="menu-link">Inicio</a>
       <a href="" class="menu-link">Carta</a>
       <a href="" class="menu-link">Contacto</a>
