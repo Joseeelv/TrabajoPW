@@ -111,7 +111,7 @@ CREATE TABLE ORDERS (
     order_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     order_date DATE NOT NULL,
-    order_status ENUM('pending', 'delivered', 'cancelled') NOT NULL,
+    order_status ENUM('pendiente', 'entregado', 'cancelado') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE
 );
 
