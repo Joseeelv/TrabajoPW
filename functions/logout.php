@@ -1,7 +1,4 @@
 <?php
-// Iniciar la sesión
-session_start();
-
 // Destruir todas las variables de sesión
 $_SESSION = array();
 
@@ -15,8 +12,7 @@ if (ini_get("session.use_cookies")) {
 
 // Finalmente, destruir la sesión
 session_destroy();
-
 // Redirigir a la página de inicio o de login
-header("Location: ../index.html");
+header("Location: ../index.php");
 exit();
 ?>

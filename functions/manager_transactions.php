@@ -2,18 +2,13 @@
 
 <head>
     <title>Historial de Transacciones</title>
+    <link rel="stylesheet" href="../assets/styles.css">
 </head>
 
 <body>
     <?php
-    include('./manager_header.php');
-    session_start();
-    require_once('.configDB.php');
-
-    $connection = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-    if ($connection->connect_error) {
-        die("Error de conexión: " . $connection->connect_error);
-    }
+    include('./navbar.php');
+    $connection = include('./conexion.php');
 
     // Consulta para obtener las transacciones con la fecha y el manager asociado
     $query = "
@@ -105,7 +100,7 @@
 
     <?php
     $stmt->close();
-    $connection->close();
+    include('./footer.php');
     ?>
 </body>
 

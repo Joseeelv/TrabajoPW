@@ -1,11 +1,6 @@
 <?php
 session_start();
-require_once('.configDB.php');
-$connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-if (!$connection) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+$connection = include('./conexion.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["ingredient_id"]) || isset($_POST["product_id"])) && isset($_POST["quantity"])) {
     if (isset($_POST["ingredient_id"]))
@@ -14,7 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["ingredient_id"]) || i
         $product_id = intval($_POST["product_id"]);
     $quantity = intval($_POST["quantity"]);
     $cost = floatval($_POST["cost"]);
-    $manager_id = 3; // CAMBIAR POR EL ID DEL MANAGER DE LA SESSION
+    $manager_id = $_SESSION["user_id"];
 
     if (isset($_POST["ingredient_id"])) {
         $sql_replenishment = "INSERT INTO REPLENISHMENTS (manager_id, replenishment_date, ingredient_id, quantity) VALUES (?, NOW(), ?, ?)";
@@ -44,8 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["ingredient_id"]) || i
         $stmt->bind_param("ii", $quantity, $product_id);
     }
     $stmt->execute();
-    mysqli_close($connection);
-
     // Guardar mensaje en sesión
     $_SESSION['success_message'] = "Reposición de " . (isset($_POST["ingredient_id"]) ? "ingrediente" : "producto") . " exitosa.";
 

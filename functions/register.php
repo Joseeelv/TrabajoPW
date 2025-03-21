@@ -34,11 +34,7 @@ header("Permissions-Policy: geolocation=(), camera=()");
 
 // Función para registrar un nuevo usuario
 function RegisterUser($username, $pass, $email, $address) {
-    require_once('.configDB.php');
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-    if (!$connection) {
-        throw new Exception("Error al conectar a la base de datos: " . mysqli_connect_error());
-    }
+    $connection = include('./conexion.php');
 
     mysqli_begin_transaction($connection);
 
@@ -177,7 +173,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
 <header>
     <nav class="navbar">
         <h1>Kebab</h1>
-        <a href="../index.html" class="menu-link">Inicio</a>
+        <a href="../index.php" class="menu-link">Inicio</a>
         <a href="" class="menu-link">Carta</a>
         <a href="" class="menu-link">Contacto</a>
         <a href="./login.php" class="menu-link">Inicia Sesión</a>
@@ -222,17 +218,6 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
 
     <p>¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
     <script src="../assets/js/password-strength-meter.js"></script>
-
-    <footer>
-        <p>KEBAB - Todos los derechos reservados</p>
-        <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
-        <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
-        <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>
-        <p><strong>Síguenos en:</strong>
-            <a href="https://facebook.com/kebab" target="_blank">Facebook</a> |
-            <a href="https://twitter.com/kebab" target="_blank">Twitter</a> |
-            <a href="https://instagram.com/kebab" target="_blank">Instagram</a>
-        </p>
-    </footer>
+    <?php include('./footer.php'); ?>
 </body>
 </html>

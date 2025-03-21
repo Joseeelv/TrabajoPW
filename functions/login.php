@@ -10,7 +10,7 @@ session_set_cookie_params([
   'samesite' => 'Strict'
 ]);
 
-session_start(); // Iniciar la sesión
+session_start(); // Iniciar la sesión          
 
 // Configuración de seguridad
 const SECURITY = [
@@ -18,6 +18,95 @@ const SECURITY = [
   'lockout_time' => 1800, // 30 minutos
   'csrf_token_expire' => 3600 // 1 hora
 ];
+
+
+// Importar una biblioteca de validación o definir funciones de validación
+require_once('validations.php');
+
+// Verificar si se envió el formulario
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  // Validar token CSRF
+  if (!validateCsrfToken($_POST['csrf_token'])) {
+    die("Token CSRF inválido");
+  }
+
+  // Recopilar y sanitizar datos de entrada
+  $username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
+  $password = $_POST['password']; // No sanitizar contraseñas
+
+  // Inicializar un array para almacenar errores de validación
+  $errors = [];
+
+  // Verificar si el usuario está bloqueado
+  if (isUserLocked($username)) {
+    $errors['username'] = "La cuenta está temporalmente bloqueada. Por favor, inténtelo más tarde.";
+  } else {
+    // Validar nombre de usuario
+    if (!usernameExists($username)) {
+      $errors['username'] = "El nombre de usuario no existe.";
+    }
+
+    // Si el nombre de usuario existe, entonces validar la contraseña
+    if (empty($errors)) {
+      $user = LoginUser($username, $password);
+      if ($user === false) {
+        $errors['password'] = "Contraseña inválida.";
+        logFailedAttempt($username);
+      }
+    }
+  }
+
+  // Verificar errores de validación
+  if (empty($errors)) {
+    // Inicio de sesión exitoso
+    session_regenerate_id(true); // Regenerar ID de sesión
+    $_SESSION['user_id'] = $user['user_id'];
+    $_SESSION['username'] = $username;
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['DB_conexion'] = $connection;
+    $_SESSION['user_type'] = $user['user_type'];
+    $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
+
+    // Eliminar variables innecesarias
+    unset($_SESSION['failed_attempts']);
+    unset($_SESSION['csrf_token']);
+    unset($_SESSION['csrf_token_expire']);
+
+    // Redirección basada en el user_type
+    switch ($_SESSION['user_type']) {
+      case 'admin':
+        header("Location: ./admin.php");
+        break;
+      case 'manager':
+        header("Location: ./manager_index.php");
+        break;
+      case 'customer':
+        header("Location: ./dashboard.php");
+        break;
+      default:
+        header("Location: ./login.php");
+        break;
+    }
+    exit();
+  } else {
+    // Almacenar errores en la sesión para mostrarlos en el formulario
+    $_SESSION['login_errors'] = $errors;
+    header("Location: login.php"); // Redirigir de vuelta a la página de inicio de sesión
+    exit();
+  }
+}
+
+// Renovación automática de sesión
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+  session_regenerate_id(true);
+  $_SESSION['last_activity'] = time();
+}
+
+// Forzar HTTPS
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+  header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+  exit();
+}
 
 // Función para generar token CSRF
 function generateCsrfToken()
@@ -38,12 +127,7 @@ function validateCsrfToken($token)
 // Función para iniciar sesión del usuario
 function LoginUser($username, $pass)
 {
-  require_once('.configDB.php');
-  $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-  if (!$connection) {
-    die("Conexión fallida: " . mysqli_connect_error());
-  }
-
+  $connection = include('./conexion.php');
   // Obtener user_secret y user_id para verificar la contraseña e iniciar sesión
   $stmt = $connection->prepare("SELECT user_id, user_secret, user_type, email FROM USERS WHERE username = ?");
   $stmt->bind_param("s", $username);
@@ -58,7 +142,6 @@ function LoginUser($username, $pass)
 
   $user = $result->fetch_assoc();
   $stmt->close();
-  $connection->close();
 
   // Verificar contraseña
   if (password_verify($pass, $user['user_secret'])) {
@@ -111,92 +194,9 @@ function isUserLocked($username)
 
   return false; // El usuario no está bloqueado
 }
-
-// Importar una biblioteca de validación o definir funciones de validación
-require_once('validations.php');
-
-// Verificar si se envió el formulario
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  // Validar token CSRF
-  if (!validateCsrfToken($_POST['csrf_token'])) {
-    die("Token CSRF inválido");
-  }
-
-  // Recopilar y sanitizar datos de entrada
-  $username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
-  $password = $_POST['password']; // No sanitizar contraseñas
-
-  // Inicializar un array para almacenar errores de validación
-  $errors = [];
-
-  // Verificar si el usuario está bloqueado
-  if (isUserLocked($username)) {
-    $errors['username'] = "La cuenta está temporalmente bloqueada. Por favor, inténtelo más tarde.";
-  } else {
-    // Validar nombre de usuario
-    if (!usernameExists($username)) {
-      $errors['username'] = "El nombre de usuario no existe.";
-    }
-
-    // Si el nombre de usuario existe, entonces validar la contraseña
-    if (empty($errors)) {
-      $user = LoginUser($username, $password);
-      if ($user === false) {
-        $errors['password'] = "Contraseña inválida.";
-        logFailedAttempt($username);
-      }
-    }
-  }
-
-  // Verificar errores de validación
-if (empty($errors)) {
-  // Inicio de sesión exitoso
-  session_regenerate_id(true); // Regenerar ID de sesión
-  $_SESSION['user_id'] = $user['user_id'];
-  $_SESSION['username'] = $username;
-  $_SESSION['email'] = $user['email'];
-  $_SESSION['user_type'] = $user['user_type'];
-  $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
-
-  // Eliminar variables innecesarias
-  unset($_SESSION['failed_attempts']);
-  unset($_SESSION['csrf_token']);
-  unset($_SESSION['csrf_token_expire']);
-
-  // Redirección basada en el user_type
-  switch ($_SESSION['user_type']) {
-      case 'admin':
-          header("Location: admin.php");
-          break;
-      case 'manager':
-          header("Location: manager.php");
-          break;
-      default:
-          header("Location: dashboard.php");
-  }
-  exit();
-} else {
-  // Almacenar errores en la sesión para mostrarlos en el formulario
-  $_SESSION['login_errors'] = $errors;
-  header("Location: login.php"); // Redirigir de vuelta a la página de inicio de sesión
-  exit();
-}
-}
-
-// Renovación automática de sesión
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
-  session_regenerate_id(true);
-  $_SESSION['last_activity'] = time();
-}
-
-// Forzar HTTPS
-if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
-  header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-  exit();
-}
 ?>
 
-<!DOCTYPE html>
+
 <html>
 
 <head>
@@ -207,11 +207,11 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
 </head>
 <header>
   <nav class="navbar">
-      <h1>Kebab</h1> 
-      <a href="../index.html" class="menu-link">Inicio</a>
-      <a href="" class="menu-link">Carta</a>
-      <a href="" class="menu-link">Contacto</a>
-      <a href="./register.php" class="menu-link">Regístrate</a>
+    <h1>Kebab</h1>
+    <a href="../index.php" class="menu-link">Inicio</a>
+    <a href="" class="menu-link">Carta</a>
+    <a href="" class="menu-link">Contacto</a>
+    <a href="./register.php" class="menu-link">Regístrate</a>
   </nav>
 </header>
 
@@ -225,7 +225,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
     unset($_SESSION['login_errors']); // Limpiar los errores después de mostrarlos
   }
   ?>
-  <h1>Inicia Sesión</h1> 
+  <h1>Inicia Sesión</h1>
   <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
     <input type="text" name="username" placeholder="Nombre de usuario" required>
     <input type="password" name="password" placeholder="Contraseña" required>
@@ -233,16 +233,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
     <button type="submit" name="login">Iniciar sesión</button>
   </form>
   <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
+  <?php include('./footer.php'); ?>
 </body>
-<footer>
-  <p>KEBAB - Todos los derechos reservados</p>
-  <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
-  <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
-  <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>
-  <p><strong>Síguenos en:</strong> 
-    <a href="https://facebook.com/kebab" target="_blank">Facebook</a> | 
-    <a href="https://twitter.com/kebab" target="_blank">Twitter</a> | 
-    <a href="https://instagram.com/kebab" target="_blank">Instagram</a>
-  </p>
-</footer>
+
 </html>

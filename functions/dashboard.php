@@ -1,10 +1,6 @@
 <?php
-session_start();
-require_once('.configDB.php');
-$connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-if (!$connection) {
-  die("Conexión fallida: " . mysqli_connect_error());
-}
+$connection = include('./conexion.php');
+echo $_SESSION['user_id'];
 $user_id = htmlspecialchars($_SESSION['user_id']);
 //Obtener los puntos de un usuario
 $stmt = $connection->prepare("SELECT points FROM CUSTOMERS WHERE user_id = ?");

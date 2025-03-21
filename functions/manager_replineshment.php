@@ -2,13 +2,13 @@
 
 <head>
     <title>Manager Replineshment</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
     <?php
-    include('./manager_header.php');
+        include('./navbar.php'); 
 
-    session_start();
     if (isset($_SESSION['success_message'])) {
         echo '<div class="alert alert-success">' . $_SESSION['success_message'] . '</div>';
         unset($_SESSION['success_message']); // Eliminar mensaje después de mostrarlo
@@ -18,11 +18,7 @@
     <main>
         <h1>Reabastecer productos</h1>
         <?php
-        require_once('.configDB.php');
-        $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-        if (!$connection) {
-            die("Connection failed: " . mysqli_connect_error());
-        }
+        $connection = include('./conexion.php');
         // Obtener ingredientes 
         $stmt = $connection->prepare("SELECT * FROM INGREDIENTS");
         $stmt->execute();
@@ -115,7 +111,7 @@
                 ?>
     </main>
     <?php
-    include('footer.php');
+        include('footer.php');
     ?>
 
 </body>

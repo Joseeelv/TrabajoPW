@@ -1,28 +1,13 @@
 <?php
-session_start();
-require_once('.configDB.php');
-$connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-if (!$connection) {
-  die("Conexión fallida: " . mysqli_connect_error());
-}
-$user_id = htmlspecialchars($_SESSION['user_id']);
-//Obtener los puntos de un usuario
-$stmt = $connection->prepare("SELECT points FROM CUSTOMERS WHERE user_id = ?");
-$stmt->bind_param("s", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-$_SESSION['points'] = $row['points'];
+  $connection = include('./conexion.php');
+  $user_id = htmlspecialchars($_SESSION['user_id']);
 
-
-// Obtener la imagen del usuario
-$stmt = $connection->prepare("SELECT img_src FROM USERS WHERE user_id = ?");
-$stmt->bind_param("s", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-
-
+  // Obtener la imagen del usuario
+  $stmt = $connection->prepare("SELECT img_src FROM USERS WHERE user_id = ?");
+  $stmt->bind_param("s", $user_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="es">

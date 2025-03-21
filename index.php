@@ -10,7 +10,7 @@
 <header>
   <nav class="navbar">
       <h1>Bienvenido a KEBAB!</h1>
-      <a href="./index.html" class="menu-link">Inicio</a>
+      <a href="./index.php" class="menu-link">Inicio</a>
       <a href="" class="menu-link">Carta</a>
       <a href="" class="menu-link">Contacto</a>
       <a href="./functions/register.php" class="menu-link">Regístrate</a>
@@ -25,18 +25,7 @@
 </div>
 
 <script href="./assets/js/carrousel.js"></script>
+  <?php include('./functions/footer.php'); ?>
 </body>
-
-<footer>
-  <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
-  <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
-  <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>
-  <p><strong>Síguenos en:</strong> 
-    <a href="https://facebook.com/kebab" target="_blank">Facebook</a> | 
-    <a href="https://twitter.com/kebab" target="_blank">Twitter</a> | 
-    <a href="https://instagram.com/kebab" target="_blank">Instagram</a>
-  </p>
-</footer>
-
 </html>
 

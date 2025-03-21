@@ -5,22 +5,24 @@ session_start();
 switch ($_SESSION['user_type']) {
     case 'admin':
         $menuItems = [
-            'Inicio' => '../functions/admin.php',
-            'Cerrar Sesión' => '../functions/logout.php'
+            'Inicio' => './admin.php',
+            'Cerrar Sesión' => './logout.php'
         ];
         break;
     case 'manager':
         $menuItems = [
-            'Inicio' => '../functions/manager.php',
-            'Cerrar Sesión' => '../functions/logout.php'
+            'Inicio' => './manager_index.php',
+            'Reabastecer' => './manager_replineshment.php',
+            'Transacciones' => './manager_transactions.php',
+            'Cerrar Sesión' => './logout.php'
         ];
         break;
     case 'customer':
         $menuItems = [
-            'Inicio' => '../functions/dashboard.php',
+            'Inicio' => './dashboard.php',
             'Carta' => '',
-            'Perfil' => '../functions/perfil.php',
-            'Cerrar Sesión' => '../functions/logout.php'
+            'Perfil' => './perfil.php',
+            'Cerrar Sesión' => './logout.php'
         ];
         break;
 }
