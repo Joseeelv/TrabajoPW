@@ -1,4 +1,4 @@
-<?php
+    <?php
 session_start(); // Inicia la sesión
 const SECURITY = [
     'csrf_token_expire' => 3600, // 1 hora
@@ -33,7 +33,7 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 header("Permissions-Policy: geolocation=(), camera=()");
 
 // Función para registrar un nuevo usuario
-function RegisterUser($username, $pass, $email, $address, $new_filename) {
+function RegisterUser($username, $pass, $email, $address) {
     require_once('.configDB.php');
     $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
     if (!$connection) {
@@ -47,8 +47,8 @@ function RegisterUser($username, $pass, $email, $address, $new_filename) {
         $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
 
         // Inserta en la tabla USERS
-        $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email, img_src) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $username, $hashed_password, $email, $new_filename);
+        $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $hashed_password, $email);
         if (!$stmt->execute()) {
             throw new Exception("Error al insertar en la tabla USERS: " . $stmt->error);
         }
@@ -82,16 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL); // Sanitizar el email
     $address = trim(htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8'));
-
-		//Cada usuario se crea con una imagen por defecto con su nombre
-		$image_default = "../assets/images/default.jpg";
-    $new_filename = $username . '.jpg';  // Nombre de archivo basado en el nombre de usuario
-    $user_image = "../assets/images/perfiles/" . $new_filename;
-
-		// Mueve la imagen predeterminada al directorio de perfiles con el nuevo nombre
-		if (!copy($image_default, $user_image)) {
-			$errors['image'] = "No se pudo copiar la imagen predeterminada.";
-		}
 
     // Inicializa un array para almacenar errores de validación
     $errors = [];
@@ -145,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Comprueba si hay errores de validación
     if (empty($errors)) {
         try {
-            RegisterUser($username, $password, $email, $address, $new_filename);
+            RegisterUser($username, $password, $email, $address);
             // Registro exitoso
             $_SESSION['success_message'] = "Usuario registrado con éxito.";
             header("Location: login.php");

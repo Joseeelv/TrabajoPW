@@ -11,7 +11,7 @@ CREATE TABLE USERS (
     user_secret VARCHAR(100) NOT NULL,
     email VARCHAR(30) NOT NULL UNIQUE,
     user_type ENUM('customer', 'manager', 'admin') NOT NULL,
-    img_src VARCHAR(255) NOT NULL
+    img_src VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
 );
 
 /* Tabla de clientes: Almacena información adicional para los clientes */

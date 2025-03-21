@@ -83,13 +83,13 @@ if (!isset($_SESSION['user_id'])) {
       elseif ($_FILES['foto']['size'] > $max_file_size) {
         $errors['foto'] = "El archivo es demasiado grande. El tamaño máximo es 5 MB.";
       } else {
-        // Generar un nombre único para la imagen
+        // Generar un nombre único para la imagen basado en el username
         $new_filename = $_SESSION['username'] . '.' . $file_extension;
 
         // Ruta segura para guardar las imágenes
         $upload_path = "../assets/images/perfiles/" . $new_filename;
 
-        // Verificar si existe una imagen previa y eliminarla
+        // Verificar si existe una imagen previa que no sea default.jpg
         $query = "SELECT img_src FROM USERS WHERE user_id = ?";
         if ($stmt = mysqli_prepare($connection, $query)) {
           mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -98,7 +98,8 @@ if (!isset($_SESSION['user_id'])) {
           mysqli_stmt_fetch($stmt);
           mysqli_stmt_close($stmt);
 
-          if ($old_img_src && $old_img_src !== $new_filename) {
+          // Si la imagen previa no es default.jpg y tiene un nombre diferente, eliminarla
+          if ($old_img_src && $old_img_src !== 'default.jpg' && $old_img_src !== $new_filename) {
             $old_file_path = "../assets/images/perfiles/" . $old_img_src;
             if (file_exists($old_file_path)) {
               unlink($old_file_path);
@@ -129,6 +130,7 @@ if (!isset($_SESSION['user_id'])) {
       }
     }
   }
+  }
 
 
   // Si no hay errores y hay cambios que realizar
@@ -152,7 +154,6 @@ if (!isset($_SESSION['user_id'])) {
       $_SESSION['register_errors']['database'] = "Error en la preparación de la consulta: " . mysqli_error($connection);
     }
   }
-}
 $connection->close();
 $_SESSION['register_errors'] = $errors;
 ?>
@@ -183,11 +184,12 @@ $_SESSION['register_errors'] = $errors;
       unset($_SESSION['register_errors']);
     }
     ?>
+    
     <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label for="email">Nuevo Email:</label>
-        <input type="email" id="email" name="email" placeholder="Nuevo email">
-      </div>
+        <input type="email" id="email" name="email" placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
+    </div>
       <div class="form-group">
         <label for="password">Nueva Contraseña:</label>
         <input type="password" id="password" name="password" placeholder="Nueva contraseña">

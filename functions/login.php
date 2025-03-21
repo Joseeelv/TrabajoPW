@@ -45,7 +45,7 @@ function LoginUser($username, $pass)
   }
 
   // Obtener user_secret y user_id para verificar la contraseña e iniciar sesión
-  $stmt = $connection->prepare("SELECT user_id, user_secret, user_type FROM USERS WHERE username = ?");
+  $stmt = $connection->prepare("SELECT user_id, user_secret, user_type, email FROM USERS WHERE username = ?");
   $stmt->bind_param("s", $username);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -154,6 +154,7 @@ if (empty($errors)) {
   session_regenerate_id(true); // Regenerar ID de sesión
   $_SESSION['user_id'] = $user['user_id'];
   $_SESSION['username'] = $username;
+  $_SESSION['email'] = $user['email'];
   $_SESSION['user_type'] = $user['user_type'];
   $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
 
