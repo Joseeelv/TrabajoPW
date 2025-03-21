@@ -1,0 +1,210 @@
+.body-login {
+  font-family: 'Roboto', sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px;
+  padding-top: 150px;
+  background-color: #fdf3e3; /* Warm beige background */
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  margin-left: auto;
+  padding-top: 50px;
+  background-color: #fdf3e3; /* Warm beige background */
+}
+
+footer {
+  background-color: #8b4513; /* Warm brown */
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  position: fixed;
+  gap: 20px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+footer strong {
+  margin: 0;
+  color: #ffd700; /* Golden yellow */
+}
+
+footer a {
+  color: white;
+  text-decoration: none;
+}
+
+.password-strength-meter {
+  height: 10px;
+  width: 100%;
+  background-color: #ddd;
+  margin-top: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.password-strength-meter-fill {
+  height: 100%;
+  width: 0;
+  transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out;
+}
+
+.password-checklist {
+  margin-top: 10px;
+  padding-left: 0;
+}
+
+.password-checklist li {
+  list-style-type: none;
+  margin-bottom: 5px;
+  padding-left: 25px;
+  position: relative;
+}
+
+.password-checklist li::before {
+  content: '❌';
+  position: absolute;
+  left: 0;
+}
+
+.password-checklist li.valid::before {
+  content: '✅';
+}
+
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #8b4513; /* Warm brown border */
+  border-radius: 5px;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #d2691e; /* Kebab-inspired orange */
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #a0522d; /* Darker brown-orange */
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 2px solid #8b4513; /* Warm brown border */
+  border-radius: 10px;
+}
+
+.carousel-images {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-images img {
+  width: 100%;
+  height: auto;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(139, 69, 19, 0.8); /* Semi-transparent brown */
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.carousel-button.prev {
+  left: 10px;
+}
+
+.carousel-button.next {
+  right: 10px;
+}
+
+.carousel-indicators {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+}
+
+.indicator.active {
+  background: #ffd700; /* Golden yellow */
+}
+
+.navbar {
+  background-color: #8b4513; /* Warm brown */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  position: fixed;
+  gap: 20px;
+}
+
+.navbar h1 {
+  position: absolute;
+  left: 20px;
+  color: #ffd700; /* Golden yellow */
+}
+
+.menu-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+.menu-link:hover {
+  color: #ffd700; /* Golden yellow on hover */
+}
+
+/* Efecto de subrayado al pasar el mouse */
+.menu-link::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #ffd700;
+  transition: width 0.3s;
+}
+
+.menu-link:hover::after {
+  width: 100%;
+}
