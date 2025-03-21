@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // Definir los elementos del menú según el tipo de usuario
 switch ($_SESSION['user_type']) {
     case 'admin':

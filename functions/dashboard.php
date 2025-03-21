@@ -1,6 +1,7 @@
 <?php
+session_start();
+
 $connection = include('./conexion.php');
-echo $_SESSION['user_id'];
 $user_id = htmlspecialchars($_SESSION['user_id']);
 //Obtener los puntos de un usuario
 $stmt = $connection->prepare("SELECT points FROM CUSTOMERS WHERE user_id = ?");

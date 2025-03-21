@@ -1,5 +1,4 @@
 <?php
-
 // Establecer parámetros de cookie seguros
 session_set_cookie_params([
   'lifetime' => 3600,
@@ -63,7 +62,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['username'] = $username;
     $_SESSION['email'] = $user['email'];
-    $_SESSION['DB_conexion'] = $connection;
     $_SESSION['user_type'] = $user['user_type'];
     $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
 
@@ -195,7 +193,6 @@ function isUserLocked($username)
   return false; // El usuario no está bloqueado
 }
 ?>
-
 
 <html>
 
