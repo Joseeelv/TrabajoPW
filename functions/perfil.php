@@ -145,7 +145,19 @@ if (empty($errors) && !empty($updates)) {
     mysqli_stmt_bind_param($stmt, ...array_merge([$types], array_values($params)));
     if (mysqli_stmt_execute($stmt)) {
       $_SESSION['success_message'] = "Perfil actualizado correctamente.";
-      header("location: ./dashboard.php");
+      switch ($_SESSION['user_type']) {
+        case 'admin':
+          header("Location: admin.php");
+          break;
+        case 'customer':
+          header("Location: dashboard.php");
+          break;
+        case 'manager':
+          header("Location: manager_index.php");
+          break;
+        default:
+          header("Location: index.php");
+      }
     } else {
       $_SESSION['register_errors']['database'] = "Error al actualizar el perfil: " . mysqli_stmt_error($stmt);
     }

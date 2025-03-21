@@ -29,7 +29,7 @@ if (isset($_SESSION['user_type'])) {
     }
 } else {
     $menuItems = [
-        'Inicio' => './index.php',
+        'Inicio' => '../index.php',
         'Carta' => '',
         'Contacto' => '',
         'Iniciar Sesión' => './login.php',
