@@ -175,58 +175,52 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
         }
     </style>
 </head>
-<header>
-    <nav class="navbar">
-        <h1>Kebab</h1>
-        <a href="../index.php" class="menu-link">Inicio</a>
-        <a href="" class="menu-link">Carta</a>
-        <a href="" class="menu-link">Contacto</a>
-        <a href="./login.php" class="menu-link">Inicia Sesión</a>
-    </nav>
-</header>
 
 <body class="body-login">
-    <h1>Regístrate</h1>
-    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <?php
-        // Muestra errores si los hay
-        if (isset($_SESSION['register_errors'])) {
-            echo "<div class='error-container'>";
-            foreach ($_SESSION['register_errors'] as $key => $error) {
-                echo "<p class='error'>$error</p>";
+    <?php include('./navbar.php'); ?>
+    <main>
+        <h1>Regístrate</h1>
+        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <?php
+            // Muestra errores si los hay
+            if (isset($_SESSION['register_errors'])) {
+                echo "<div class='error-container'>";
+                foreach ($_SESSION['register_errors'] as $key => $error) {
+                    echo "<p class='error'>$error</p>";
+                }
+                echo "</div>";
+                unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
             }
-            echo "</div>";
-            unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
-        }
-        ?>
-        <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
-        <input type="text" name="username" placeholder="Nombre de usuario" required
-            value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
-        <div>
-            <input type="password" name="password" id="password" placeholder="Contraseña" required>
-            <!-- Barra de fortaleza -->
-            <div class="password-strength-meter">
-                <div class="password-strength-meter-fill"></div>
+            ?>
+            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+            <input type="text" name="username" placeholder="Nombre de usuario" required
+                value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+            <div>
+                <input type="password" name="password" id="password" placeholder="Contraseña" required>
+                <!-- Barra de fortaleza -->
+                <div class="password-strength-meter">
+                    <div class="password-strength-meter-fill"></div>
+                </div>
+                <!-- Lista de verificación -->
+                <ul class="password-checklist">
+                    <li id="length">Al menos 8 caracteres de longitud</li>
+                    <li id="uppercase">Contiene letra mayúscula</li>
+                    <li id="lowercase">Contiene letra minúscula</li>
+                    <li id="number">Contiene número</li>
+                    <li id="special">Contiene carácter especial</li>
+                </ul>
             </div>
-            <!-- Lista de verificación -->
-            <ul class="password-checklist">
-                <li id="length">Al menos 8 caracteres de longitud</li>
-                <li id="uppercase">Contiene letra mayúscula</li>
-                <li id="lowercase">Contiene letra minúscula</li>
-                <li id="number">Contiene número</li>
-                <li id="special">Contiene carácter especial</li>
-            </ul>
-        </div>
 
-        <input type="text" name="email" placeholder="Email" required
-            value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-        <input type="text" name="address" placeholder="Dirección" required
-            value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>">
-        <button type="submit" name="register">Registrarse</button>
-    </form>
+            <input type="text" name="email" placeholder="Email" required
+                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+            <input type="text" name="address" placeholder="Dirección" required
+                value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>">
+            <button type="submit" name="register">Registrarse</button>
+        </form>
 
-    <p>¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
-    <script src="../assets/js/password-strength-meter.js"></script>
+        <p>¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
+        <script src="../assets/js/password-strength-meter.js"></script>
+    </main>
     <?php include('./footer.php'); ?>
 </body>
 

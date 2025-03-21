@@ -130,30 +130,30 @@ if (!isset($_SESSION['user_id'])) {
       }
     }
   }
-  }
+}
 
 
-  // Si no hay errores y hay cambios que realizar
-  if (empty($errors) && !empty($updates)) {
-    // Construir la consulta SQL dinámicamente
-    $sql = "UPDATE USERS SET " . implode(", ", $updates) . " WHERE user_id= ?";
-    $types .= "i";
-    $params[] = intval($user_id);
+// Si no hay errores y hay cambios que realizar
+if (empty($errors) && !empty($updates)) {
+  // Construir la consulta SQL dinámicamente
+  $sql = "UPDATE USERS SET " . implode(", ", $updates) . " WHERE user_id= ?";
+  $types .= "i";
+  $params[] = intval($user_id);
 
-    // Preparar y ejecutar la consulta
-    if ($stmt = mysqli_prepare($connection, $sql)) {
-      mysqli_stmt_bind_param($stmt, ...array_merge([$types], array_values($params)));
-      if (mysqli_stmt_execute($stmt)) {
-        $_SESSION['success_message'] = "Perfil actualizado correctamente.";
-        header("location: ./dashboard.php");
-      } else {
-        $_SESSION['register_errors']['database'] = "Error al actualizar el perfil: " . mysqli_stmt_error($stmt);
-      }
-      mysqli_stmt_close($stmt);
+  // Preparar y ejecutar la consulta
+  if ($stmt = mysqli_prepare($connection, $sql)) {
+    mysqli_stmt_bind_param($stmt, ...array_merge([$types], array_values($params)));
+    if (mysqli_stmt_execute($stmt)) {
+      $_SESSION['success_message'] = "Perfil actualizado correctamente.";
+      header("location: ./dashboard.php");
     } else {
-      $_SESSION['register_errors']['database'] = "Error en la preparación de la consulta: " . mysqli_error($connection);
+      $_SESSION['register_errors']['database'] = "Error al actualizar el perfil: " . mysqli_stmt_error($stmt);
     }
+    mysqli_stmt_close($stmt);
+  } else {
+    $_SESSION['register_errors']['database'] = "Error en la preparación de la consulta: " . mysqli_error($connection);
   }
+}
 $connection->close();
 $_SESSION['register_errors'] = $errors;
 ?>
@@ -166,56 +166,51 @@ $_SESSION['register_errors'] = $errors;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
-  <?php include('./navbar.php'); ?>
+
 </head>
 
 <body>
-  <div class="container">
-    <h2>Modificar Perfil</h2>
-    <?php
-    if (isset($_SESSION['success_message'])) {
-      echo "<p class='success'>" . $_SESSION['success_message'] . "</p>";
-      unset($_SESSION['success_message']);
-    }
-    if (!empty($_SESSION['register_errors'])) {
-      foreach ($_SESSION['register_errors'] as $error) {
-        echo "<p class='error'>$error</p>";
+  <?php include('./navbar.php'); ?>
+  <main>
+    <div class="container">
+      <h2>Modificar Perfil</h2>
+      <?php
+      if (isset($_SESSION['success_message'])) {
+        echo "<p class='success'>" . $_SESSION['success_message'] . "</p>";
+        unset($_SESSION['success_message']);
       }
-      unset($_SESSION['register_errors']);
-    }
-    ?>
-    
-    <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="email">Nuevo Email:</label>
-        <input type="email" id="email" name="email" placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
+      if (!empty($_SESSION['register_errors'])) {
+        foreach ($_SESSION['register_errors'] as $error) {
+          echo "<p class='error'>$error</p>";
+        }
+        unset($_SESSION['register_errors']);
+      }
+      ?>
+
+      <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST"
+        enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="email">Nuevo Email:</label>
+          <input type="email" id="email" name="email"
+            placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
+        </div>
+        <div class="form-group">
+          <label for="password">Nueva Contraseña:</label>
+          <input type="password" id="password" name="password" placeholder="Nueva contraseña">
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirmar Contraseña:</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
+        </div>
+        <div class="form-group">
+          <label for="foto">Nueva foto de perfil:</label>
+          <input type="file" id="foto" name="foto">
+        </div>
+        <button type="submit">Actualizar Perfil</button>
+      </form>
     </div>
-      <div class="form-group">
-        <label for="password">Nueva Contraseña:</label>
-        <input type="password" id="password" name="password" placeholder="Nueva contraseña">
-      </div>
-      <div class="form-group">
-        <label for="confirm_password">Confirmar Contraseña:</label>
-        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
-      </div>
-      <div class="form-group">
-        <label for="foto">Nueva foto de perfil:</label>
-        <input type="file" id="foto" name="foto">
-      </div>
-      <button type="submit">Actualizar Perfil</button>
-    </form>
-  </div>
+  </main>
+  <?php include('./footer.php'); ?>
 </body>
-<footer>
-  <p>KEBAB - Todos los derechos reservados</p>
-  <p><strong>Información Legal:</strong> Este sitio web cumple con las normativas vigentes.</p>
-  <p><strong>Ubicación:</strong> Calle Falsa 123, Ciudad Ejemplo, País.</p>
-  <p><strong>Copyright:</strong> &copy; <?php echo date("Y"); ?> KEBAB. Todos los derechos reservados.</p>
-  <p><strong>Síguenos en:</strong>
-    <a href="https://facebook.com/kebab" target="_blank">Facebook</a> |
-    <a href="https://twitter.com/kebab" target="_blank">Twitter</a> |
-    <a href="https://instagram.com/kebab" target="_blank">Instagram</a>
-  </p>
-</footer>
 
 </html>

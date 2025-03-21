@@ -4,7 +4,7 @@
 <head>
     <title>Historial de Transacciones</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
-    </head>
+</head>
 
 <body>
     <?php
@@ -68,37 +68,38 @@
     // Reiniciar el puntero del resultado para recorrerlo de nuevo
     $result->data_seek(0);
     ?>
+    <main>
+        <h1>Resumen de Transacciones</h1>
 
-    <h1>Resumen de Transacciones</h1>
+        <table border='1'>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Balance (€)</th>
+            </tr>
+            <!-- Fila de resumen -->
+            <tr style="font-weight: bold;">
+                <td>Total</td>
+                <td>Ventas: <?= number_format($total_ventas, 2) ?>€ | Compras: <?= number_format($total_compras, 2) ?>€
+                </td>
+                <td><?= number_format($balance_final, 2) ?>€</td>
+            </tr>
 
-    <table border='1'>
-        <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Balance (€)</th>
-        </tr>
-        <!-- Fila de resumen -->
-        <tr style="font-weight: bold;">
-            <td>Total</td>
-            <td>Ventas: <?= number_format($total_ventas, 2) ?>€ | Compras: <?= number_format($total_compras, 2) ?>€</td>
-            <td><?= number_format($balance_final, 2) ?>€</td>
-        </tr>
-
-        <?php
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr>";
-                echo "<td>" . $row["transaction_date"] . "</td>";
-                echo "<td>" . $row["transaction_type"] . "</td>";
-                echo "<td>" . number_format($row["balance"], 2) . "€</td>";
-                echo "</tr>";
+            <?php
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . $row["transaction_date"] . "</td>";
+                    echo "<td>" . $row["transaction_type"] . "</td>";
+                    echo "<td>" . number_format($row["balance"], 2) . "€</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='3'>No hay transacciones registradas.</td></tr>";
             }
-        } else {
-            echo "<tr><td colspan='3'>No hay transacciones registradas.</td></tr>";
-        }
-        ?>
-    </table>
-
+            ?>
+        </table>
+    </main>
     <?php
     $stmt->close();
     include('./footer.php');

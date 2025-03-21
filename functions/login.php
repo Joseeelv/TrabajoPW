@@ -203,18 +203,11 @@ function isUserLocked($username)
   <title>Iniciar sesión</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
-<header>
-  <nav class="navbar">
-    <h1>Kebab</h1>
-    <a href="../index.php" class="menu-link">Inicio</a>
-    <a href="" class="menu-link">Carta</a>
-    <a href="" class="menu-link">Contacto</a>
-    <a href="./register.php" class="menu-link">Regístrate</a>
-  </nav>
-</header>
+
 
 <body class="body-login">
   <?php
+  include('./navbar.php');
   // Mostrar errores si los hay
   if (isset($_SESSION['login_errors'])) {
     foreach ($_SESSION['login_errors'] as $error) {
@@ -223,14 +216,16 @@ function isUserLocked($username)
     unset($_SESSION['login_errors']); // Limpiar los errores después de mostrarlos
   }
   ?>
-  <h1>Inicia Sesión</h1>
-  <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-    <input type="text" name="username" placeholder="Nombre de usuario" required>
-    <input type="password" name="password" placeholder="Contraseña" required>
-    <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
-    <button type="submit" name="login">Iniciar sesión</button>
-  </form>
-  <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
+  <main>
+    <h1>Inicia Sesión</h1>
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+      <input type="text" name="username" placeholder="Nombre de usuario" required>
+      <input type="password" name="password" placeholder="Contraseña" required>
+      <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+      <button type="submit" name="login">Iniciar sesión</button>
+    </form>
+    <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
+  </main>
   <?php include('./footer.php'); ?>
 </body>
 
