@@ -165,7 +165,7 @@ $_SESSION['register_errors'] = $errors;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
-  <link rel="stylesheet" href="../assets/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
   <?php include('./navbar.php'); ?>
 </head>
 

@@ -64,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['email'] = $user['email'];
     $_SESSION['user_type'] = $user['user_type'];
     $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
+    $_SESSION['user_img'] = $user['img_src'];
 
     // Eliminar variables innecesarias
     unset($_SESSION['failed_attempts']);
@@ -127,7 +128,7 @@ function LoginUser($username, $pass)
 {
   $connection = include('./conexion.php');
   // Obtener user_secret y user_id para verificar la contraseña e iniciar sesión
-  $stmt = $connection->prepare("SELECT user_id, user_secret, user_type, email FROM USERS WHERE username = ?");
+  $stmt = $connection->prepare("SELECT user_id, user_secret, user_type, email, img_src FROM USERS WHERE username = ?");
   $stmt->bind_param("s", $username);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -200,7 +201,7 @@ function isUserLocked($username)
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar sesión</title>
-  <link rel="stylesheet" href="../assets/styles.css">
+  <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <header>
   <nav class="navbar">

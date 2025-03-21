@@ -1,4 +1,4 @@
-    <?php
+<?php
 session_start(); // Inicia la sesión
 const SECURITY = [
     'csrf_token_expire' => 3600, // 1 hora
@@ -12,7 +12,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // ************** PROTECCIÓN CSRF ************** //
-function generateCsrfToken() {
+function generateCsrfToken()
+{
     if (empty($_SESSION['csrf_token']) || time() > $_SESSION['csrf_token_expire']) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         $_SESSION['csrf_token_expire'] = time() + SECURITY['csrf_token_expire'];
@@ -20,7 +21,8 @@ function generateCsrfToken() {
     return $_SESSION['csrf_token'];
 }
 
-function validateCsrfToken($token) {
+function validateCsrfToken($token)
+{
     return hash_equals($_SESSION['csrf_token'], $token) && time() < $_SESSION['csrf_token_expire'];
 }
 
@@ -33,7 +35,8 @@ header("Referrer-Policy: strict-origin-when-cross-origin");
 header("Permissions-Policy: geolocation=(), camera=()");
 
 // Función para registrar un nuevo usuario
-function RegisterUser($username, $pass, $email, $address) {
+function RegisterUser($username, $pass, $email, $address)
+{
     $connection = include('./conexion.php');
 
     mysqli_begin_transaction($connection);
@@ -154,17 +157,19 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
-    <link rel="stylesheet" href="../assets/styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         .error-container {
             color: red;
             margin-bottom: 10px;
         }
+
         .error {
             margin: 5px 0;
         }
@@ -179,6 +184,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
         <a href="./login.php" class="menu-link">Inicia Sesión</a>
     </nav>
 </header>
+
 <body class="body-login">
     <h1>Regístrate</h1>
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -194,7 +200,8 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
         }
         ?>
         <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
-        <input type="text" name="username" placeholder="Nombre de usuario" required value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
+        <input type="text" name="username" placeholder="Nombre de usuario" required
+            value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
         <div>
             <input type="password" name="password" id="password" placeholder="Contraseña" required>
             <!-- Barra de fortaleza -->
@@ -211,8 +218,10 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
             </ul>
         </div>
 
-        <input type="text" name="email" placeholder="Email" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-        <input type="text" name="address" placeholder="Dirección" required value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>">
+        <input type="text" name="email" placeholder="Email" required
+            value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+        <input type="text" name="address" placeholder="Dirección" required
+            value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>">
         <button type="submit" name="register">Registrarse</button>
     </form>
 
@@ -220,4 +229,5 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
     <script src="../assets/js/password-strength-meter.js"></script>
     <?php include('./footer.php'); ?>
 </body>
+
 </html>

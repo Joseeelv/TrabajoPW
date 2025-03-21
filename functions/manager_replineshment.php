@@ -4,8 +4,8 @@
 
 <head>
     <title>Manager Replineshment</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    </head>
 
 <body>
     <?php

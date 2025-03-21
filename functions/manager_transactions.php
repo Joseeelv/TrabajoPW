@@ -3,8 +3,8 @@
 
 <head>
     <title>Historial de Transacciones</title>
-    <link rel="stylesheet" href="../assets/styles.css">
-</head>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    </head>
 
 <body>
     <?php
