@@ -31,7 +31,7 @@ if (isset($_SESSION['user_type'])) {
     $menuItems = [
         'Inicio' => '../index.php',
         'Carta' => '',
-        'Contacto' => '',
+        'Contacto' => './contact.php',
         'Iniciar Sesión' => './login.php',
         'Registrarse' => './register.php'
 

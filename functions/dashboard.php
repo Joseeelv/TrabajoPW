@@ -12,14 +12,6 @@ $row = $result->fetch_assoc();
 $_SESSION['points'] = $row['points'];
 
 
-// Obtener la imagen del usuario
-$stmt = $connection->prepare("SELECT img_src FROM USERS WHERE user_id = ?");
-$stmt->bind_param("s", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -44,7 +36,7 @@ $row = $result->fetch_assoc();
       if (isset($_SESSION['username']) && isset($_SESSION['user_id'])) {
         $username = $_SESSION['username'];
         echo htmlspecialchars($username);
-        $image = "../assets/images/perfiles/" . $row['img_src'] ?? '../assets/images/perfiles/default.jpg'; // Imagen por defecto si no hay imagen
+        $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/images/perfiles/default.jpg'; // Imagen por defecto si no hay imagen
       } else {
         echo "Invitado!";
         $image = '../assets/images/perfiles/default.jpg'; // Imagen por defecto para invitados

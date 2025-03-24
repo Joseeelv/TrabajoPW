@@ -64,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['email'] = $user['email'];
     $_SESSION['user_type'] = $user['user_type'];
     $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
-    $_SESSION['user_img'] = $user['img_src'];
+    $_SESSION['img_src'] = $user['img_src'];
 
     // Eliminar variables innecesarias
     unset($_SESSION['failed_attempts']);

@@ -1,4 +1,9 @@
-<?php session_start(); ?>
+<?php
+    session_start();
+    $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/images/perfiles/default.jpg'; // Imagen por defecto si no hay imagen
+?>
+
+
 <html>
 
 <head>
@@ -15,8 +20,7 @@
     <main>
         <h1> Bienvenido, <?php echo $_SESSION['username'];
         ?> a su menú de manager.</h1>
-        <img src="../assets/images/perfiles/<?php echo $_SESSION["user_img"]; ?>" alt="Imagen de perfil"
-            id="profile-image">
+         <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">
             <a href="./manager_replineshment.php">Reabastecer productos</a>
