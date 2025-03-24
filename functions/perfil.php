@@ -184,44 +184,45 @@ $_SESSION['register_errors'] = $errors;
 
 <body>
   <?php include('./navbar.php'); ?>
-  <main>
-    <div class="container">
-      <h2>Modificar Perfil</h2>
-      <?php
-      if (isset($_SESSION['success_message'])) {
-        echo "<p class='success'>" . $_SESSION['success_message'] . "</p>";
-        unset($_SESSION['success_message']);
-      }
-      if (!empty($_SESSION['register_errors'])) {
-        foreach ($_SESSION['register_errors'] as $error) {
-          echo "<p class='error'>$error</p>";
-        }
-        unset($_SESSION['register_errors']);
-      }
-      ?>
 
-      <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST"
-        enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="email">Nuevo Email:</label>
-          <input type="email" id="email" name="email"
-            placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
-        </div>
-        <div class="form-group">
-          <label for="password">Nueva Contraseña:</label>
-          <input type="password" id="password" name="password" placeholder="Nueva contraseña">
-        </div>
-        <div class="form-group">
-          <label for="confirm_password">Confirmar Contraseña:</label>
-          <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
-        </div>
-        <div class="form-group">
-          <label for="foto">Nueva foto de perfil:</label>
-          <input type="file" id="foto" name="foto">
-        </div>
-        <button type="submit">Actualizar Perfil</button>
-      </form>
-    </div>
+  <main class="container">
+
+    <h2>Modificar Perfil</h2>
+    <?php
+    if (isset($_SESSION['success_message'])) {
+      echo "<p class='success'>" . $_SESSION['success_message'] . "</p>";
+      unset($_SESSION['success_message']);
+    }
+    if (!empty($_SESSION['register_errors'])) {
+      foreach ($_SESSION['register_errors'] as $error) {
+        echo "<p class='error'>$error</p>";
+      }
+      unset($_SESSION['register_errors']);
+    }
+    ?>
+
+    <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST"
+      enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="email">Nuevo Email:</label>
+        <input type="email" id="email" name="email"
+          placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
+      </div>
+      <div class="form-group">
+        <label for="password">Nueva Contraseña:</label>
+        <input type="password" id="password" name="password" placeholder="Nueva contraseña">
+      </div>
+      <div class="form-group">
+        <label for="confirm_password">Confirmar Contraseña:</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
+      </div>
+      <div class="form-group">
+        <label for="foto">Nueva foto de perfil:</label>
+        <input type="file" id="foto" name="foto">
+      </div>
+      <button type="submit">Actualizar Perfil</button>
+    </form>
+
   </main>
   <?php include('./footer.php'); ?>
 </body>
