@@ -202,18 +202,21 @@ function isUserLocked($username)
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar sesión</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/register.css">
 </head>
 
 
-<body class="body-login">
+<body>
   <?php
   include('./navbar.php');
   // Mostrar errores si los hay
   if (isset($_SESSION['login_errors'])) {
+    echo "<div class='error-container'>";
     foreach ($_SESSION['login_errors'] as $error) {
-      echo "<p style='color: red;'>$error</p>";
+      echo "<p class='error'>$error</p>";
     }
-    unset($_SESSION['login_errors']); // Limpiar los errores después de mostrarlos
+    echo "</div>";
+    unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
   }
   ?>
   <main>

@@ -13,11 +13,11 @@ main {
 }
 
 #manager-options {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
 }
 
 #manager-options > a {
-    margin: 10px;
+	margin: 10px;
 }

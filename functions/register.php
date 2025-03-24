@@ -164,19 +164,11 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
     <title>Registro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <style>
-        .error-container {
-            color: red;
-            margin-bottom: 10px;
-        }
-
-        .error {
-            margin: 5px 0;
-        }
+    <link rel="stylesheet" href="../assets/css/register.css">
     </style>
 </head>
 
-<body class="body-login">
+<body>
     <?php include('./navbar.php'); ?>
     <main>
         <h1>Regístrate</h1>
