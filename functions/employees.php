@@ -19,11 +19,11 @@
     ?>
     <main>
         <h1> Bienvenido, <?php echo $_SESSION['username'];
-        ?> a su Admin Panel.</h1>
+        ?> a su menú de manager.</h1>
          <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">
-            <a href="./employees.php">Ver empleados</a>
+            <a href="./manager_replineshment.php">Reabastecer productos</a>
             <a href="./manager_transactions.php">Ver transacciones</a>
             <a href="./perfil.php">Ver perfil</a>
         </div>

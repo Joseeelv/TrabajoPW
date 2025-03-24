@@ -3,62 +3,93 @@ session_start();
 
 require_once('./.configDB.php');
 require_once('./validations.php');
-$connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+$connection = require_once('./conexion.php');
 if (!$connection) {
-  die("Conexión fallida: " . mysqli_connect_error());
+  die("Error en la conexión a la base de datos: " . mysqli_connect_error());
+}
+function UpdateProfile($connection, $pass, $email, $address, $image)
+{
+  mysqli_begin_transaction($connection);
+  try {
+    // Validar y encriptar la contraseña si no está vacía
+    $hashed_password = null;
+    if (!empty($pass)) {
+      $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
+    }
+    if (empty($email)){
+      $email = $_SESSION['email'];
+    }
+
+    // Actualizar la tabla USERS
+    $stmt = $connection->prepare("UPDATE USERS SET 
+                                      user_secret = COALESCE(?, user_secret),
+                                      email = COALESCE(?, email),
+                                      img_src = COALESCE(?, img_src)
+                                      WHERE user_id = ?");
+    $stmt->bind_param("sssi", $hashed_password, $email, $image, $_SESSION['user_id']);
+    if (!$stmt->execute()) {
+      throw new Exception("Error al actualizar USERS: " . $stmt->error);
+    }
+    $stmt->close();
+
+    // Actualizar la tabla CUSTOMERS solo si la dirección no está vacía
+    if (!empty($address)) {
+      $stmt = $connection->prepare("UPDATE CUSTOMERS SET customer_address = ? WHERE user_id = ?");
+      $stmt->bind_param("si", $address, $_SESSION['user_id']);
+      if (!$stmt->execute()) {
+        throw new Exception("Error al actualizar CUSTOMERS: " . $stmt->error);
+      }
+      $stmt->close();
+    }
+
+    mysqli_commit($connection);
+  } catch (Exception $e) {
+    mysqli_rollback($connection);
+    throw $e;
+  }
 }
 
-// Inicializa un array para almacenar errores de validación
-$errors = [];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  // Obtener los datos del formulario
+  $password = $_POST['password'];
+  $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+  $address = trim(htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8'));
+  $image = isset($_FILES['foto']) ? $_FILES['foto'] : null;
 
-// Verifica si el usuario está logueado
-if (!isset($_SESSION['user_id'])) {
-  $errors['user'] = "Usuario no autenticado";
-} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $user_id = $_SESSION['user_id'];
-  $updates = [];
-  $types = "";
-  $params = [];
+  $errors = [];
 
-  // Definir una lista de dominios de correo electrónico permitidos
-  $dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'example.com', 'test.com']; // Añade aquí los dominios que quieras permitir
-
-  // Valida el email
-  if (!empty($_POST['email'])) {
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $errors['email'] = "Por favor, introduce una dirección de email válida.";
-    } else {
-      // Extraer el dominio del email
-      $dominio = substr(strrchr($email, "@"), 1);
-      if (!in_array($dominio, $dominiosPermitidos)) {
-        $errors['email'] = "Por favor, utiliza un dominio de correo electrónico válido.";
-      } elseif (emailExists($email)) { // Asegúrate de que esta función esté definida
-        $errors['email'] = "Este email ya está registrado.";
-      } else {
-        $updates[] = "email = ?";
-        $types .= "s";
-        $params[] = $email;
-      }
+  // Validación de la contraseña
+  if (!empty($password)) {
+    if (strlen($password) < 8) {
+      $errors['password'] = "La contraseña debe tener al menos 8 caracteres.";
+    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,}$/', $password)) {
+      $errors['password'] = "Debe contener mayúscula, minúscula, número y carácter especial.";
     }
   }
 
-  // Valida la contraseña
-  if (!empty($_POST['password'])) {
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    if ($password !== $confirm_password) {
-      $errors['password'] = "Las contraseñas no coinciden.";
-    } elseif (strlen($password) < 8) {
-      $errors['password'] = "La contraseña debe tener al menos 8 caracteres.";
-    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,}$/', $password)) {
-      $errors['password'] = "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
+  // Validación del email
+  if (!empty($email)) {
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+      $errors['email'] = "Introduce un email válido.";
     } else {
-      $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-      $updates[] = "user_secret = ?";
-      $types .= "s";
-      $params[] = $hashed_password;
+      $dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'example.com', 'test.com'];
+      $dominio = substr(strrchr($email, "@"), 1);
+      if (!in_array($dominio, $dominiosPermitidos)) {
+        $errors['email'] = "Usa un dominio de correo válido.";
+      } else {
+        // Verificar si el email ya está registrado
+        $query = "SELECT COUNT(*) FROM USERS WHERE email = ? AND user_id != ?";
+        $stmt = $connection->prepare($query);
+        $stmt->bind_param("si", $email, $_SESSION['user_id']);
+        $stmt->execute();
+        $stmt->bind_result($email_count);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($email_count > 0) {
+          $errors['email'] = "Este email ya está registrado.";
+        }
+      }
     }
   }
 
@@ -131,44 +162,31 @@ if (!isset($_SESSION['user_id'])) {
       }
     }
   }
-}
 
-
-// Si no hay errores y hay cambios que realizar
-if (empty($errors) && !empty($updates)) {
-  // Construir la consulta SQL dinámicamente
-  $sql = "UPDATE USERS SET " . implode(", ", $updates) . " WHERE user_id= ?";
-  $types .= "i";
-  $params[] = intval($user_id);
-
-  // Preparar y ejecutar la consulta
-  if ($stmt = mysqli_prepare($connection, $sql)) {
-    mysqli_stmt_bind_param($stmt, ...array_merge([$types], array_values($params)));
-    if (mysqli_stmt_execute($stmt)) {
-      $_SESSION['success_message'] = "Perfil actualizado correctamente.";
-      switch ($_SESSION['user_type']) {
-        case 'admin':
-          header("Location: admin.php");
-          break;
-        case 'customer':
-          header("Location: dashboard.php");
-          break;
-        case 'manager':
-          header("Location: manager_index.php");
-          break;
-        default:
-          header("Location: index.php");
-      }
-    } else {
-      $_SESSION['register_errors']['database'] = "Error al actualizar el perfil: " . mysqli_stmt_error($stmt);
+  // Si no hay errores, actualizar perfil
+  if (empty($errors)) {
+    UpdateProfile($connection, $password, $email, $address, $new_filename);
+    $_SESSION['success_message'] = "Perfil actualizado correctamente.";
+    switch ($_SESSION['user_type']) {
+      case 'admin':
+        header("Location: admin.php");
+        break;
+      case 'customer':
+        header("Location: dashboard.php");
+        break;
+      case 'manager':
+        header("Location: manager_index.php");
+        break;
+      default:
+        header("Location: index.php");
     }
-    mysqli_stmt_close($stmt);
-  } else {
-    $_SESSION['register_errors']['database'] = "Error en la preparación de la consulta: " . mysqli_error($connection);
+    exit();
   }
+
+  $_SESSION['register_errors'] = $errors;
 }
+
 $connection->close();
-$_SESSION['register_errors'] = $errors;
 ?>
 
 <!DOCTYPE html>
@@ -179,15 +197,14 @@ $_SESSION['register_errors'] = $errors;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
-
 </head>
 
 <body>
   <?php include('./navbar.php'); ?>
 
   <main class="container">
-
     <h2>Modificar Perfil</h2>
+
     <?php
     if (isset($_SESSION['success_message'])) {
       echo "<p class='success'>" . $_SESSION['success_message'] . "</p>";
@@ -201,12 +218,10 @@ $_SESSION['register_errors'] = $errors;
     }
     ?>
 
-    <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST"
-      enctype="multipart/form-data">
+    <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label for="email">Nuevo Email:</label>
-        <input type="email" id="email" name="email"
-          placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="email" id="email" name="email" placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
       </div>
       <div class="form-group">
         <label for="password">Nueva Contraseña:</label>
@@ -217,13 +232,17 @@ $_SESSION['register_errors'] = $errors;
         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
       </div>
       <div class="form-group">
+        <label for="address" style="<?php if($_SESSION['user_type'] !== 'customer') { echo 'display: none;'; } ?>">Nueva dirección:</label>
+<input type="text" id="address" name="address" placeholder="Nueva dirección" style="<?php if($_SESSION['user_type'] !== 'customer') { echo 'display: none;'; } ?>">
+      </div>
+      <div class="form-group">
         <label for="foto">Nueva foto de perfil:</label>
         <input type="file" id="foto" name="foto">
       </div>
       <button type="submit">Actualizar Perfil</button>
     </form>
-
   </main>
+
   <?php include('./footer.php'); ?>
 </body>
 
