@@ -1,54 +1,115 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
-body, html {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
+body,
+html {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
 }
 
+/* Fijar el header arriba */
+header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	background: rgba(0, 0, 0, 0.8); /* Fondo semi-transparente */
+	color: white;
+	padding: 15px;
+	z-index: 10; /* Para que siempre esté arriba */
+}
+
+/* Asegurar que el main no se superponga con el header */
+main {
+	margin-top: 50px; /* Igual a la altura del header */
+}
+
+/* Contenedor del carrusel */
 .carousel-container {
-    display: flex;
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 50px); /* Resta la altura del header */
     position: relative;
     overflow: hidden;
+    transition: opacity 1s ease-in-out; /* Suaviza la transición del fondo */
 }
 
-.carousel {
-    display: flex;
-    width: 300vw; /* 3 slides */
-    transition: transform 1s ease-in-out;
-}
-
-.slide {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: white;
-}
-
-.slide:nth-child(1) { background: #ff5733; }
-.slide:nth-child(2) { background: #33ff57; }
-.slide:nth-child(3) { background: #3357ff; }
-
-.btn {
+.carousel-container::before {
+    content: "";
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    cursor: pointer;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Oscurecer el fondo */
+    z-index: 1; /* Colocar detrás del contenido del carrusel */
 }
 
-.btn-left { left: 10px; }
-.btn-right { right: 10px; }
+
+/* Carrusel */
+.carousel {
+	display: flex;
+	width: 300vw;
+	height: 100%;
+	transition: transform 1.5s ease-in-out;
+	position: relative;
+	z-index: 2; /* Asegurar que esté encima del fondo oscuro */
+}
+/* Cada slide ocupa el 100% del contenedor */
+.slide {
+	width: 100vw;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+/* Imágenes del carrusel */
+.slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	filter: brightness(1);
+}
+
+.slide_bg {
+	background-size: cover;
+	background-position: center;
+	object-fit: cover;
+}
+
+/* Botones de navegación */
+.btn {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	font-size: 1.5rem;
+	cursor: pointer;
+	z-index: 3; /* Se asegura de que los botones estén por encima */
+}
+
+.btn-left {
+	left: 10px;
+}
+.btn-right {
+	right: 10px;
+}
+.btn-register {
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 217, 0, 0.5);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out; /* Transición suave */
+}
+.hidden {
+    opacity: 0;
+    pointer-events: none; /* Evita que sea clickeable cuando esté oculto */
+}

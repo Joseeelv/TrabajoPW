@@ -7,7 +7,7 @@
   <title>Kebab</title>
   <link rel="stylesheet" href="./assets/css/styles.css">
   <link rel="stylesheet" href="./assets/css/carrusel.css">
-  <script src="./assets/js/carrusel.js"></script>
+  <script src="./assets/js/carrusel.js" defer></script>
 </head>
 
 <body>
@@ -21,12 +21,15 @@
       <a href="./functions/register.php" class="menu-link">Registrarse</a>
     </nav>
   </header>
+
   <main>
+
     <div class="carousel-container">
+      <button class="btn btn-register" onclick="window.location.href='./functions/register.php'">Unete a la sociedad</button>
       <div class="carousel">
-        <div class="slide"><img src="./assets/images/first_slide.png" alt="Kebab 1"></div>
-        <div class="slide"><img src="./assets/img/kebab2.jpg" alt="Kebab 2"></div>
-        <div class="slide"><img src="./assets/img/kebab3.jpg" alt="Kebab 3"></div>
+        <div class="slide"><img src="./assets/images/carrusel/first_slide.png" alt="Kebab 1"></div>
+        <div class="slide"><img src="./assets/images/carrusel/second_slide.png" alt="Kebab 2"></div>
+        <div class="slide"><img src="./assets/images/carrusel/third_slide.jpg" alt="Kebab 3"></div>
       </div>
       <button class="btn btn-left" onclick="prevSlide()">&#9664;</button>
       <button class="btn btn-right" onclick="nextSlide()">&#9654;</button>

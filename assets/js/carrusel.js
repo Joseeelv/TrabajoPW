@@ -1,11 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
     let currentIndex = 0;
-    const totalSlides = document.querySelectorAll('.slide').length;
+    const slides = document.querySelectorAll('.slide img');
+    const totalSlides = slides.length;
     const carousel = document.querySelector('.carousel');
+    const carouselContainer = document.querySelector('.carousel-container');
+    const btnLeft = document.querySelector(".btn-left");
+    const btnRight = document.querySelector(".btn-right");
 
     function updateCarousel() {
         carousel.style.transform = `translateX(-${currentIndex * 100}vw)`;
+        updateBackground(currentIndex);
+        updateRegisterButton();
     }
+
+    function updateBackground(index) {
+        setTimeout(() => {
+            carouselContainer.style.backgroundImage = `url(${slides[index].src})`;
+        }, 500); // Espera un poco para cambiar la imagen (la mitad del tiempo del fade-out)
+    }
+    
 
     function nextSlide() {
         currentIndex = (currentIndex + 1) % totalSlides;
@@ -17,8 +30,20 @@ document.addEventListener("DOMContentLoaded", () => {
         updateCarousel();
     }
 
-    document.querySelector(".btn-right").addEventListener("click", nextSlide);
-    document.querySelector(".btn-left").addEventListener("click", prevSlide);
+    function updateRegisterButton() {
+        const btnRegister = document.querySelector('.btn-register');
+        if (currentIndex === 1 || currentIndex === 2) {
+            btnRegister.classList.add('hidden'); // Ocultar con fade
+        } else {
+            btnRegister.classList.remove('hidden'); // Mostrar con fade
+        }
+    }
 
-    setInterval(nextSlide, 8000); 
+    // **Corregido: Añadir eventos a los botones**
+    btnRight.addEventListener("click", nextSlide);
+    btnLeft.addEventListener("click", prevSlide);
+
+    updateBackground(currentIndex); // Inicializa el fondo con la primera imagen
+
+    setInterval(nextSlide, 10000); // Cambia cada 8 segundos
 });
