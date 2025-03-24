@@ -11,7 +11,7 @@ CREATE TABLE USERS (
     user_secret VARCHAR(100) NOT NULL,
     email VARCHAR(30) NOT NULL UNIQUE,
     user_type ENUM('customer', 'manager', 'admin') NOT NULL,
-    img_src VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
+    img_src VARCHAR(255) NOT NULL DEFAULT 'default.png'
 );
 
 /* Tabla de clientes: Almacena información adicional para los clientes */
@@ -198,9 +198,9 @@ CREATE TABLE TRANSACTIONS (
 -- Insertar usuarios
 
 INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
-('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'default.jpg'),
-('user1', '$2y$10$fD2Z7brBG3z/piz6bIcP1OxY1BEuz3IylAm.57A7StxY09Ra2NUd2', 'user1@gmail.com', 'customer', 'default.jpg'),
-('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@gmail.com', 'manager', 'default.jpg');
+('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'default.png'),
+('user1', '$2y$10$fD2Z7brBG3z/piz6bIcP1OxY1BEuz3IylAm.57A7StxY09Ra2NUd2', 'user1@gmail.com', 'customer', 'default.png'),
+('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@gmail.com', 'manager', 'default.png');
 -- Admin123_
 -- Useruser1_
 -- Managermanager1_
@@ -215,28 +215,28 @@ INSERT INTO MANAGERS (user_id, salary) VALUES
 
 -- Insertar productos
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES
-('Döner de pollo', 6.00, 'Döner', 'döner_pollo.jpg', NULL, NULL),
-('Döner de ternera', 6.00, 'Döner', 'döner_ternera.jpg', NULL, NULL),
-('Döner cordero', 6.00, 'Döner', 'döner_mixto.jpg', NULL, NULL),
-('Döner de falafel', 6.50, 'Döner', 'döner_vegetariano.jpg', NULL, NULL),
-('Durum de pollo', 6.00, 'Durum', 'durum_pollo.jpg', NULL, NULL),
-('Durum de ternera', 6.00, 'Durum', 'durum_ternera.jpg', NULL, NULL),
-('Durum cordero', 6.00, 'Durum', 'durum_mixto.jpg', NULL, NULL),
-('Durum de falafel', 6.50, 'Durum', 'durum_vegetariano.jpg', NULL, NULL),
-('Lahmacun de pollo', 6.00, 'Lahmacun', 'lahmacun_pollo.jpg', NULL, NULL),
-('Lahmacun de ternera', 6.00, 'Lahmacun', 'lahmacun_ternera.jpg', NULL, NULL),
-('Lahmacun cordero', 6.00, 'Lahmacun', 'lahmacun_mixto.jpg', NULL, NULL),
-('Lahmacun de falafel', 6.50, 'Lahmacun', 'lahmacun_vegetariano.jpg', NULL, NULL),
-('Patatas Fritas', 3.00, 'Starter', 'patatas_fritas.jpg', NULL, NULL),
-('Patatas Kebab', 3.50, 'Starter', 'patatas_kebab.jpg', NULL, NULL),
-('Falafel', 4.00, 'Starter', 'falafel.jpg', NULL, NULL),
-('Refresco Pequeño', 1.00, 'Drink', 'refresco_pequeño.jpg', 0.30, 20),
-('Refresco Mediano', 1.50, 'Drink', 'refresco_mediano.jpg', 0.50, 20),
-('Refresco Grande', 2.00, 'Drink', 'refresco_grande.jpg', 0.75, 20),
-('Cerveza', 1.50, 'Drink', 'cerveza.jpg', 1.00, 20),
-('Agua', 1.00, 'Drink', 'agua.jpg', 0.20, 20),
-('Baklava', 2.00, 'Dessert', 'baklava.jpg', 1.00, 20),
-('Helado', 2.00, 'Dessert', 'helado.jpg', 1.00, 20);
+('Döner de pollo', 6.00, 'Döner', 'döner_pollo.png', NULL, NULL),
+('Döner de ternera', 6.00, 'Döner', 'döner_ternera.png', NULL, NULL),
+('Döner cordero', 6.00, 'Döner', 'döner_mixto.png', NULL, NULL),
+('Döner de falafel', 6.50, 'Döner', 'döner_vegetariano.png', NULL, NULL),
+('Durum de pollo', 6.00, 'Durum', 'durum_pollo.png', NULL, NULL),
+('Durum de ternera', 6.00, 'Durum', 'durum_ternera.png', NULL, NULL),
+('Durum cordero', 6.00, 'Durum', 'durum_mixto.png', NULL, NULL),
+('Durum de falafel', 6.50, 'Durum', 'durum_vegetariano.png', NULL, NULL),
+('Lahmacun de pollo', 6.00, 'Lahmacun', 'lahmacun_pollo.png', NULL, NULL),
+('Lahmacun de ternera', 6.00, 'Lahmacun', 'lahmacun_ternera.png', NULL, NULL),
+('Lahmacun cordero', 6.00, 'Lahmacun', 'lahmacun_mixto.png', NULL, NULL),
+('Lahmacun de falafel', 6.50, 'Lahmacun', 'lahmacun_vegetariano.png', NULL, NULL),
+('Patatas Fritas', 3.00, 'Starter', 'patatas_fritas.png', NULL, NULL),
+('Patatas Kebab', 3.50, 'Starter', 'patatas_kebab.png', NULL, NULL),
+('Falafel', 4.00, 'Starter', 'falafel.png', NULL, NULL),
+('Refresco Pequeño', 1.00, 'Drink', 'refresco_pequeño.png', 0.30, 20),
+('Refresco Mediano', 1.50, 'Drink', 'refresco_mediano.png', 0.50, 20),
+('Refresco Grande', 2.00, 'Drink', 'refresco_grande.png', 0.75, 20),
+('Cerveza', 1.50, 'Drink', 'cerveza.png', 1.00, 20),
+('Agua', 1.00, 'Drink', 'agua.png', 0.20, 20),
+('Baklava', 2.00, 'Dessert', 'baklava.png', 1.00, 20),
+('Helado', 2.00, 'Dessert', 'helado.png', 1.00, 20);
 
 -- Insertar ingredientes
 INSERT INTO INGREDIENTS (ingredient_name, cost, stock, vegan) VALUES
@@ -262,20 +262,20 @@ INSERT INTO INGREDIENTS (ingredient_name, cost, stock, vegan) VALUES
 -- Insertar alergenos
 INSERT INTO ALLERGENS
 (allergen_name, img_src) VALUES
-('Gluten', 'gluten.jpg'),
-('Crustáceos', 'crustaceos.jpg'),
-('Huevos', 'huevo.jpg'),
-('Pescado', 'pescado.jpg'),
-('Cacahuetes', 'cacahuetes.jpg'),
-('Soja', 'soja.jpg'),
-('Lácteos', 'lacteos.jpg'),
-('Frutos secos', 'frutos_cascara.jpg'),
-('Apio', 'Apio.jpg'),
-('Mostaza', 'mostaza.jpg'),
-('Sésamo', 'sesamo.jpg'),
-('Sulfitos', 'sulfitos.jpg'),
-('Altramuz', 'altramuz.jpg'),
-('Moluscos', 'moluscos.jpg');
+('Gluten', 'gluten.png'),
+('Crustáceos', 'crustaceos.png'),
+('Huevos', 'huevo.png'),
+('Pescado', 'pescado.png'),
+('Cacahuetes', 'cacahuetes.png'),
+('Soja', 'soja.png'),
+('Lácteos', 'lacteos.png'),
+('Frutos secos', 'frutos_cascara.png'),
+('Apio', 'Apio.png'),
+('Mostaza', 'mostaza.png'),
+('Sésamo', 'sesamo.png'),
+('Sulfitos', 'sulfitos.png'),
+('Altramuz', 'altramuz.png'),
+('Moluscos', 'moluscos.png');
 
 -- Insertar ingredientes_alergenos
 INSERT INTO INGREDIENTS_ALLERGENS (ingredient_id, allergen_id) VALUES
@@ -441,10 +441,10 @@ INSERT INTO PRODUCTS_INGREDIENTS (product_id, ingredient_id) VALUES
 
 -- Insertar menús en la tabla PRODUCTS
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES
-('Menú Familiar', 20.00, 'Menu', 'menu_familiar.jpg', NULL, NULL),
-('Menú Pareja', 12.00, 'Menu', 'menu_pareja.jpg', NULL, NULL),
-('Menú 3x2 Döner', 15.00, 'Menu', 'menu_3x2_doner.jpg', NULL, NULL),
-('Menú Ahorro', 10.00, 'Menu', 'menu_ahorro.jpg', NULL, NULL);
+('Menú Familiar', 20.00, 'Menu', 'menu_familiar.png', NULL, NULL),
+('Menú Pareja', 12.00, 'Menu', 'menu_pareja.png', NULL, NULL),
+('Menú 3x2 Döner', 15.00, 'Menu', 'menu_3x2_doner.png', NULL, NULL),
+('Menú Ahorro', 10.00, 'Menu', 'menu_ahorro.png', NULL, NULL);
 
 -- Menú Familiar: 4 Döner (2 pollo, 2 ternera), 2 patatas fritas, 4 refrescos medianos
 INSERT INTO MENUS_CONTENTS (menu_product_id, product_id, quantity) VALUES
