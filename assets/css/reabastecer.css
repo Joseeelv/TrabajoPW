@@ -1,0 +1,34 @@
+main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tables{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+#table1{
+    margin-right: 20px;
+}
+
+#table2{
+    margin-left: 20px;
+}
+
+#table1, #table2{
+    flex-direction: column;
+    align-items: center;
+}
+
+#table1 h2, #table2 h2{
+    /*centrar texto*/
+    text-align: center;
+}
+
+h1, h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

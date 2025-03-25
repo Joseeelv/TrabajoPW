@@ -48,7 +48,6 @@ main {
     z-index: 1; /* Colocar detrás del contenido del carrusel */
 }
 
-
 /* Carrusel */
 .carousel {
 	display: flex;

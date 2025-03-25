@@ -11,12 +11,18 @@ footer {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 15px;
 	position: fixed;
 	gap: 20px;
 	bottom: 0;
 	left: 0;
 	right: 0;
+	height: 50px;
+
+}
+
+main{
+	margin-top: 50px; /* Igual a la altura del header */
+	margin-bottom: 80px; /* Igual a la altura del footer */
 }
 
 footer strong {

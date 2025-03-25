@@ -14,11 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateBackground(index) {
+        
         setTimeout(() => {
             carouselContainer.style.backgroundImage = `url(${slides[index].src})`;
         }, 500); // Espera un poco para cambiar la imagen (la mitad del tiempo del fade-out)
     }
-    
+    function firstupdateBackground(index) {
+            carouselContainer.style.backgroundImage = `url(${slides[index].src})`;
+    }
 
     function nextSlide() {
         currentIndex = (currentIndex + 1) % totalSlides;
@@ -38,12 +41,11 @@ document.addEventListener("DOMContentLoaded", () => {
             btnRegister.classList.remove('hidden'); // Mostrar con fade
         }
     }
-
-    // **Corregido: Añadir eventos a los botones**
     btnRight.addEventListener("click", nextSlide);
     btnLeft.addEventListener("click", prevSlide);
+    firstupdateBackground(currentIndex); // Inicializa el fondo con la primera imagen
 
-    updateBackground(currentIndex); // Inicializa el fondo con la primera imagen
+    updateBackground(currentIndex); 
 
     setInterval(nextSlide, 10000); // Cambia cada 8 segundos
 });

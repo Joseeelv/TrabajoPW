@@ -9,8 +9,6 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	padding: 30px;
-	margin-top: 30px;
 	background-color: #fdf3e3; /* Warm beige background */
 }
 
