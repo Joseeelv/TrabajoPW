@@ -6,6 +6,10 @@ if (isset($_SESSION['user_type'])) {
         case 'admin':
             $menuItems = [
                 'Inicio' => './admin.php',
+                'Empleados' => './employees.php',
+                'Contratar' => './contratar.php',
+                'Despedir' => './despedir.php',
+                'Perfil' => './perfil.php',
                 'Cerrar Sesión' => './logout.php'
             ];
             break;

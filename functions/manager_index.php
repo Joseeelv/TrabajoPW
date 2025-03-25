@@ -24,7 +24,7 @@
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">
             <a href="./manager_replineshment.php">Reabastecer productos</a>
-            <a href="./manager_transactions.php">Ver transacciones</a>
+            <a href="./transactions.php">Ver transacciones</a>
             <a href="./perfil.php">Ver perfil</a>
         </div>
     </main>

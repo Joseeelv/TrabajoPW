@@ -41,6 +41,12 @@ function RegisterUser($username, $pass, $email, $address)
 
     mysqli_begin_transaction($connection);
 
+    if($address == NULL){
+        if (empty($address)){
+            $address = "";
+          }
+    }
+
     try {
         // Hashea la contraseña
         $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
