@@ -197,7 +197,8 @@ $connection->close();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
-  <link rek="stylesheet" href="../assets/css/perfil.css">
+  <link rel="stylesheet" href="../assets/css/perfil.css">
+  <script src="../assets/js/previewFoto.js" defer></script>
 </head>
 
 <body>
@@ -245,7 +246,9 @@ $connection->close();
       </div>
       <div class="form-group">
         <label for="foto">Nueva foto de perfil:</label>
-        <input type="file" id="foto" name="foto">
+        <input type="file" id="foto" name="foto" accept="image/*">
+        <img id="previewImage" src="" alt="Vista previa" style="display: none; width: 200px; height: auto;">
+
       </div>
       <button type="submit">Actualizar Perfil</button>
     </form>
