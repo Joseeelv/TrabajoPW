@@ -21,16 +21,19 @@ if (isset($_SESSION['user_type'])) {
         case 'customer':
             $menuItems = [
                 'Inicio' => './dashboard.php',
-                'Carta' => '',
+                'Ofertas' => './offers.php',
+                'Carta' => './Menu.php',
+                'Carrito' => './Carrito.php',
                 'Perfil' => './perfil.php',
                 'Cerrar Sesión' => './logout.php'
+
             ];
             break;
     }
 } else {
     $menuItems = [
         'Inicio' => '../index.php',
-        'Carta' => '',
+        'Carta' => './Menu.php',
         'Contacto' => './contact.php',
         'Iniciar Sesión' => './login.php',
         'Registrarse' => './register.php'

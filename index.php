@@ -15,7 +15,7 @@
     <nav class="navbar">
       <h1>Bienvenido a KEBAB!</h1>
       <a href="./index.php" class="menu-link">Inicio</a>
-      <a href="" class="menu-link">Carta</a>
+      <a href="./functions/menu.php" class="menu-link">Carta</a>
       <a href="./functions/contact.php" class="menu-link">Contacto</a>
       <a href="./functions/login.php" class="menu-link">Iniciar Sesión</a>
       <a href="./functions/register.php" class="menu-link">Registrarse</a>
