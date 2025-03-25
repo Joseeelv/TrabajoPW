@@ -25,7 +25,8 @@
   <main>
 
     <div class="carousel-container">
-      <button class="btn btn-register" onclick="window.location.href='./functions/register.php'">Unete a la sociedad</button>
+      <button class="btn btn-register" onclick="window.location.href='./functions/register.php'">Unete a la
+        sociedad</button>
       <div class="carousel">
         <div class="slide"><img src="./assets/images/carrusel/first_slide.png" alt="Kebab 1"></div>
         <div class="slide"><img src="./assets/images/carrusel/second_slide.png" alt="Kebab 2"></div>
