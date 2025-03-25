@@ -7,7 +7,7 @@
 <html>
 
 <head>
-    <title>Manager</title>
+    <title>Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/manager.css">
 
@@ -24,7 +24,7 @@
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">
             <a href="./employees.php">Ver empleados</a>
-            <a href="./manager_transactions.php">Ver transacciones</a>
+            <a href="./transactions.php">Ver transacciones</a>
             <a href="./perfil.php">Ver perfil</a>
         </div>
     </main>

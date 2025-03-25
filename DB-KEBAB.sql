@@ -199,19 +199,12 @@ CREATE TABLE TRANSACTIONS (
 
 INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
 ('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'default.jpg'),
-('user1', '$2y$10$fD2Z7brBG3z/piz6bIcP1OxY1BEuz3IylAm.57A7StxY09Ra2NUd2', 'user1@gmail.com', 'customer', 'default.jpg'),
-('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@gmail.com', 'manager', 'default.jpg');
 -- Admin123_
--- Useruser1_
--- Managermanager1_
 
 -- Insertar clientes
 INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUE
 (2, 'Avenida Real 456, Ciudad B', 100);
 
--- Insertar managers
-INSERT INTO MANAGERS (user_id, salary) VALUES
-(3, 2500);
 
 -- Insertar productos
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES

@@ -58,35 +58,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Verificar errores de validación
   if (empty($errors)) {
     // Inicio de sesión exitoso
-    session_regenerate_id(true); // Regenerar ID de sesión
-    $_SESSION['user_id'] = $user['user_id'];
-    $_SESSION['username'] = $username;
-    $_SESSION['email'] = $user['email'];
-    $_SESSION['user_type'] = $user['user_type'];
-    $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
-    $_SESSION['img_src'] = $user['img_src'];
+    $user = LoginUser($username, $password);
+    if ($user === false) {
+      $errors['password'] = "Contraseña inválida.";
+      logFailedAttempt($username);
+    } elseif ($user === 'inactive') {
+      $errors['username'] = "Esta cuenta de manager está inactiva.";
+    } else {
+      session_regenerate_id(true); // Regenerar ID de sesión
+      $_SESSION['user_id'] = $user['user_id'];
+      $_SESSION['username'] = $username;
+      $_SESSION['email'] = $user['email'];
+      $_SESSION['user_type'] = $user['user_type'];
+      $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
+      $_SESSION['img_src'] = $user['img_src'];
 
-    // Eliminar variables innecesarias
-    unset($_SESSION['failed_attempts']);
-    unset($_SESSION['csrf_token']);
-    unset($_SESSION['csrf_token_expire']);
+      // Eliminar variables innecesarias
+      unset($_SESSION['failed_attempts']);
+      unset($_SESSION['csrf_token']);
+      unset($_SESSION['csrf_token_expire']);
 
-    // Redirección basada en el user_type
-    switch ($_SESSION['user_type']) {
-      case 'admin':
-        header("Location: ./admin.php");
-        break;
-      case 'manager':
-        header("Location: ./manager_index.php");
-        break;
-      case 'customer':
-        header("Location: ./dashboard.php");
-        break;
-      default:
-        header("Location: ./login.php");
-        break;
+      // Redirección basada en el user_type
+      switch ($_SESSION['user_type']) {
+        case 'admin':
+          header("Location: ./admin.php");
+          break;
+        case 'manager':
+          header("Location: ./manager_index.php");
+          break;
+        case 'customer':
+          header("Location: ./dashboard.php");
+          break;
+        default:
+          header("Location: ./login.php");
+          break;
+      }
+      exit();
     }
-    exit();
   } else {
     // Almacenar errores en la sesión para mostrarlos en el formulario
     $_SESSION['login_errors'] = $errors;
@@ -127,8 +135,13 @@ function validateCsrfToken($token)
 function LoginUser($username, $pass)
 {
   $connection = include('./conexion.php');
-  // Obtener user_secret y user_id para verificar la contraseña e iniciar sesión
-  $stmt = $connection->prepare("SELECT user_id, user_secret, user_type, email, img_src FROM USERS WHERE username = ?");
+  // Obtener user_secret, user_id, y verificar si es un manager activo
+  $stmt = $connection->prepare("
+    SELECT u.user_id, u.user_secret, u.user_type, u.email, u.img_src, m.employee 
+    FROM USERS u
+    LEFT JOIN MANAGERS m ON u.user_id = m.user_id
+    WHERE u.username = ?
+  ");
   $stmt->bind_param("s", $username);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -142,8 +155,11 @@ function LoginUser($username, $pass)
   $user = $result->fetch_assoc();
   $stmt->close();
 
-  // Verificar contraseña
+  // Verificar contraseña y si es un manager activo
   if (password_verify($pass, $user['user_secret'])) {
+    if ($user['user_type'] === 'manager' && $user['employee'] != 1) {
+      return 'inactive';
+    }
     return $user;
   } else {
     return false;
@@ -190,6 +206,7 @@ function isUserLocked($username)
       return false; // El usuario no está bloqueado
     }
   }
+
 
   return false; // El usuario no está bloqueado
 }
