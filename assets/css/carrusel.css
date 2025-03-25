@@ -23,15 +23,10 @@ header {
 	z-index: 10; /* Para que siempre esté arriba */
 }
 
-/* Asegurar que el main no se superponga con el header */
-main {
-	margin-top: 50px; /* Igual a la altura del header */
-}
-
 /* Contenedor del carrusel */
 .carousel-container {
     width: 100vw;
-    height: calc(100vh - 50px); /* Resta la altura del header */
+    height: calc(100vh - 100px); /* Resta la altura del header */
     position: relative;
     overflow: hidden;
     transition: opacity 1s ease-in-out; /* Suaviza la transición del fondo */
@@ -103,10 +98,12 @@ main {
 }
 .btn-register {
     left: 50%;
+	top:80%;
     transform: translate(-50%, -50%);
-    background: rgba(255, 217, 0, 0.5);
+    background: rgba(255, 217, 0, 1);
     opacity: 1;
     transition: opacity 0.5s ease-in-out; /* Transición suave */
+	color: black;
 }
 .hidden {
     opacity: 0;
