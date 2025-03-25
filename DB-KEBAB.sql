@@ -133,16 +133,10 @@ CREATE TABLE ORDER_ITEMS_INGREDIENTS (
     order_item_ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
     order_item_id INT NOT NULL,
     ingredient_id INT NOT NULL,
-    extra BOOLEAN DEFAULT FALSE,
-    removed BOOLEAN DEFAULT FALSE,
+    quantity INT NOT NULL,
     FOREIGN KEY (order_item_id) REFERENCES ORDER_ITEMS(order_item_id),
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id),
-    CHECK (
-        NOT (
-            extra = TRUE
-            AND removed = TRUE
-        )
-    )
+    CHECK (quantity = 1 OR quantity = -1)
 );
 
 /* Tabla de ofertas: Almacena las ofertas disponibles */
