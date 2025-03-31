@@ -17,11 +17,12 @@ footer {
 	left: 0;
 	right: 0;
 	height: 50px;
+
 }
 
-main {
+main{
 	margin-top: 50px; /* Igual a la altura del header */
-	margin-bottom: 50px; /* Igual a la altura del footer */
+	margin-bottom: 80px; /* Igual a la altura del footer */
 }
 
 footer strong {
@@ -85,10 +86,6 @@ button:hover {
 	position: absolute;
 	left: 20px;
 	color: #ffd700; /* Golden yellow */
-	font-family: neiziri;
-	font-size: 1.8em;
-	/*borde de la letra*/
-	-webkit-text-stroke: 1.2px #2c2500;
 }
 
 .menu-link {
