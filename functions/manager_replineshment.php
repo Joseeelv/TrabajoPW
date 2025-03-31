@@ -38,6 +38,7 @@
 
                 <table>
                     <tr>
+                        <th></th>
                         <th>Nombre</th>
                         <th>Precio unitario</th>
                         <th>Stock</th>
@@ -48,6 +49,7 @@
                     if ($result_ing->num_rows > 0) {
                         while ($row = $result_ing->fetch_assoc()) {
                             echo "<tr>";
+                            echo "<td><img src='../assets/images/ingredientes/" . $row["img_src"] . "' alt='Imagen de " . $row["ingredient_name"] . "'></td>";
                             echo "<td>" . $row["ingredient_name"] . "</td>";
                             echo "<td>" . $row["cost"] . " €</td>";
                             echo "<td>" . $row["stock"] . "</td>";
@@ -77,6 +79,7 @@
                 <h2>Stock de productos</h2>
                 <table>
                     <tr>
+                        <th></th>
                         <th>Nombre</th>
                         <th>Precio unitario</th>
                         <th>Stock</th>
@@ -87,6 +90,7 @@
                     if ($result_prod->num_rows > 0) {
                         while ($row = $result_prod->fetch_assoc()) {
                             echo "<tr>";
+                            echo "<td><img src='../assets/images/productos/" . $row["img_src"] . "' alt='Imagen de " . $row["product_name"] . "'></td>";
                             echo "<td>" . $row["product_name"] . "</td>";
                             echo "<td>" . $row["cost"] . " €</td>";
                             echo "<td>" . $row["stock"] . "</td>";

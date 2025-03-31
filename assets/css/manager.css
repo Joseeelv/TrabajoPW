@@ -19,6 +19,6 @@ main {
 	align-items: center;
 }
 
-#manager-options > a {
+#manager-options > button {
 	margin: 10px;
 }

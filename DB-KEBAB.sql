@@ -204,6 +204,11 @@ INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
 INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUE
 (2, 'Avenida Real 456, Ciudad B', 100);
 
+-- Insertar managers
+INSERT INTO MANAGERS (user_id, salary) VALUES
+(3, 2500);
+
+
 
 -- Insertar productos
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES

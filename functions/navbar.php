@@ -17,7 +17,7 @@ if (isset($_SESSION['user_type'])) {
             $menuItems = [
                 'Inicio' => './manager_index.php',
                 'Reabastecer' => './manager_replineshment.php',
-                'Transacciones' => './manager_transactions.php',
+                'Transacciones' => './transactions.php',
                 'Perfil' => './perfil.php',
                 'Cerrar Sesión' => './logout.php'
             ];
