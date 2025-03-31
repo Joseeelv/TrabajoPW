@@ -36,9 +36,8 @@
             <div id="table1">
                 <h2>Stock de ingredientes</h2>
 
-                <table border='1'>
+                <table>
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Precio unitario</th>
                         <th>Stock</th>
@@ -49,9 +48,8 @@
                     if ($result_ing->num_rows > 0) {
                         while ($row = $result_ing->fetch_assoc()) {
                             echo "<tr>";
-                            echo "<td>" . $row["ingredient_id"] . "</td>";
                             echo "<td>" . $row["ingredient_name"] . "</td>";
-                            echo "<td>" . $row["cost"] . "</td>";
+                            echo "<td>" . $row["cost"] . " €</td>";
                             echo "<td>" . $row["stock"] . "</td>";
                             echo "<td>";
                             ?>
@@ -77,9 +75,8 @@
             </div>
             <div id="table2">
                 <h2>Stock de productos</h2>
-                <table border='1'>
+                <table>
                     <tr>
-                        <th>ID</th>
                         <th>Nombre</th>
                         <th>Precio unitario</th>
                         <th>Stock</th>
@@ -90,9 +87,8 @@
                     if ($result_prod->num_rows > 0) {
                         while ($row = $result_prod->fetch_assoc()) {
                             echo "<tr>";
-                            echo "<td>" . $row["product_id"] . "</td>";
                             echo "<td>" . $row["product_name"] . "</td>";
-                            echo "<td>" . $row["cost"] . "</td>";
+                            echo "<td>" . $row["cost"] . " €</td>";
                             echo "<td>" . $row["stock"] . "</td>";
                             echo "<td>";
                             ?>
