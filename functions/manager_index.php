@@ -28,7 +28,6 @@ $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/image
             <button class="btn btn-register" onclick="window.location.href='./transactions.php'">Ver
                 transacciones</button>
             <button class="btn btn-register" onclick="window.location.href='./perfil.php'">Ver perfil</button>
-
         </div>
     </main>
     <?php include('./footer.php'); ?>

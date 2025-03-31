@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
-  <link rel="stylesheet" href="../assets/css/manager.css">
+  <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 
 <body>
@@ -157,14 +157,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       </div>
       <input type="text" name="email" placeholder="Email" required
         value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-      <button type="submit" name="register">Registrarse</button>
+      <button type="submit" name="register">Registrar nuevo manager</button>
     </form>
-    <div id="manager-options">
-      <a href="./contratar.php">Ver empleados</a>
-      <a href="./despedir.php">Despedir</a>
-      <a href="./transactions.php">Ver transacciones</a>
-      <a href="./perfil.php">Ver perfil</a>
-    </div>
     <?php 
       $connection = include('./conexion.php');
     try {

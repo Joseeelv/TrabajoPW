@@ -47,9 +47,9 @@ if (isset($_SESSION['user_type'])) {
 
 // Generar el HTML de la navbar
 ?>
-<link rel="stylesheet" href="../assets/css/styles.css">
 <header>
     <nav class="navbar">
+        <h1>DÖNER KEBAB SOCIETY</h1>
         <?php
         foreach ($menuItems as $label => $url) {
             echo "<a href=\"$url\" class=\"menu-link\">$label</a>";
