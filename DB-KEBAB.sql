@@ -4,11 +4,7 @@ CREATE DATABASE DB_KEBAB;
 
 USE DB_KEBAB;
 
-<<<<<<< HEAD
 /* Tabla de usuarios generales: Almacena la información general de los usuarios en el sistema */
-=======
-/* General users table: Stores general user information in the system */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE USERS (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(30) NOT NULL UNIQUE,
@@ -18,11 +14,7 @@ CREATE TABLE USERS (
     img_src VARCHAR(255) NOT NULL DEFAULT 'default.png'
 );
 
-<<<<<<< HEAD
 /* Tabla de clientes: Almacena información adicional para los clientes */
-=======
-/* Customers users table: Stores additional information for customers */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE CUSTOMERS (
     user_id INT PRIMARY KEY,
     customer_address VARCHAR(255) NOT NULL,
@@ -30,7 +22,6 @@ CREATE TABLE CUSTOMERS (
     FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON DELETE CASCADE
 );
 
-<<<<<<< HEAD
 /* Tabla de gerentes: Almacena información adicional para los gerentes */
 CREATE TABLE MANAGERS (
     user_id INT PRIMARY KEY,
@@ -40,65 +31,23 @@ CREATE TABLE MANAGERS (
 );
 
 /* Tabla de ingredientes: Almacena los ingredientes disponibles para los productos */
-=======
-/* Managers users table: Stores additional information for managers */
-CREATE TABLE MANAGERS (
-    user_id INT PRIMARY KEY,
-    salary INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES USERS(user_id) ON DELETE CASCADE
-);
-
-/* Reviews table: Stores customer reviews and manager responses */
--- CREATE TABLE REVIEWS (
---     review_id INT PRIMARY KEY AUTO_INCREMENT,
---     user_id INT NOT NULL,
---     review_date DATE NOT NULL,
---     review_text TEXT NOT NULL,
---     rating INT NOT NULL CHECK (
---         rating BETWEEN 1
---         AND 5
---     ),
---     manager_id INT DEFAULT NULL,
---     -- NULL if no response yet
---     answer TEXT DEFAULT NULL,
---     -- NULL if no response yet
---     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE,
---     FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE,
---     CHECK (
---         answer IS NOT NULL
---         OR manager_id IS NULL
---     ) -- If there is an answer, there must be a manager
--- );
-/* Ingredients table: Stores ingredients available for products */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE INGREDIENTS (
     ingredient_id INT PRIMARY KEY AUTO_INCREMENT,
     ingredient_name VARCHAR(30) NOT NULL UNIQUE,
     cost DECIMAL(5, 2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
-<<<<<<< HEAD
     img_src VARCHAR(255),
     vegan BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 /* Tabla de alérgenos: Almacena información sobre los alérgenos */
-=======
-    vegan BOOLEAN NOT NULL DEFAULT FALSE
-);
-
-/* Allergens table: Stores allergen information */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE ALLERGENS (
     allergen_id INT PRIMARY KEY AUTO_INCREMENT,
     allergen_name VARCHAR(30) NOT NULL UNIQUE,
     img_src VARCHAR(255)
 );
 
-<<<<<<< HEAD
 /* Enlace entre INGREDIENTES y ALÉRGENOS */
-=======
-/* Links: INGREDIENTS - ALLERGENS */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE INGREDIENTS_ALLERGENS (
     ingredient_id INT NOT NULL,
     allergen_id INT NOT NULL,
@@ -107,20 +56,12 @@ CREATE TABLE INGREDIENTS_ALLERGENS (
     FOREIGN KEY (allergen_id) REFERENCES ALLERGENS(allergen_id) ON DELETE CASCADE
 );
 
-<<<<<<< HEAD
 /* Tabla de productos: Almacena los elementos del menú disponibles para ordenar */
-=======
-/* Products table: Stores menu items available for order */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE PRODUCTS (
     product_id INT PRIMARY KEY AUTO_INCREMENT,
     product_name VARCHAR(30) NOT NULL UNIQUE,
     product_price DECIMAL(5, 2) NOT NULL,
-<<<<<<< HEAD
     /* Precio en el momento de la creación (puede cambiar) */
-=======
-    -- Price at the time of creation (can change)
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
     category ENUM(
         'Menu',
         'Durum',
@@ -131,20 +72,12 @@ CREATE TABLE PRODUCTS (
         'Dessert'
     ) NOT NULL,
     img_src VARCHAR(255),
-<<<<<<< HEAD
     /* Solo si la categoría es 'Drink' o 'Dessert' */
-=======
-    -- Only if category = 'Drink' or 'Dessert':
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
     cost DECIMAL(5, 2) DEFAULT NULL,
     stock INT DEFAULT NULL
 );
 
-<<<<<<< HEAD
 /* Enlace entre MENÚS y los productos dentro del menú */
-=======
-/* Links: PRODUCTS (Menus) - PRODUCTS (Items inside the menu) */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE MENUS_CONTENTS (
     menu_product_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -152,20 +85,12 @@ CREATE TABLE MENUS_CONTENTS (
     PRIMARY KEY (menu_product_id, product_id),
     FOREIGN KEY (menu_product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
-<<<<<<< HEAD
     /* El producto del menú debe ser un menú */
     CHECK (menu_product_id != product_id)
     /* Un menú no puede contenerse a sí mismo */
 );
 
 /* Enlace entre PRODUCTOS e INGREDIENTES */
-=======
-    -- The menu product must be a menu   
-    CHECK (menu_product_id != product_id) -- A menu can't contain itself
-);
-
-/* Links: PRODUCTS - INGREDIENTS */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE PRODUCTS_INGREDIENTS (
     product_id INT NOT NULL,
     ingredient_id INT NOT NULL,
@@ -174,11 +99,7 @@ CREATE TABLE PRODUCTS_INGREDIENTS (
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE
 );
 
-<<<<<<< HEAD
 /* Enlace entre PRODUCTOS SIN INGREDIENTES y ALÉRGENOS */
-=======
-/* Links: PRODUCTS_NO_INGREDIENTS - ALLERGENS */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE PRODUCTS_NO_INGREDIENTS_ALLERGENS (
     product_id INT NOT NULL,
     allergen_id INT NOT NULL,
@@ -187,53 +108,32 @@ CREATE TABLE PRODUCTS_NO_INGREDIENTS_ALLERGENS (
     FOREIGN KEY (allergen_id) REFERENCES ALLERGENS(allergen_id) ON DELETE CASCADE
 );
 
-<<<<<<< HEAD
 /* Tabla de pedidos: Almacena los detalles de los pedidos de los clientes */
-=======
-/* Orders table: Stores customer order details */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE ORDERS (
     order_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     order_date DATE NOT NULL,
-<<<<<<< HEAD
     order_status ENUM('pendiente', 'entregado', 'cancelado') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE
 );
 
 /* Tabla de artículos en un pedido: Almacena los productos dentro de un pedido */
-=======
-    order_status ENUM('pending', 'delivered', 'cancelled') NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE
-);
-
-/* Order items table: Stores individual items within an order */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE ORDER_ITEMS (
     order_item_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(5, 2) NOT NULL,
-<<<<<<< HEAD
     /* Precio en el momento del pedido (no puede cambiar) */
-=======
-    -- Price at the time of the order (cant change)
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
     FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
     FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id)
 );
 
-<<<<<<< HEAD
 /* Enlace entre ITEMS DE PEDIDO e INGREDIENTES (modificaciones por pedido) */
-=======
-/* Links: ORDER_ITEMS - INGREDIENTS (modifications per order) */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE ORDER_ITEMS_INGREDIENTS (
     order_item_ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
     order_item_id INT NOT NULL,
     ingredient_id INT NOT NULL,
-<<<<<<< HEAD
     quantity INT NOT NULL,
     FOREIGN KEY (order_item_id) REFERENCES ORDER_ITEMS(order_item_id),
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id),
@@ -242,37 +142,14 @@ CREATE TABLE ORDER_ITEMS_INGREDIENTS (
 
 /* Tabla de ofertas: Almacena las ofertas disponibles */
 CREATE TABLE OFFERS (
-=======
-    extra BOOLEAN DEFAULT FALSE,
-    removed BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (order_item_id) REFERENCES ORDER_ITEMS(order_item_id),
-    FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id),
-    CHECK (
-        NOT (
-            extra = TRUE
-            AND removed = TRUE
-        )
-    )
-);
-
-/* Offers table: Stores available offers */
-CREATE TABLE OFFERS(
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
     offer_id INT PRIMARY KEY AUTO_INCREMENT,
     prod_id INT NOT NULL,
     cost INT NOT NULL DEFAULT 100,
     discount DECIMAL(5, 2) NOT NULL,
-<<<<<<< HEAD
     offer_text TEXT
 );
 
 /* Enlace entre CLIENTES y OFERTAS */
-=======
-    offer_text TEXT 
-);
-
-/* Links: CUSTOMERS - OFFERS */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE CUSTOMERS_OFFERS (
     user_id INT NOT NULL,
     offer_id INT NOT NULL,
@@ -282,16 +159,11 @@ CREATE TABLE CUSTOMERS_OFFERS (
     FOREIGN KEY (offer_id) REFERENCES OFFERS(offer_id) ON DELETE CASCADE
 );
 
-<<<<<<< HEAD
 /* Tabla de reabastecimientos: Almacena los detalles de los reabastecimientos de ingredientes y productos por los gerentes */
-=======
-/* Replenishments table: Stores manager replenishment details */
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
 CREATE TABLE REPLENISHMENTS (
     replenishment_id INT PRIMARY KEY AUTO_INCREMENT,
     manager_id INT NOT NULL,
     replenishment_date DATE NOT NULL,
-<<<<<<< HEAD
     ingredient_id INT,
     product_id INT,
     quantity INT NOT NULL,
@@ -309,32 +181,6 @@ CREATE TABLE TRANSACTIONS (
     transaction_id INT PRIMARY KEY AUTO_INCREMENT,
     order_id INT,
     replenishment_id INT,
-=======
-    FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE
-);
-
-/* Replenishments details table: Stores individual items within a replenishment */
-CREATE TABLE REPLENISHMENTS_DETAILS (
-    item_id INT AUTO_INCREMENT PRIMARY KEY,
-    replenishment_id INT NOT NULL,
-    ingredient_id INT ,
-    prod_id INT,
-    quantity INT NOT NULL,
-    FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
-    FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE,
-    FOREIGN KEY (prod_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
-    CHECK (
-        ingredient_id IS NOT NULL
-        OR prod_id IS NOT NULL
-    )
-);
-
-/* Transactions table: Stores transaction details */
-CREATE TABLE TRANSACTIONS (
-    transaction_id INT PRIMARY KEY AUTO_INCREMENT,
-    order_id INT NOT NULL,
-    replenishment_id INT NOT NULL,
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
     transaction_money DECIMAL(5, 2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES ORDERS(order_id) ON DELETE CASCADE,
     FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
@@ -342,7 +188,6 @@ CREATE TABLE TRANSACTIONS (
         order_id IS NOT NULL
         OR replenishment_id IS NOT NULL
     )
-<<<<<<< HEAD
 );
 -- Scrip maestro de datos iniciales para la base de datos Kebab
 -- Insertar usuarios
@@ -651,6 +496,3 @@ INSERT INTO OFFERS (prod_id, cost, discount, offer_text) VALUES
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Durum de ternera'), 50, 25.00, '¡OFERTA FLASH! 25% de descuento en Durum de ternera solo hoy.'),
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú 3x2 Döner'), 1000, 18.00, 'Pide el Menú 3x2 Döner y ahorra un 18% en tu compra.'),
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Lahmacun de pollo'), 200, 30.00, 'Lahmacun de pollo con un 30% de descuento esta semana.');
-=======
-);
->>>>>>> 74a6d0edba6f8f0a662e59c2540c56a6d20c3b57
