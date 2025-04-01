@@ -9,6 +9,7 @@ if (isset($_SESSION['user_type'])) {
                 'Empleados' => './employees.php',
                 'Contratar' => './contratar.php',
                 'Perfil' => './perfil.php',
+                'Transacciones' => './transactions.php',
                 'Cerrar Sesión' => './logout.php'
             ];
             break;
