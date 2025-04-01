@@ -2,9 +2,9 @@
 session_start();
 
 echo "holabuenastardes";
-include "./functions/.configDB.php";
+include ".configDB.php";
 
-require_once('./functions/.configDB.php');
+require_once('.configDB.php');
 if(isset($_SESSION['conexión'])) {
    $connection = $_SESSION['conexión'];
 } else {
@@ -13,7 +13,8 @@ if(isset($_SESSION['conexión'])) {
 
 /** Obtener id de Producto */
 if(isset($_SESSION['idProdSelecCarta'])) {
-   $idProdSelecCarta = 1/*$_SESSION['idProdSelecCarta']*/;
+   // $idProdSelecCarta = 1
+   $_SESSION['idProdSelecCarta'];
 }
 
 $idProdSelecCarta = 1;
@@ -54,12 +55,14 @@ echo "<br>$resultado_ingredientes->num_rows";
    <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="../assets/css/styles.css">
       <title>KEBAB SOCIETY - CARTA</title>
 
       <script src="producto.js"></script>
    </head>
 
    <body>
+      <?php include './navbar.php'; ?>
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%||                    ||%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%||                    ||%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
@@ -84,7 +87,7 @@ echo "<br>$resultado_ingredientes->num_rows";
                echo "<div title='Contenedor modificacion producto' style='border: 1px solid yellow; height:auto; width:50%;; display:flex; justify-content:center; align-items:center; flex-direction:column;'>";
                   /* Imagen de producto */
                   echo "<div title='prod-image'>";
-                     $imgPath = './productos_img/'.basename($producto["img_src"]);
+                     $imgPath = '../assets/images/productos/'.basename($producto["img_src"]);
                      if (file_exists($imgPath)) {
                         echo "<img style='width:300px;height:300px;' src='".$imgPath."' alt='".htmlspecialchars($producto["img_src"])."'>";
                      } else {
@@ -97,7 +100,7 @@ echo "<br>$resultado_ingredientes->num_rows";
                   /* Listado de ingredientes */
                   echo "<div title='Contenedor lista ingredientes' style='border:1px dashed green; display:flex; flex-wrap:wrap; justify-content:space-evenly;'>";
                      while ($ingredientes = $resultado_ingredientes->fetch_assoc()) {
-                        $imgPath = './ingredientes_img/'.basename($ingredientes["img_src"]);
+                        $imgPath = '../assets/images/ingredientes/'.basename($ingredientes["img_src"]);
                         echo "<div class='ingredient-container' title='Contenedor ingrediente' style='border:1px solid black; display:flex; flex-direction:column; margin:10px;'>";
                         /** Cargar imagen */
                         if (file_exists($imgPath)) {
@@ -135,6 +138,6 @@ echo "<br>$resultado_ingredientes->num_rows";
             echo "<div>";
          ?>
       </div>
-
+<?php include './footer.php'; ?>
    </body>
 </html>
