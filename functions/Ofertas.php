@@ -21,6 +21,7 @@ try {
         <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../assets/css/styles.css">
+        <link rel="stylesheet" href="../assets/css/ofertas.css">
         <title>Ofertas</title>
     </head>
 
@@ -55,14 +56,14 @@ try {
                         <form method=\"POST\">
                         <input type=\"hidden\" name=\"Oferta\" value=\"" . $f['id'] . "\">
                         <input type=\"image\" width=\"100px\"src=../assets/images/productos/" . $f["img"] . " alt=\"\">
-                        </form>";
+                            </form>";
 
-                if (!empty($_SESSION['Aceptada'])) {
-                    echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
-                        . "% Activa</li>";
-                } else {
-                    echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
-                        . "% No Activa</li>";
+                    if (!empty($_SESSION['Aceptada'])) {
+                        echo "Oferta: " . $f["nombre"] . "<br>Precio: " . $f["coronas"] . "<img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'><br>Descuento: " . $f["discount"]
+                            . "%<br>Activa</li>";
+                    } else {
+                        echo "Oferta: " . $f["nombre"] . "<br>Precio: " . $f["coronas"] . "<img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'><br>Descuento: " . $f["discount"]
+                        . "%<br>No Activa</li>";
                 }
             }
 
