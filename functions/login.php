@@ -108,8 +108,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Renovación automática de sesión
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+  session_unset();
+  session_destroy();
   session_regenerate_id(true);
   $_SESSION['last_activity'] = time();
+  header("Location: ../index.php");
+  exit();
 }
 
 // Forzar HTTPS

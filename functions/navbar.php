@@ -54,9 +54,12 @@ if (isset($_SESSION['user_type'])) {
             echo "<a href=\"$url\" class=\"menu-link\">$label</a>";
         }
         if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'customer') {
-            echo "<span>Puntos: " . $_SESSION['points'] . "</span>";
+            echo "<div id=\"kebabito-container\">";
+            echo "<img id=\"kebabito-image\" src=\"../assets/images/logo/DKS.png\" alt=\"Kebabito image\"><span> " . $_SESSION['points'] . "</span>";
+            echo "</div>";
             echo "<img id=\"profile-image\" src=\"../assets/images/perfiles/" . $_SESSION['img_src'] . "\" alt=\"Profile
                 Image\">";
+
         }
         ?>
 
