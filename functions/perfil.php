@@ -140,7 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Verificar si la ruta de destino existe y tiene permisos de escritura
         if (!is_dir(dirname($upload_path))) {
-          if (!mkdir(dirname($upload_path), 0755, true) && !is_dir(dirname($upload_path))) {
+          if (!mkdir(dirname($upload_path), 0777, true) && !is_dir(dirname($upload_path))) {
             $errors['foto'] = "No se pudo crear el directorio para subir la imagen.";
           }
         }

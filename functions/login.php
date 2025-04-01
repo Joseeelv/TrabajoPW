@@ -1,15 +1,15 @@
 <?php
 // Establecer parámetros de cookie seguros
 session_set_cookie_params([
-  'lifetime' => 3600,
+  'lifetime' => 3600, // segundos (1 hora)
   'path' => '/',
-  'domain' => $_SERVER['HTTP_HOST'],
-  'secure' => true,
-  'httponly' => true,
-  'samesite' => 'Strict'
+  'domain' => $_SERVER['HTTP_HOST'], // Dominio actual
+  'secure' => true, // Solo enviar cookies a través de HTTPS
+  'httponly' => true, // No permitir acceso a JavaScript
+  'samesite' => 'Strict' // Estrategia de SameSite para prevenir CSRF
 ]);
 
-session_start(); // Iniciar la sesión          
+session_start(); // Iniciar la sesión      
 
 // Configuración de seguridad
 const SECURITY = [
@@ -43,6 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validar nombre de usuario
     if (!usernameExists($username)) {
       $errors['username'] = "El nombre de usuario no existe.";
+    }
+    // Validamos la contraseña
+    if (!validatePassword($username, $password)) {
+      $errors['password'] = "Contraseña inválida.";
     }
 
     // Si el nombre de usuario existe, entonces validar la contraseña
@@ -184,7 +188,7 @@ function logFailedAttempt($username)
   $_SESSION['failed_attempts'][$username]['last_failed_attempt'] = time();
 }
 
-// Función para verificar si el usuario está bloqueado (basado en datos de sesión)
+// Función para verificar si el usuario está bloqueado (basado en datos de sesión).
 function isUserLocked($username)
 {
   if (!isset($_SESSION['failed_attempts'][$username])) {
@@ -222,7 +226,6 @@ function isUserLocked($username)
   <link rel="stylesheet" href="../assets/css/register.css">
 </head>
 
-
 <body>
   <?php
   include('./navbar.php');
@@ -233,7 +236,7 @@ function isUserLocked($username)
       echo "<p class='error'>$error</p>";
     }
     echo "</div>";
-    unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
+    unset($_SESSION['login_errors']); // Limpia los errores después de mostrarlos
   }
   ?>
   <main>
