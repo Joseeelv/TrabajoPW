@@ -47,7 +47,9 @@ try {
 <body>
     <?php include('./navbar.php'); ?>
     <main>
-        <?php echo "<form method=\"POST\">";
+        <?php
+        /* probar que pilla idProdSelecCarta */
+        echo "<form method=\"POST\">";
         echo "<select name=\"category\" id=\"category\">";
         echo "<option value=Ninguna>Ninguna</option>";
         foreach ($_SESSION['categoria'] as $c) {
@@ -67,9 +69,15 @@ try {
         if(isset($_SESSION['user_id'])){
 
             // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-            echo "<li><a href=\"producto.php\"><input type=\"hidden\" name=\"idProdSelecCarta\" value=\"" .$id . "\"/>
-                        <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
-                        <span>" . $productName . "</span></a></li>";
+            echo "<li>
+                    <form method=\"POST\" action=\"producto.php\">
+                        <input type=\"hidden\" name=\"idProdSelecCarta\" value=\"" . $id . "\" />
+                        <button type=\"submit\" style=\"border:none;background:none;cursor:pointer;\">
+                            <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
+                            <span>" . $productName . "</span>
+                        </button>
+                    </form>
+                  </li>";
         }else{
             // Create the list item with an image, product name, and link to 'producto.php' with a product ID
             echo "<li><a href=\"login.php\">

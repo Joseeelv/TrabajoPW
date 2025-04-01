@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
          if (boton.textContent == '+') {
             spanToMod = boton.previousElementSibling;
             cant_ingr = parseInt(spanToMod.textContent, 10);
-            cant_ingr++;
+            if (cant_ingr < 2) {
+               cant_ingr++;
+            }
          } else{
             spanToMod = boton.nextElementSibling;
             cant_ingr = parseInt(spanToMod.textContent, 10);

@@ -1,7 +1,7 @@
 <?php 
 session_start();
 
-echo "holabuenastardes";
+echo $_POST['idProdSelecCarta'];
 include ".configDB.php";
 
 require_once('.configDB.php');
@@ -12,12 +12,11 @@ if(isset($_SESSION['conexión'])) {
 }
 
 /** Obtener id de Producto */
-if(isset($_SESSION['idProdSelecCarta'])) {
+if(isset($_POST['idProdSelecCarta'])) {
    // $idProdSelecCarta = 1
-   $_SESSION['idProdSelecCarta'];
+   $idProdSelecCarta= $_POST['idProdSelecCarta'];
 }
 
-$idProdSelecCarta = 1;
 $cantidad = 1;
 
 /* Obtener filas de producto seleccionado */
@@ -58,7 +57,7 @@ echo "<br>$resultado_ingredientes->num_rows";
       <link rel="stylesheet" href="../assets/css/styles.css">
       <title>KEBAB SOCIETY - CARTA</title>
 
-      <script src="producto.js"></script>
+      <script src="../assets/js/producto.js"></script>
    </head>
 
    <body>
@@ -113,7 +112,7 @@ echo "<br>$resultado_ingredientes->num_rows";
                            /** Botones para añadir o quitar ingredientes */
                            echo "<div title='Contenedor botones ingredientes' style='border:1px solid purple; width:100%; height:50px; display:flex; justify-content:center; align-items:center;'>
                               <button class='ingr_btn' style='width:20px;height:20px;background-color:yellow;'>-</button>
-                              <span class='ingr-cant' style='padding:10px'>0</span>
+                              <span class='ingr-cant' style='padding:10px'>1</span>
                               <button class='ingr_btn' style='width:20px;height:20px;background-color:yellow;'>+</button>
                            </div>";
                         echo "</div>";
@@ -122,7 +121,7 @@ echo "<br>$resultado_ingredientes->num_rows";
 
                   /** Botón para añadir a carrito */
                   ?>
-                  <form id="form_add_carrito" action="functions/add_prod_carrito.php" method="POST">
+                  <form id="form_add_carrito" action="./add_prod_carrito.php" method="POST">
                      <input type="hidden" name="product_id" value="<?php echo "$idProdSelecCarta"; ?>">
                      <input type="hidden" name="product_name" value="<?php echo "$product_name"; ?>">
                      <input type="hidden" name="product_price" value="<?php echo "$product_price"; ?>">
