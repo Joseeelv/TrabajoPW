@@ -51,7 +51,7 @@ function RegisterUser($username, $pass, $email, $address)
         // Hashea la contraseña
         $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
 
-        // Inserta en la tabla USERS
+        // Inserta en la tabla USERSs
         $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $username, $hashed_password, $email);
         if (!$stmt->execute()) {
