@@ -1,6 +1,6 @@
 <?php
-    session_start();
-    $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/images/perfiles/default.jpg'; // Imagen por defecto si no hay imagen
+session_start();
+$image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/images/perfiles/default.jpg'; // Imagen por defecto si no hay imagen
 ?>
 
 
@@ -20,12 +20,14 @@
     <main>
         <h1> Bienvenido, <?php echo $_SESSION['username'];
         ?> a su menú de manager.</h1>
-         <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
+        <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">
-            <a href="./manager_replineshment.php">Reabastecer productos</a>
-            <a href="./transactions.php">Ver transacciones</a>
-            <a href="./perfil.php">Ver perfil</a>
+            <button class="btn btn-register"
+                onclick="window.location.href='./manager_replineshment.php'">Reabastecer productos</button>
+            <button class="btn btn-register" onclick="window.location.href='./transactions.php'">Ver
+                transacciones</button>
+            <button class="btn btn-register" onclick="window.location.href='./perfil.php'">Ver perfil</button>
         </div>
     </main>
     <?php include('./footer.php'); ?>

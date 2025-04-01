@@ -4,6 +4,7 @@
 <head>
     <title>Historial de Transacciones</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/reabastecer.css">
 </head>
 
 <body>
@@ -88,7 +89,13 @@
             <?php
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    echo "<tr>";
+                    if ($row["transaction_type"] == "Compra") {
+                        echo "<tr style='background-color: #FDE3E3;'>"; // Color de fondo para compras
+                    }
+                    else {
+                        echo "<tr style='background-color: #E3FDE3;'>"; // Color de fondo para ventas
+                    }
+
                     echo "<td>" . $row["transaction_date"] . "</td>";
                     echo "<td>" . $row["transaction_type"] . "</td>";
                     echo "<td>" . number_format($row["balance"], 2) . "€</td>";

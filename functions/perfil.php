@@ -16,7 +16,7 @@ function UpdateProfile($connection, $pass, $email, $address, $image)
     if (!empty($pass)) {
       $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
     }
-    if (empty($email)){
+    if (empty($email)) {
       $email = $_SESSION['email'];
     }
 
@@ -197,13 +197,15 @@ $connection->close();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/perfil.css">
+  <script src="../assets/js/previewFoto.js" defer></script>
 </head>
 
 <body>
   <?php include('./navbar.php'); ?>
 
-  <main class="container">
-    <h2>Modificar Perfil</h2>
+  <main>
+    <h1>Modificar Perfil</h1>
 
     <?php
     if (isset($_SESSION['success_message'])) {
@@ -218,10 +220,12 @@ $connection->close();
     }
     ?>
 
-    <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST" enctype="multipart/form-data">
+    <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST"
+      enctype="multipart/form-data">
       <div class="form-group">
         <label for="email">Nuevo Email:</label>
-        <input type="email" id="email" name="email" placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
+        <input type="email" id="email" name="email"
+          placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
       </div>
       <div class="form-group">
         <label for="password">Nueva Contraseña:</label>
@@ -232,12 +236,19 @@ $connection->close();
         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
       </div>
       <div class="form-group">
-        <label for="address" style="<?php if($_SESSION['user_type'] !== 'customer') { echo 'display: none;'; } ?>">Nueva dirección:</label>
-<input type="text" id="address" name="address" placeholder="Nueva dirección" style="<?php if($_SESSION['user_type'] !== 'customer') { echo 'display: none;'; } ?>">
+        <label for="address" style="<?php if ($_SESSION['user_type'] !== 'customer') {
+          echo 'display: none;';
+        } ?>">Nueva
+          dirección:</label>
+        <input type="text" id="address" name="address" placeholder="Nueva dirección" style="<?php if ($_SESSION['user_type'] !== 'customer') {
+          echo 'display: none;';
+        } ?>">
       </div>
       <div class="form-group">
         <label for="foto">Nueva foto de perfil:</label>
-        <input type="file" id="foto" name="foto">
+        <input type="file" id="foto" name="foto" accept="image/*">
+        <img id="previewImage" src="" alt="Vista previa" style="display: none; width: 200px; height: auto;">
+
       </div>
       <button type="submit">Actualizar Perfil</button>
     </form>

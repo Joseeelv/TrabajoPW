@@ -13,8 +13,6 @@ try {
         $_SESSION['categoria'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-
-
     if (!isset($_SESSION['menu']) || isset($_POST['category'])) {
         $category = $_POST['category'];
         if ($category != "Ninguna") {
@@ -66,10 +64,17 @@ try {
         $productName = htmlspecialchars($f["nombre"], ENT_QUOTES, 'UTF-8');  // Prevent XSS by escaping characters
         $productImg = htmlspecialchars("../assets/images/productos/" . $f["img"], ENT_QUOTES, 'UTF-8'); // Sanitize image URL
 
-        // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-        echo "<li><a href=\"producto.php?\">
+        if(isset($_SESSION['user_id'])){
+            // Create the list item with an image, product name, and link to 'producto.php' with a product ID
+            echo "<li><a href=\"producto.php\">
+                        <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
+                        <span>" . $productName . "</span></a></li>";
+        }else{
+            // Create the list item with an image, product name, and link to 'producto.php' with a product ID
+            echo "<li><a href=\"login.php\">
                     <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
                     <span>" . $productName . "</span></a></li>";
+        }
     }
 
     // Close the unordered list (ul)

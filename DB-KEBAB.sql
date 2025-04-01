@@ -349,11 +349,20 @@ CREATE TABLE TRANSACTIONS (
 
 INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
 ('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'default.jpg'),
+('user1', '$2y$10$fD2Z7brBG3z/piz6bIcP1OxY1BEuz3IylAm.57A7StxY09Ra2NUd2', 'user1@gmail.com', 'customer', 'default.jpg'),
+('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@gmail.com', 'manager', 'default.jpg');
 -- Admin123_
+-- Useruser1_
+-- Managermanager1_
 
 -- Insertar clientes
 INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUE
 (2, 'Avenida Real 456, Ciudad B', 100);
+
+-- Insertar managers
+INSERT INTO MANAGERS (user_id, salary) VALUES
+(3, 2500);
+
 
 
 -- Insertar productos
@@ -382,25 +391,26 @@ INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stoc
 ('Helado', 2.00, 'Dessert', 'helado.png', 1.00, 20);
 
 -- Insertar ingredientes
-INSERT INTO INGREDIENTS (ingredient_name, cost, stock, vegan) VALUES
-('Pan de pita', 0.50, 100, TRUE),
-('Tortillas', 0.50, 100, TRUE),
-('Base de lahmacun', 0.50, 100, TRUE),
-('Carne de pollo', 2.00, 50, FALSE),
-('Carne de ternera', 2.50, 50, FALSE),
-('Carne de cordero', 3.00, 50, FALSE),
-('Falafel', 1.50, 50, TRUE),
-('Lechuga', 0.20, 100, TRUE),
-('Tomate', 0.20, 100, TRUE),
-('Cebolla', 0.20, 100, TRUE),
-('Pimiento', 0.20, 100, TRUE),
-('Zanahoria', 0.20, 100, TRUE),
-('Pepino', 0.20, 100, TRUE),
-('Salsa de yogur', 0.50, 50, TRUE),
-('Salsa picante', 0.50, 50, TRUE),
-('Patatas congeladas', 1.00, 100, TRUE),
-('Aceite de oliva', 0.50, 100, TRUE),
-('Sal', 0.10, 100, TRUE);
+INSERT INTO INGREDIENTS (ingredient_name, cost, stock, vegan, img_src) VALUES
+('Pan de pita', 0.50, 100, TRUE, 'pan_de_pita.png'),
+('Tortillas', 0.50, 100, TRUE, 'tortillas.png'),
+('Base de lahmacun', 0.50, 100, TRUE, 'base_de_lahmacun.png'),
+('Carne de pollo', 2.00, 50, FALSE, 'carne_de_pollo.png'),
+('Carne de ternera', 2.50, 50, FALSE, 'carne_de_ternera.png'),
+('Carne de cordero', 3.00, 50, FALSE, 'carne_de_cordero.png'),
+('Falafel', 1.50, 50, TRUE, 'falafel.png'),
+('Lechuga', 0.20, 100, TRUE, 'lechuga.png'),
+('Tomate', 0.20, 100, TRUE, 'tomate.png'),
+('Cebolla', 0.20, 100, TRUE, 'cebolla.png'),
+('Pimiento', 0.20, 100, TRUE, 'pimiento.png'),
+('Zanahoria', 0.20, 100, TRUE, 'zanahoria.png'),
+('Pepino', 0.20, 100, TRUE, 'pepino.png'),
+('Salsa de yogur', 0.50, 50, TRUE, 'salsa_de_yogur.png'),
+('Salsa picante', 0.50, 50, TRUE, 'salsa_picante.png'),
+('Patatas congeladas', 1.00, 100, TRUE, 'patatas_congeladas.png'),
+('Aceite de oliva', 0.50, 100, TRUE, 'aceite_de_oliva.png'),
+('Sal', 0.10, 100, TRUE, 'sal.png'),
+('Queso', 0.50, 50, FALSE, 'queso.png');
 
 -- Insertar alergenos
 INSERT INTO ALLERGENS
@@ -429,6 +439,7 @@ INSERT INTO INGREDIENTS_ALLERGENS (ingredient_id, allergen_id) VALUES
 
 -- Salsa de yogur contiene lácteos
 (14, 7),  -- Salsa de yogur - Lácteos
+(19, 7),  -- Queso - Lácteos
 
 -- Falafel puede contener gluten y sésamo
 (7, 1),  -- Falafel - Gluten
@@ -572,11 +583,12 @@ INSERT INTO PRODUCTS_INGREDIENTS (product_id, ingredient_id) VALUES
 (13, 18), -- Sal
 
 -- Patatas Kebab
-(14, 16), -- Patatas congeladas
+(14, 16),-- Patatas congeladas
 (14, 17), -- Aceite de oliva
 (14, 18), -- Sal
 (14, 14), -- Salsa de yogur
-(14, 15), -- Salsa picante
+(14, 15), -- Salsa picante    
+(14, 19), -- Queso
 
 -- Falafel
 (15, 7) -- Falafel

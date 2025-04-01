@@ -22,10 +22,17 @@
         ?> a su Admin Panel.</h1>
          <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>
-        <div id="manager-options">
-            <a href="./employees.php">Ver empleados</a>
-            <a href="./transactions.php">Ver transacciones</a>
-            <a href="./perfil.php">Ver perfil</a>
+        <div id="manager-options">        <div id="manager-options">
+            <button class="btn btn-register"
+                onclick="window.location.href='./employees.php'">Ver empleados</button>
+                <button class="btn btn-register"
+                onclick="window.location.href='./contratar.php'">Contratar nuevos empleados</button>
+                <button class="btn btn-register"
+                onclick="window.location.href='./employees.php'">Despedir empleados</button>
+
+            <button class="btn btn-register" onclick="window.location.href='./transactions.php'">Ver
+                transacciones</button>
+            <button class="btn btn-register" onclick="window.location.href='./perfil.php'">Ver perfil</button>
         </div>
     </main>
     <?php include('./footer.php'); ?>
