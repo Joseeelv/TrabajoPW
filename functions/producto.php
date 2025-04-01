@@ -1,3 +1,4 @@
+
 <?php 
 session_start();
 
@@ -20,7 +21,7 @@ if(isset($_POST['idProdSelecCarta'])) {
 $cantidad = 1;
 
 /* Obtener filas de producto seleccionado */
-$query_producto = "SELECT product_id, product_name, product_price, img_src FROM PRODUCTS WHERE product_id=?";
+$query_producto = "SELECT category,product_id, product_name, product_price, img_src FROM PRODUCTS WHERE product_id=?";
 $stmt = $connection->prepare($query_producto);
 $stmt->bind_param("s",$idProdSelecCarta);
 $stmt->execute();
@@ -30,6 +31,7 @@ $producto = $resultado_producto->fetch_assoc();
 
 $product_name = $producto['product_name'];
 $product_price = $producto['product_price'];
+$category = $producto['category'];
 
 /* Obtener filas de ingredientes de producto */
 $query_ingredientes = "SELECT i.ingredient_id, i.ingredient_name, i.img_src FROM products_ingredients pi JOIN ingredients i ON pi.ingredient_id = i.ingredient_id WHERE pi.product_id =?";
@@ -53,8 +55,6 @@ echo "<br>$resultado_ingredientes->num_rows";
 <html lang="es">
    <head>
       <meta charset="UTF-8">
-      <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
-
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="stylesheet" href="../assets/css/styles.css">
       <title>KEBAB SOCIETY - CARTA</title>
@@ -101,12 +101,13 @@ echo "<br>$resultado_ingredientes->num_rows";
                            echo "<p> Imagen no disponible </p>";
                         }
                         /** Nombre de ingrediente */
-                        echo "<p class='ingr-nom'>".$ingredientes["ingredient_name"]."</p>";
+                        echo "<p class='ingr-nombre'>".$ingredientes["ingredient_name"]."</p>";
                            /** Botones para añadir o quitar ingredientes */
                            echo "<div title='Contenedor botones ingredientes' style='border:1px solid purple; width:100%; height:50px; display:flex; justify-content:center; align-items:center;'>
                               <button class='ingr_btn' style='width:20px;height:20px;background-color:yellow;'>-</button>
                               <span class='ingr-cant' style='padding:10px'>1</span>
                               <button class='ingr_btn' style='width:20px;height:20px;background-color:yellow;'>+</button>
+                              <p class='ingr-id' hidden>".$ingredientes["ingredient_id"]."</p>
                            </div>";
                         echo "</div>";
                      }
@@ -119,6 +120,7 @@ echo "<br>$resultado_ingredientes->num_rows";
                      <input type="hidden" name="product_name" value="<?php echo "$product_name"; ?>">
                      <input type="hidden" name="product_price" value="<?php echo "$product_price"; ?>">
                      <input type="hidden" id="ingr_list_info" name="ingr_list_info">
+                     <input type="hidden" name="category" value="<?php echo "$category"; ?>">
                      
                      <button id="add_to_carrito" type="submit" style="width:150px;height:20px;background-color:lightyellow;font-weight:bold;">Añadir a carrito</button>
                   </form>

@@ -19,8 +19,10 @@
     include('./navbar.php');
     ?>
     <main>
+
         <h1> Bienvenido de nuevo <?php echo $_SESSION['username'];
         ?>.</h1>
+
          <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">        <div id="manager-options">

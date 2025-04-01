@@ -1,8 +1,8 @@
 <?php
 require_once('.configDB.php');
 
-function usernameExists($username)
-{
+
+function usernameExists($username){
     // Lógica para verificar si el nombre de usuario ya existe
     $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
     if (!$connection) {
@@ -19,6 +19,7 @@ function usernameExists($username)
     $connection->close();
     return $count > 0; // Es verdadero si el nombre de usuario existe
 }
+
 
 function emailExists($email)
 {
@@ -39,8 +40,7 @@ function emailExists($email)
     return $count > 0; // Es verdadero si el correo electrónico existe
 }
 
-function validatePassword($username, $password)
-{
+function validatePassword($username, $password){
     // Conexión a la base de datos
     $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
     if (!$connection) {

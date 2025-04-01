@@ -22,7 +22,8 @@ if(isset($_POST['product_id'], $_POST['product_name'], $_POST['product_price'], 
       'nombre' => $_POST['product_name'],
       'precio' => $_POST['product_price'],
       'cantidad' => 1,
-      'lista_ingredientes' => $lista_ingredientes
+      'lista_ingredientes' => $lista_ingredientes,
+      'category' => $_POST['category']
    ];
 }
 

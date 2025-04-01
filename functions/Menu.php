@@ -29,7 +29,6 @@ try {
         }
     }
 
-
 } catch (Exception $e) {
     // If a D_Error exception is thrown, redirect to the 500 error page
     header("Location: 500.php");
@@ -97,5 +96,6 @@ try {
     </main>
     <?php include('./footer.php'); ?>
 </body>
+
 
 </html>

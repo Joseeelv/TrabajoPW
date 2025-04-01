@@ -18,6 +18,7 @@ $_SESSION['points'] = $row['points'];
 
 <head>
   <meta charset="UTF-8">
+
   <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kebab Society</title>
@@ -30,6 +31,7 @@ $_SESSION['points'] = $row['points'];
   <header>
     <?php include('./navbar.php'); ?>
   </header>
+
     <main>
       <div class="carousel-container">
         <div class="carousel">

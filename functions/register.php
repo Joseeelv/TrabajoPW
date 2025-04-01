@@ -7,6 +7,7 @@ const SECURITY = [
 ];
 
 // Habilitar visualización de errores (solo para desarrollo)
+
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
 // error_reporting(E_ALL);
@@ -52,6 +53,8 @@ function RegisterUser($username, $pass, $email, $address)
         $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
 
         // Inserta en la tabla USERSs
+
+        // Inserta en la tabla USERS
         $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $username, $hashed_password, $email);
         if (!$stmt->execute()) {

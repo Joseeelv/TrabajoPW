@@ -1,6 +1,7 @@
 <?php
 // Establecer parámetros de cookie seguros
 session_set_cookie_params([
+
   'lifetime' => 3600, // segundos (1 hora)
   'path' => '/',
   'domain' => $_SERVER['HTTP_HOST'], // Dominio actual
@@ -10,6 +11,7 @@ session_set_cookie_params([
 ]);
 
 session_start(); // Iniciar la sesión
+
 
 // Configuración de seguridad
 const SECURITY = [
@@ -34,7 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Inicializar un array para almacenar errores de validación
   $errors = [];
 
-
   // Verificar si el usuario está bloqueado
   if (isUserLocked($username)) {
     $errors['username'] = "La cuenta está temporalmente bloqueada. Por favor, inténtelo más tarde.";
@@ -43,6 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!usernameExists($username)) {
       $errors['username'] = "El nombre de usuario no existe.";
     }
+
     // Validamos la contraseña
     if (!validatePassword($username, $password)) {
       $errors['password'] = "Contraseña inválida.";
@@ -108,12 +110,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // Renovación automática de sesión
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+
   session_unset();
   session_destroy();
   session_regenerate_id(true);
   $_SESSION['last_activity'] = time();
   header("Location: ../index.php");
   exit();
+
 }
 
 // Forzar HTTPS
@@ -192,6 +196,7 @@ function logFailedAttempt($username)
 }
 
 // Función para verificar si el usuario está bloqueado (basado en datos de sesión).
+
 function isUserLocked($username)
 {
   if (!isset($_SESSION['failed_attempts'][$username])) {
@@ -229,7 +234,18 @@ function isUserLocked($username)
 </head>
 
 <body>
-  <?php include('./navbar.php');  ?>
+  <?php
+  include('./navbar.php');
+  // Mostrar errores si los hay
+  if (isset($_SESSION['login_errors'])) {
+    echo "<div class='error-container'>";
+    foreach ($_SESSION['login_errors'] as $error) {
+      echo "<p class='error'>$error</p>";
+    }
+    echo "</div>";
+    unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
+  }
+  ?>
   <main>
     <h1>Inicia Sesión</h1>
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -237,6 +253,7 @@ function isUserLocked($username)
       <input type="password" name="password" placeholder="Contraseña" required>
       <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
       <button type="submit" name="login">Iniciar sesión</button>
+
       <?php
       // Mostrar errores si los hay
       if (isset($_SESSION['login_errors'])) {
@@ -248,6 +265,7 @@ function isUserLocked($username)
         unset($_SESSION['login_errors']); // Limpia los errores después de mostrarlos
       }
       ?>
+
     </form>
     <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
   </main>

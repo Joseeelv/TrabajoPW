@@ -53,6 +53,7 @@ if (isset($_SESSION['user_type'])) {
         foreach ($menuItems as $label => $url) {
             echo "<a href=\"$url\" class=\"menu-link\">$label</a>";
         }
+
         if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'customer') {
             echo "<div id=\"kebabito-container\">";
             echo "<img id=\"kebabito-image\" src=\"../assets/images/logo/DKS.png\" alt=\"Kebabito image\"><span> " . $_SESSION['points'] . "</span>";
@@ -62,6 +63,5 @@ if (isset($_SESSION['user_type'])) {
 
         }
         ?>
-
     </nav>
 </header>
