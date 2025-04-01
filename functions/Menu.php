@@ -16,20 +16,20 @@ try {
     if (!isset($_SESSION['menu']) || isset($_POST['category'])) {
         $category = $_POST['category'];
         if ($category != "Ninguna") {
-            $query = "SELECT PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS where PRODUCTS.category = ?";
+            $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS where PRODUCTS.category = ?";
             $stmt = $_SESSION['connection']->prepare($query);
             $stmt->bind_param("s", $category);
             $stmt->execute();
             $_SESSION['menu'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         } else {
-            $query = "SELECT PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS";
+            $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS";
             $stmt = $_SESSION['connection']->prepare($query);
             $stmt->execute();
             $_SESSION['menu'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         }
     }
 
-    
+
 } catch (Exception $e) {
     // If a D_Error exception is thrown, redirect to the 500 error page
     header("Location: 500.php");
@@ -47,40 +47,56 @@ try {
 <body>
     <?php include('./navbar.php'); ?>
     <main>
-        <?php echo "<form method=\"POST\">";
-        echo "<select name=\"category\" id=\"category\">";
-        echo "<option value=Ninguna>Ninguna</option>";
-        foreach ($_SESSION['categoria'] as $c) {
-            echo "<option value=" . $c['cat'] . ">" . $c['cat'] . "</option>";
-        }
-        echo "</select>";
-        echo "<input type=\"submit\" value=\"Submit\"></form>";
-        // Begin an unordered list (ul) to display products
-    echo "<ul>";
+        <aside class="sidebar">
+            <ul>
+                <form method="POST"><input type="hidden" name="category" value="Ninguna"><button
+                        type="submit">Ninguna</button></form>
+                <?php
+                foreach ($_SESSION['categoria'] as $c) {
+                    $categoryName = htmlspecialchars($c['cat'], ENT_QUOTES, 'UTF-8'); // Sanitize category name
+                    echo "
+                            <form method=\"POST\">
+                                <input type=\"hidden\" name=\"category\" value=\"" . $categoryName . "\">
+                                <button type=\"submit\">" . $categoryName . "</button>
+                            </form>
+                          ";
+                }
+                ?>
+            </ul>
+        </aside>
+        <?php
+        echo "<ul>";
 
-    // Loop through each row in the result set
-    foreach ($_SESSION['menu'] as $f) {
-        // Ensure that the image and product name are properly displayed
-        $productName = htmlspecialchars($f["nombre"], ENT_QUOTES, 'UTF-8');  // Prevent XSS by escaping characters
-        $productImg = htmlspecialchars("../assets/images/productos/" . $f["img"], ENT_QUOTES, 'UTF-8'); // Sanitize image URL
+        // Loop through each row in the result set
+        foreach ($_SESSION['menu'] as $f) {
+            // Ensure that the image and product name are properly displayed
+            $productName = htmlspecialchars($f["nombre"], ENT_QUOTES, 'UTF-8');  // Prevent XSS by escaping characters
+            $productImg = htmlspecialchars("../assets/images/productos/" . $f["img"], ENT_QUOTES, 'UTF-8'); // Sanitize image URL
+            $id = htmlspecialchars($f["id"], ENT_QUOTES, 'UTF-8'); // Sanitize product ID
+            if (isset($_SESSION['user_id'])) {
 
-        if(isset($_SESSION['user_id'])){
-            // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-            echo "<li><a href=\"producto.php\">
-                        <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
-                        <span>" . $productName . "</span></a></li>";
-        }else{
-            // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-            echo "<li><a href=\"login.php\">
+                // Create the list item with an image, product name, and link to 'producto.php' with a product ID
+                echo "<li>
+                    <form method=\"POST\" action=\"producto.php\">
+                        <input type=\"hidden\" name=\"idProdSelecCarta\" value=\"" . $id . "\" />
+                        <button type=\"submit\" style=\"border:none;background:none;cursor:pointer;\">
+                            <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
+                            <span>" . $productName . "</span>
+                        </button>
+                    </form>
+                  </li>";
+            } else {
+                // Create the list item with an image, product name, and link to 'producto.php' with a product ID
+                echo "<li><a href=\"login.php\">
                     <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
                     <span>" . $productName . "</span></a></li>";
+            }
         }
-    }
-
-    // Close the unordered list (ul)
-    echo "</ul>";
         ?>
+        </ul>
+
     </main>
     <?php include('./footer.php'); ?>
+</body>
 
 </html>
