@@ -227,18 +227,7 @@ function isUserLocked($username)
 </head>
 
 <body>
-  <?php
-  include('./navbar.php');
-  // Mostrar errores si los hay
-  if (isset($_SESSION['login_errors'])) {
-    echo "<div class='error-container'>";
-    foreach ($_SESSION['login_errors'] as $error) {
-      echo "<p class='error'>$error</p>";
-    }
-    echo "</div>";
-    unset($_SESSION['login_errors']); // Limpia los errores después de mostrarlos
-  }
-  ?>
+  <?php include('./navbar.php');  ?>
   <main>
     <h1>Inicia Sesión</h1>
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -246,6 +235,18 @@ function isUserLocked($username)
       <input type="password" name="password" placeholder="Contraseña" required>
       <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
       <button type="submit" name="login">Iniciar sesión</button>
+      
+      <?php
+      // Mostrar errores si los hay
+      if (isset($_SESSION['login_errors'])) {
+        echo "<div class='error-container'>";
+        foreach ($_SESSION['login_errors'] as $error) {
+          echo "<p class='error'>$error</p>";
+        }
+        echo "</div>";
+        unset($_SESSION['login_errors']); // Limpia los errores después de mostrarlos
+      }
+      ?>
     </form>
     <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
   </main>
