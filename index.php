@@ -15,7 +15,6 @@
   <header>
     <nav class="navbar">
       <h1>DÖNER KEBAB SOCIETY</h1>
-
       <a href="./index.php" class="menu-link">Inicio</a>
       <a href="./functions/menu.php" class="menu-link">Carta</a>
       <a href="./functions/contact.php" class="menu-link">Contacto</a>
@@ -25,7 +24,6 @@
   </header>
 
   <main>
-
     <div class="carousel-container">
       <button class="btn btn-register" onclick="window.location.href='./functions/register.php'">Unete a la
         sociedad</button>
