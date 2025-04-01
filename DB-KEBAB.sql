@@ -63,32 +63,19 @@ CREATE TABLE PRODUCTS (
     product_price DECIMAL(5, 2) NOT NULL,
     /* Precio en el momento de la creación (puede cambiar) */
     category ENUM(
-        'Menu',
         'Durum',
         'Döner',
         'Lahmacun',
-        'Starter',
-        'Drink',
-        'Dessert'
+        'Entrante',
+        'Bebida',
+        'Postre'
     ) NOT NULL,
     img_src VARCHAR(255),
-    /* Solo si la categoría es 'Drink' o 'Dessert' */
+    /* Solo si la categoría es 'Bebida' o 'Postre' */
     cost DECIMAL(5, 2) DEFAULT NULL,
     stock INT DEFAULT NULL
 );
 
-/* Enlace entre MENÚS y los productos dentro del menú */
-CREATE TABLE MENUS_CONTENTS (
-    menu_product_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    PRIMARY KEY (menu_product_id, product_id),
-    FOREIGN KEY (menu_product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
-    /* El producto del menú debe ser un menú */
-    CHECK (menu_product_id != product_id)
-    /* Un menú no puede contenerse a sí mismo */
-);
 
 /* Enlace entre PRODUCTOS e INGREDIENTES */
 CREATE TABLE PRODUCTS_INGREDIENTS (
@@ -224,16 +211,16 @@ INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stoc
 ('Lahmacun de ternera', 6.00, 'Lahmacun', 'lahmacun_ternera.png', NULL, NULL),
 ('Lahmacun cordero', 6.00, 'Lahmacun', 'lahmacun_cordero.png', NULL, NULL),
 ('Lahmacun de falafel', 6.50, 'Lahmacun', 'lahmacun_vegetariano.png', NULL, NULL),
-('Patatas Fritas', 3.00, 'Starter', 'patatas_fritas.png', NULL, NULL),
-('Patatas Kebab', 3.50, 'Starter', 'patatas_kebab.png', NULL, NULL),
-('Falafel', 4.00, 'Starter', 'falafel.png', NULL, NULL),
-('Refresco Pequeño', 1.00, 'Drink', 'refresco_pequeño.png', 0.30, 20),
-('Refresco Mediano', 1.50, 'Drink', 'refresco_mediano.png', 0.50, 20),
-('Refresco Grande', 2.00, 'Drink', 'refresco_grande.png', 0.75, 20),
-('Cerveza', 1.50, 'Drink', 'cerveza.png', 1.00, 20),
-('Agua', 1.00, 'Drink', 'agua.png', 0.20, 20),
-('Baklava', 2.00, 'Dessert', 'baklava.png', 1.00, 20),
-('Helado', 2.00, 'Dessert', 'helado.png', 1.00, 20);
+('Patatas Fritas', 3.00, 'Entrante', 'patatas_fritas.png', NULL, NULL),
+('Patatas Kebab', 3.50, 'Entrante', 'patatas_kebab.png', NULL, NULL),
+('Falafel', 4.00, 'Entrante', 'falafel.png', NULL, NULL),
+('Refresco Pequeño', 1.00, 'Bebida', 'refresco_pequeño.png', 0.30, 20),
+('Refresco Mediano', 1.50, 'Bebida', 'refresco_mediano.png', 0.50, 20),
+('Refresco Grande', 2.00, 'Bebida', 'refresco_grande.png', 0.75, 20),
+('Cerveza', 1.50, 'Bebida', 'cerveza.png', 1.00, 20),
+('Agua', 1.00, 'Bebida', 'agua.png', 0.20, 20),
+('Baklava', 2.00, 'Postre', 'baklava.png', 1.00, 20),
+('Helado', 2.00, 'Postre', 'helado.png', 1.00, 20);
 
 -- Insertar ingredientes
 INSERT INTO INGREDIENTS (ingredient_name, cost, stock, vegan, img_src) VALUES
@@ -439,60 +426,9 @@ INSERT INTO PRODUCTS_INGREDIENTS (product_id, ingredient_id) VALUES
 (15, 7) -- Falafel
 ;
 
--- Insertar menús en la tabla PRODUCTS
-INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES
-('Menú Familiar', 20.00, 'Menu', 'menu_familiar.png', NULL, NULL),
-('Menú Pareja', 12.00, 'Menu', 'menu_pareja.png', NULL, NULL),
-('Menú 3x2 Döner', 15.00, 'Menu', 'menu_3x2_doner.png', NULL, NULL),
-('Menú Ahorro', 10.00, 'Menu', 'menu_ahorro.png', NULL, NULL);
-
--- Menú Familiar: 4 Döner (2 pollo, 2 ternera), 2 patatas fritas, 4 refrescos medianos
-INSERT INTO MENUS_CONTENTS (menu_product_id, product_id, quantity) VALUES
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Familiar'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de pollo'), 2),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Familiar'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de ternera'), 2),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Familiar'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Patatas Fritas'), 2),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Familiar'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Mediano'), 4);
-
--- Menú Pareja: 2 Durum (1 pollo, 1 ternera), 1 patatas fritas, 2 refrescos medianos
-INSERT INTO MENUS_CONTENTS (menu_product_id, product_id, quantity) VALUES
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Pareja'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Durum de pollo'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Pareja'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Durum de ternera'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Pareja'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Patatas Fritas'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Pareja'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Mediano'), 2);
-
--- Menú 3x2 Döner: 3 Döner (pueden ser diferentes), 2 refrescos grandes
-INSERT INTO MENUS_CONTENTS (menu_product_id, product_id, quantity) VALUES
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú 3x2 Döner'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de pollo'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú 3x2 Döner'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de ternera'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú 3x2 Döner'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner cordero'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú 3x2 Döner'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Grande'), 2);
-
--- Menú Ahorro: 1 Lahmacun de pollo, 1 patatas fritas, 1 refresco pequeño
-INSERT INTO MENUS_CONTENTS (menu_product_id, product_id, quantity) VALUES
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Ahorro'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Lahmacun de pollo'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Ahorro'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Patatas Fritas'), 1),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Ahorro'), 
- (SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Pequeño'), 1);
-
 -- Insertar ofertas en la tabla OFFERS
 INSERT INTO OFFERS (prod_id, cost, discount, offer_text) VALUES
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de pollo'), 300, 20.00, '¡20% de descuento en Döner de pollo esta semana!'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú Familiar'), 500, 15.00, 'Menú Familiar con un 15% de descuento por tiempo limitado.'),
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Grande'), 100, 10.00, 'Refresco Grande con 10% de descuento al pedir cualquier menú.'),
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Durum de ternera'), 50, 25.00, '¡OFERTA FLASH! 25% de descuento en Durum de ternera solo hoy.'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Menú 3x2 Döner'), 1000, 18.00, 'Pide el Menú 3x2 Döner y ahorra un 18% en tu compra.'),
 ((SELECT product_id FROM PRODUCTS WHERE product_name = 'Lahmacun de pollo'), 200, 30.00, 'Lahmacun de pollo con un 30% de descuento esta semana.');

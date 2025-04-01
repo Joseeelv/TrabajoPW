@@ -14,7 +14,10 @@ try {
     }
 
     if (!isset($_SESSION['menu']) || isset($_POST['category'])) {
-        $category = $_POST['category'];
+        if (isset($_POST['category']))
+            $category = $_POST['category'];
+        else
+            $category = "Ninguna";
         if ($category != "Ninguna") {
             $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS where PRODUCTS.category = ?";
             $stmt = $_SESSION['connection']->prepare($query);
@@ -85,9 +88,10 @@ try {
                     </form>";
             } else {
                 // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-                echo "<a href=\"login.php\">
-                    <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
-                    <span>" . $productName . "</span></a>";
+                echo "<button  onclick=\"window.location.href='./login.php'\" class=\"container-producto\">
+                    <img class=\"imagen-producto\" src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
+                    <span>" . $productName . "</span>
+                    </button>";
             }
         }
         ?>

@@ -40,7 +40,7 @@ try {
                 $stmt->execute();
                 $_SESSION['Aceptada'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-                if(isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
+                if (isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
                     $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
                     $stmt = $_SESSION['connection']->prepare($query);
                     $fecha = date('Y-m-d');
@@ -53,17 +53,17 @@ try {
                 // The image source and product name are pulled from the database results
                 echo "<li>
                         <form method=\"POST\">
-                        <input type=\"hidden\" name=\"Oferta\" value=\"". $f['id'] ."\">
-                        <input type=\"image\" width=\"100px\"src=../assets/images/productos/" . $f["img"] ." alt=\"\">
+                        <input type=\"hidden\" name=\"Oferta\" value=\"" . $f['id'] . "\">
+                        <input type=\"image\" width=\"100px\"src=../assets/images/productos/" . $f["img"] . " alt=\"\">
                         </form>";
 
-                        if(!empty($_SESSION['Aceptada'])) {
-                            echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
-                            . "% Activa</li>";
-                        } else {
-                            echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
-                            . "% No Activa</li>";
-                        }
+                if (!empty($_SESSION['Aceptada'])) {
+                    echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
+                        . "% Activa</li>";
+                } else {
+                    echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
+                        . "% No Activa</li>";
+                }
             }
 
             // Close the unordered list (ul)
