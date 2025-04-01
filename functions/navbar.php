@@ -8,8 +8,8 @@ if (isset($_SESSION['user_type'])) {
                 'Inicio' => './admin.php',
                 'Empleados' => './employees.php',
                 'Contratar' => './contratar.php',
-                'Despedir' => './despedir.php',
                 'Perfil' => './perfil.php',
+                'Transacciones' => './transactions.php',
                 'Cerrar Sesión' => './logout.php'
             ];
             break;
@@ -30,7 +30,6 @@ if (isset($_SESSION['user_type'])) {
                 'Carrito' => './Carrito.php',
                 'Perfil' => './perfil.php',
                 'Cerrar Sesión' => './logout.php'
-
             ];
             break;
     }
@@ -54,6 +53,12 @@ if (isset($_SESSION['user_type'])) {
         foreach ($menuItems as $label => $url) {
             echo "<a href=\"$url\" class=\"menu-link\">$label</a>";
         }
+        if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'customer') {
+            echo "<span>Puntos: " . $_SESSION['points'] . "</span>";
+            echo "<img id=\"profile-image\" src=\"../assets/images/perfiles/" . $_SESSION['img_src'] . "\" alt=\"Profile
+                Image\">";
+        }
         ?>
+
     </nav>
 </header>

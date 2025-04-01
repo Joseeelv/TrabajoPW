@@ -140,7 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Verificar si la ruta de destino existe y tiene permisos de escritura
         if (!is_dir(dirname($upload_path))) {
-          if (!mkdir(dirname($upload_path), 0755, true) && !is_dir(dirname($upload_path))) {
+          if (!mkdir(dirname($upload_path), 0777, true) && !is_dir(dirname($upload_path))) {
             $errors['foto'] = "No se pudo crear el directorio para subir la imagen.";
           }
         }
@@ -194,6 +194,8 @@ $connection->close();
 
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
   <link rel="stylesheet" href="../assets/css/styles.css">

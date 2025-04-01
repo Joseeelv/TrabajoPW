@@ -7,9 +7,9 @@ const SECURITY = [
 ];
 
 // Habilitar visualización de errores (solo para desarrollo)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 // ************** PROTECCIÓN CSRF ************** //
 function generateCsrfToken()
@@ -51,7 +51,7 @@ function RegisterUser($username, $pass, $email, $address)
         // Hashea la contraseña
         $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
 
-        // Inserta en la tabla USERS
+        // Inserta en la tabla USERSs
         $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $username, $hashed_password, $email);
         if (!$stmt->execute()) {
@@ -166,6 +166,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>

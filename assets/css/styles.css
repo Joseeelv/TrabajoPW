@@ -1,3 +1,4 @@
+
 body {
 	font-family: "Roboto", sans-serif;
 	background-color: #fdf3e3; /* Warm beige background */
@@ -114,4 +115,20 @@ button:hover {
 
 .menu-link:hover::after {
 	width: 100%;
+}
+
+.navbar span {
+	color: #fff;
+	font-size: 16px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	transition: color 0.3s ease;
+}
+
+#profile-image {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 50%;
+	vertical-align: middle;
 }

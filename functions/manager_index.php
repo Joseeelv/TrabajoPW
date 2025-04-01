@@ -8,6 +8,7 @@ $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/image
 
 <head>
     <title>Manager</title>
+    <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/manager.css">
 
@@ -19,7 +20,7 @@ $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/image
     ?>
     <main>
         <h1> Bienvenido, <?php echo $_SESSION['username'];
-        ?> a su menú de manager.</h1>
+        ?>.</h1>
         <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">
