@@ -66,7 +66,7 @@ try {
             </ul>
         </aside>
         <?php
-        echo "<ul>";
+        echo "<ul class=\"container-productos\">";
 
         // Loop through each row in the result set
         foreach ($_SESSION['menu'] as $f) {
@@ -77,20 +77,18 @@ try {
             if (isset($_SESSION['user_id'])) {
 
                 // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-                echo "<li>
-                    <form method=\"POST\" action=\"producto.php\">
+                echo "<form method=\"POST\" action=\"producto.php\">
                         <input type=\"hidden\" name=\"idProdSelecCarta\" value=\"" . $id . "\" />
-                        <button type=\"submit\" style=\"border:none;background:none;cursor:pointer;\">
-                            <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
+                        <button type=\"submit\" class=\"container-producto\">
+                            <img class=\"imagen-producto\" src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
                             <span>" . $productName . "</span>
                         </button>
-                    </form>
-                  </li>";
+                    </form>";
             } else {
                 // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-                echo "<li><a href=\"login.php\">
+                echo "<a href=\"login.php\">
                     <img style='width:100px;height:100px;' src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
-                    <span>" . $productName . "</span></a></li>";
+                    <span>" . $productName . "</span></a>";
             }
         }
         ?>

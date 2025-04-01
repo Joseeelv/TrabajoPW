@@ -12,7 +12,6 @@ body {
 	background-color: #fdf3e3; /* Warm beige background */
 }
 
-
 main
 {
     width: 100%;
@@ -31,4 +30,38 @@ main
     flex-direction: column;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.container-producto
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ddd; /* Light gray border */
+    border-radius: 5px;
+    background-color: #fff; /* White background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.container-producto span
+{
+    font-size: 14px;
+    color: #555; /* Dark gray text */
+    margin-bottom: 5px;
+}
+.imagen-producto
+{
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.container-productos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 15px;
+    width: 100%;
+    align-items: start;
 }

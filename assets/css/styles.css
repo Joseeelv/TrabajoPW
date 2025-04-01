@@ -131,7 +131,6 @@ button:hover {
 	height: 1.5em;
 	border-radius: 50%;
 	vertical-align: middle;
-
 }
 
 #kebabito-image {
@@ -140,7 +139,6 @@ button:hover {
 	border-radius: 50%;
 	vertical-align: middle;
 }
-
 
 #kebabito-container {
 	display: flex;
