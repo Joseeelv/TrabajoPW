@@ -23,12 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
    /** Envio de cantidades de todos los ingredientes a la sesion */
    envio = document.getElementById("add_to_carrito");
    envio.addEventListener('click', () => {
-      let lista_ingredientes = {};
+      let lista_ingredientes = [];
+      let index = 0;
 
       document.querySelectorAll(".ingredient-container").forEach(div => {
          let nombre = div.querySelector(".ingr-nom").textContent.trim();
          let cantidad = div.querySelector(".ingr-cant").textContent.trim();
-         lista_ingredientes[nombre] = cantidad;
+         lista_ingredientes[index] = [nombre, cantidad];
+         index++;
       });
 
       // Enviar el objeto como JSON en un campo oculto

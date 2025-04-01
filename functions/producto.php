@@ -71,15 +71,6 @@ echo "<br>$resultado_ingredientes->num_rows";
 
       <div>
          <?php
-            /* Lista de cosas que sacar de la BD */
-
-            /* PRODUCTS --> id, nombre, precio, imagen */
-            /* MENUS_CONTENT --> id, idProducto, precio, categoría, imagen */
-            /* INGREDIENTS --> id, nombre, vegan */
-            /* ALLERGENS --> id, nombre, imagen */
-
-            /** if(isset(&_SESSION['idProductoSeleccionadoDeCarta'])) {} */
-
             echo "<div title='Contenido principal' style='border:1px dashed blue; height:auto; width:100%; display:flex; justify-content:center; align-items:center;'>";
 
                /* Contenedor modificacion producto */

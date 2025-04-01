@@ -56,7 +56,11 @@ if (isset($_SESSION['conexión'])) {
                                     }
 
                                     // Mostramos el nombre del producto y su precio con descuento
-                                    echo "<li>" . $p['nombre'] . " " . $descuento . "</li>";
+                                    echo "<li>" . $p['nombre'] . " " . $descuento . " ";
+                                    foreach ($p['lista_ingredientes'] as $ingrediente) {
+                                        echo "{$ingrediente[0]} -> {$ingrediente[1]}";
+                                    }
+                                    echo "</li>";
                                     $v_total += $descuento;  // Añadimos el precio al total de la compra
                                 }
                                 echo "</ul>";  // Terminamos la lista de productos
