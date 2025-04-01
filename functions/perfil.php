@@ -194,6 +194,8 @@ $connection->close();
 
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
   <link rel="stylesheet" href="../assets/css/styles.css">

@@ -8,6 +8,7 @@
 
 <head>
     <title>Admin Panel</title>
+    <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/manager.css">
 
