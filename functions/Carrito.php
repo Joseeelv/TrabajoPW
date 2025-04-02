@@ -31,8 +31,13 @@ if (isset($_SESSION['conexión'])) {
                         try {
                             // Si no se han cargado las ofertas en la sesión, las traemos de la base de datos
                             if (!isset($_SESSION['ofertas'])) {
-                                $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
+                                $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas 
+                                          FROM CUSTOMERS_OFFERS 
+                                          JOIN OFFERS ON CUSTOMERS_OFFERS.offer_id = OFFERS.offer_id 
+                                          JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id 
+                                          WHERE CUSTOMERS_OFFERS.user_id = ?";
                                 $stmt = $connection->prepare($query);
+                                $stmt->bind_param("i", $_SESSION['user_id']);
                                 $stmt->execute();
                                 $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                             }
@@ -134,7 +139,7 @@ if (isset($_SESSION['conexión'])) {
                                         }
 
                                         // Mostramos el nombre del producto y su precio con descuento
-                                        echo "<li>" . $p['nombre'] . " Precio: " . $descuento . "$";
+                                        echo "<li>" . $p['nombre'] . " Precio: " . $descuento . " €";
                                         foreach ($p['lista_ingredientes'] as $ingrediente) {
                                             echo " {$ingrediente[0]} -> {$ingrediente[1]}";
                                         }
