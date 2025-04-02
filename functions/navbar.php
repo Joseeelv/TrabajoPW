@@ -49,7 +49,7 @@ if (isset($_SESSION['user_type'])) {
 ?>
 <header>
     <nav class="navbar">
-        <h1>DÖNER KEBAB SOCIETY</h1>
+        <h1 class="navbar-title">DÖNER KEBAB SOCIETY</h1>
         <?php
         foreach ($menuItems as $label => $url) {
             echo "<a href=\"$url\" class=\"menu-link\">$label</a>";
