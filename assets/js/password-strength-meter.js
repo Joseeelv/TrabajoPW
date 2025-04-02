@@ -8,10 +8,10 @@ function updatePasswordStrength(password) {
   if (/[A-Z]/.test(password)) strength++;
   if (/[a-z]/.test(password)) strength++;
   if (/\d/.test(password)) strength++;
-  if (/[@$!%*?&]/.test(password)) strength++;
+  if (/[@$!%*?&/_-]/.test(password)) strength++;
 
   // Actualizar barra de fuerza
-  strengthMeter.style.width = `${strength * 20}%`;
+  strengthMeter.style.width = `${Math.min(strength * 20, 100)}%`;
 
   const colors = ["#ff0000", "#ff4500", "#ffa500", "#9acd32", "#008000"];
   strengthMeter.style.backgroundColor = colors[strength - 1] || "#ddd";

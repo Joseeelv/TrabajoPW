@@ -11,7 +11,7 @@ CREATE TABLE USERS (
     user_secret VARCHAR(100) NOT NULL,
     email VARCHAR(30) NOT NULL UNIQUE,
     user_type ENUM('customer', 'manager', 'admin') NOT NULL,
-    img_src VARCHAR(255) NOT NULL DEFAULT 'default.png'
+    img_src VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
 );
 
 /* Tabla de clientes: Almacena información adicional para los clientes */
@@ -180,9 +180,9 @@ CREATE TABLE TRANSACTIONS (
 -- Insertar usuarios
 
 INSERT INTO USERS (username, user_secret, email, user_type, img_src) VALUES
-('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@gmail.com', 'admin', 'default.jpg'),
+('admin', '$2y$10$vtJ0CcA7T.Owsybcx5tAPOrWtnyNfjvf65.v9hSC5iSL5Ly/9dR02', 'admin@donerkebab.com', 'admin', 'default.jpg'),
 ('user1', '$2y$10$fD2Z7brBG3z/piz6bIcP1OxY1BEuz3IylAm.57A7StxY09Ra2NUd2', 'user1@gmail.com', 'customer', 'default.jpg'),
-('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@gmail.com', 'manager', 'default.jpg');
+('Manager', '$2y$10$rVVxM.uLqE/41PqQyMjvROQo/diu2TTpIkJjKSru6s0qln0baA.fq', 'manager@donerkebab.com', 'manager', 'default.jpg');
 -- Admin123_
 -- Useruser1_
 -- Managermanager1_

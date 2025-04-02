@@ -21,7 +21,7 @@ $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/image
     <main>
         <h1> Bienvenido, <?php echo $_SESSION['username'];
         ?>.</h1>
-        <img id="profile-image" src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser">
+        <img id="profile-image" src="<?php echo htmlspecialchars(file_exists($image) ? $image : '../assets/images/perfiles/default.jpg');?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>
         <div id="manager-options">
             <button class="btn btn-register"
