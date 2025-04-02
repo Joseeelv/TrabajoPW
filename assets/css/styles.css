@@ -2,7 +2,6 @@
 body {
 	font-family: "Roboto", sans-serif;
 	background-color: #fdf3e3; /* Warm beige background */
-	padding-top: 70px;
 }
 
 footer {
@@ -85,7 +84,7 @@ button:hover {
 
 .navbar h1 {
 	font-size: 20px;
-	position: flex;
+	position: absolute;
 	left: 20px;
 	color: #ffd700; /* Golden yellow */
 }
