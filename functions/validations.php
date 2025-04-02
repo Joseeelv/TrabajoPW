@@ -124,29 +124,28 @@ class Validator {
     }
 
     public static function validatePassword(string $password): array {
-        $errors = [];
-        $requirements = [
-            'length' => strlen($password) >= 8,
-            'lowercase' => preg_match('/[a-z]/', $password),
-            'uppercase' => preg_match('/[A-Z]/', $password),
-            'number' => preg_match('/\d/', $password),
-            'special' => preg_match('/[@$!%*?&\_-]/', $password)
-        ];
-    
-        if (empty($password)) {
-            $errors[] = "La contraseña es obligatoria.";
-        } elseif (in_array(false, $requirements, true)) {
-            $errors[] = "La contraseña debe contener al menos:";
-            if (!$requirements['length']) $errors[] = "- 8 caracteres mínimo";
-            if (!$requirements['lowercase']) $errors[] = "- Una letra minúscula";
-            if (!$requirements['uppercase']) $errors[] = "- Una letra mayúscula";
-            if (!$requirements['number']) $errors[] = "- Un número";
-            if (!$requirements['special']) $errors[] = "- Un carácter especial (@$!%*?&_-)";
-        }
-    
-        return $errors;
+    $errors = [];
+    $requirements = [
+        'length' => strlen($password) >= 8,
+        'lowercase' => preg_match('/[a-z]/', $password),
+        'uppercase' => preg_match('/[A-Z]/', $password),
+        'number' => preg_match('/\d/', $password),
+        'special' => preg_match('/[@$!%*?&\_-]/', $password)
+    ];
+
+    if (empty($password)) {
+        $errors[] = "La contraseña es obligatoria.";
+    } elseif (in_array(false, $requirements, true)) {
+        $errors[] = "La contraseña debe contener al menos:";
+        if (!$requirements['length']) $errors[] = "- 8 caracteres mínimo";
+        if (!$requirements['lowercase']) $errors[] = "- Una letra minúscula";
+        if (!$requirements['uppercase']) $errors[] = "- Una letra mayúscula";
+        if (!$requirements['number']) $errors[] = "- Un número";
+        if (!$requirements['special']) $errors[] = "- Un carácter especial (@$!%*?&_-)";
     }
-    
+
+    return $errors;
+}
 
     public static function validateEmail(string $email): array {
         $errors = [];

@@ -406,3 +406,155 @@ if ($_SERVER['HTTPS'] !== 'on' && $_SERVER['HTTP_HOST'] !== 'localhost') {
 ```
 
 Con estas medidas, se mejora significativamente la seguridad en la actualización de perfiles.
+# Documentación PHP: Validaciones
+
+Veremos la funcionalidad y el propósito de las funciones PHP utilizadas para la validación de usuarios en un sistema de autenticación. Se incluyen funciones para verificar la existencia de nombres de usuario y correos electrónicos, validar credenciales y aplicar reglas de validación para nombres de usuario, contraseñas y correos electrónicos.
+
+## 2. Conexión a la Base de Datos
+Cada función que interactúa con la base de datos utiliza `mysqli_connect()` para establecer la conexión. Se recomienda mantener credenciales seguras y utilizar `prepared statements` para prevenir ataques de inyección SQL.
+
+## 3. Funciones de Validación en la Base de Datos
+
+### 3.1. Verificar si un Nombre de Usuario Existe
+**Función:** `usernameExists($username)`
+
+**Descripción:**
+Verifica si un nombre de usuario ya está registrado en la base de datos.
+
+**Código:**
+```php
+function usernameExists($username){
+    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if (!$connection) {
+        die("Conexión fallida: " . mysqli_connect_error());
+    }
+    $stmt = $connection->prepare("SELECT COUNT(*) FROM USERS WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $count = $result->fetch_row()[0];
+    $stmt->close();
+    $connection->close();
+    return $count > 0;
+}
+```
+
+### 3.2. Verificar si un Correo Electrónico Existe
+**Función:** `emailExists($email)`
+
+**Descripción:**
+Verifica si un correo electrónico ya está registrado en la base de datos.
+
+**Código:**
+```php
+function emailExists($email){
+    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if (!$connection) {
+        die("Conexión fallida: " . mysqli_connect_error());
+    }
+    $stmt = $connection->prepare("SELECT COUNT(*) FROM USERS WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $count = $result->fetch_row()[0];
+    $stmt->close();
+    $connection->close();
+    return $count > 0;
+}
+```
+
+### 3.3. Validar Contraseña del Usuario
+**Función:** `validatePassword($username, $password)`
+
+**Descripción:**
+Verifica si la contraseña ingresada coincide con la almacenada en la base de datos y, si es necesario, actualiza el hash de la contraseña.
+
+**Código:**
+```php
+function validatePassword($username, $password){
+    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if (!$connection) {
+        error_log("Conexión fallida: " . mysqli_connect_error());
+        return false;
+    }
+    try {
+        $stmt = $connection->prepare("SELECT user_secret FROM USERS WHERE username = ? LIMIT 1");
+        if (!$stmt) {
+            throw new Exception("Error al preparar la consulta: " . $connection->error);
+        }
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0) {
+            return false;
+        }
+        $row = $result->fetch_assoc();
+        $storedHash = $row['user_secret'];
+        if (password_verify($password, $storedHash)) {
+            if (password_needs_rehash($storedHash, PASSWORD_BCRYPT)) {
+                $newHash = password_hash($password, PASSWORD_BCRYPT);
+                $updateStmt = $connection->prepare("UPDATE USERS SET user_secret = ? WHERE username = ?");
+                if ($updateStmt) {
+                    $updateStmt->bind_param("ss", $newHash, $username);
+                    $updateStmt->execute();
+                    $updateStmt->close();
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log("Error en validatePassword: " . $e->getMessage());
+        return false;
+    } finally {
+        if (isset($stmt) && $stmt instanceof mysqli_stmt) {
+            $stmt->close();
+        }
+        $connection->close();
+    }
+}
+```
+
+## 4. Validaciones con la Clase `Validator`
+La clase `Validator` proporciona métodos estáticos para validar nombres de usuario, correos electrónicos y contraseñas antes de su almacenamiento.
+
+### 4.1. Validación del Nombre de Usuario
+```php
+public static function validateUsername(string $username): array {
+    $errors = [];
+    if (empty($username)) {
+        $errors[] = "El nombre de usuario es obligatorio.";
+    } elseif (strlen($username) < 3 || strlen($username) > 20) {
+        $errors[] = "Debe tener entre 3 y 20 caracteres.";
+    } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        $errors[] = "Solo puede contener letras, números y guiones bajos.";
+    } elseif (usernameExists($username)) {
+        $errors[] = "Este nombre de usuario ya está en uso.";
+    }
+    return $errors;
+}
+```
+
+### 4.2. Validación de Contraseña
+```php
+public static function validatePassword(string $password): array {
+    $errors = [];
+    $requirements = [
+        'length' => strlen($password) >= 8,
+        'lowercase' => preg_match('/[a-z]/', $password),
+        'uppercase' => preg_match('/[A-Z]/', $password),
+        'number' => preg_match('/\d/', $password),
+        'special' => preg_match('/[@$!%*?&\_-]/', $password)
+    ];
+    if (empty($password)) {
+        $errors[] = "La contraseña es obligatoria.";
+    } elseif (in_array(false, $requirements, true)) {
+        $errors[] = "Debe cumplir con los requisitos de seguridad.";
+    }
+    return $errors;
+}
+```
+
+Estas funciones aseguran una validación segura y eficiente para nombres de usuario, contraseñas y correos electrónicos en un sistema de autenticación.
+
