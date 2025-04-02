@@ -40,10 +40,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isUserLocked($username)) {
     $errors['username'] = "La cuenta está temporalmente bloqueada. Por favor, inténtelo más tarde.";
   } else {
-    // Validar nombre de usuario
-    if (!usernameExists($username)) {
-      $errors['username'] = "El nombre de usuario no existe.";
-    }
 
     // Validamos la contraseña
     if (!validatePassword($username, $password)) {
