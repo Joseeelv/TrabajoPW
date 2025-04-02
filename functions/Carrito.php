@@ -30,7 +30,7 @@ if (isset($_SESSION['conexión'])) {
                         <?php
                         try {
                             // Si no se han cargado las ofertas en la sesión, las traemos de la base de datos
-                            if (!isset($_SESSION['ofertas'])) {
+                            if (!isset($_SESSION['ofertasActivas'])) {
                                 $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas 
                                           FROM CUSTOMERS_OFFERS 
                                           JOIN OFFERS ON CUSTOMERS_OFFERS.offer_id = OFFERS.offer_id 
@@ -39,7 +39,7 @@ if (isset($_SESSION['conexión'])) {
                                 $stmt = $connection->prepare($query);
                                 $stmt->bind_param("i", $_SESSION['user_id']);
                                 $stmt->execute();
-                                $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                                $_SESSION['ofertasActivas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                             }
                             $v_total = 0;  // Inicializamos el total de la compra
                         
@@ -47,7 +47,7 @@ if (isset($_SESSION['conexión'])) {
                             <h2>Ofertas activas:</h2>
                             <?php
                             // Mostramos las ofertas activas
-                            foreach ($_SESSION['ofertas'] as $f) {
+                            foreach ($_SESSION['ofertasActivas'] as $f) {
                                 echo "<ul>";
                                 echo "<li>" . $f['of_name'] . "</li>";
                                 echo "</ul>";
@@ -77,8 +77,8 @@ if (isset($_SESSION['conexión'])) {
                                         $descuento = $p['precio'];  // Obtenemos el precio base del producto
                         
                                         // Aplicamos el descuento si hay alguna oferta
-                                        if (isset($_SESSION['ofertas'])) {
-                                            foreach ($_SESSION['ofertas'] as $f) {
+                                        if (isset($_SESSION['ofertasActivas'])) {
+                                            foreach ($_SESSION['ofertasActivas'] as $f) {
                                                 if ($f['nombre'] == $p['nombre']) {
                                                     $descuento *= (1 - $f['discount'] / 100);  // Aplicamos el descuento
                                                 }
@@ -130,8 +130,8 @@ if (isset($_SESSION['conexión'])) {
                                         $descuento = $p['precio'] * $p['cantidad'];  // Calculamos el precio base del producto
                         
                                         // Verificamos si hay alguna oferta para este producto
-                                        if (isset($_SESSION['ofertas'])) {
-                                            foreach ($_SESSION['ofertas'] as $f) {
+                                        if (isset($_SESSION['ofertasActivas'])) {
+                                            foreach ($_SESSION['ofertasActivas'] as $f) {
                                                 if ($f['nombre'] == $p['nombre']) {
                                                     $descuento *= (1 - $f['discount'] / 100);  // Aplicamos el descuento si existe una oferta
                                                 }
