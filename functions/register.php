@@ -1,229 +1,269 @@
 <?php
-session_start(); // Inicia la sesión
+// Establecer parámetros de cookie seguros
+session_set_cookie_params([
+
+  'lifetime' => 3600, // segundos (1 hora)
+  'path' => '/',
+  'domain' => $_SERVER['HTTP_HOST'], // Dominio actual
+  'secure' => true, // Solo enviar cookies a través de HTTPS
+  'httponly' => true, // No permitir acceso a JavaScript
+  'samesite' => 'Strict' // Estrategia de SameSite para prevenir CSRF
+]);
+
+session_start(); // Iniciar la sesión... // Configuración de seguridad
 const SECURITY = [
-    'csrf_token_expire' => 3600, // 1 hora
-    'rate_limit' => 5, // Máximo de intentos por hora
-    'password_min_strength' => 3 // Nivel de seguridad de la contraseña (0-4)
+  'max_attempts' => 5,
+  'lockout_time' => 1800, // 30 minutos
+  'csrf_token_expire' => 3600 // 1 hora
 ];
 
-// Habilitar visualización de errores (solo para desarrollo)
-
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
-// ************** PROTECCIÓN CSRF ************** //
-function generateCsrfToken()
-{
-    if (empty($_SESSION['csrf_token']) || time() > $_SESSION['csrf_token_expire']) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        $_SESSION['csrf_token_expire'] = time() + SECURITY['csrf_token_expire'];
-    }
-    return $_SESSION['csrf_token'];
-}
-
-function validateCsrfToken($token)
-{
-    return hash_equals($_SESSION['csrf_token'], $token) && time() < $_SESSION['csrf_token_expire'];
-}
-
-// Cabeceras de seguridad
-header("Content-Security-Policy: default-src 'self'");
-header("X-Frame-Options: DENY");
-header("Strict-Transport-Security: max-age=63072000; includeSubDomains");
-header("X-Content-Type-Options: nosniff");
-header("Referrer-Policy: strict-origin-when-cross-origin");
-header("Permissions-Policy: geolocation=(), camera=()");
-
-// Función para registrar un nuevo usuario
-function RegisterUser($username, $pass, $email, $address)
-{
-    $connection = include('./conexion.php');
-
-    mysqli_begin_transaction($connection);
-
-    if($address == NULL){
-        if (empty($address)){
-            $address = "";
-          }
-    }
-
-    try {
-        // Hashea la contraseña
-        $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
-
-        // Inserta en la tabla USERSs
-
-        // Inserta en la tabla USERS
-        $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $hashed_password, $email);
-        if (!$stmt->execute()) {
-            throw new Exception("Error al insertar en la tabla USERS: " . $stmt->error);
-        }
-        $user_id = $connection->insert_id;
-        $stmt->close();
-
-        // Inserta en la tabla CUSTOMERS
-        $stmt = $connection->prepare("INSERT INTO CUSTOMERS (user_id, customer_address) VALUES (?, ?)");
-        $stmt->bind_param("is", $user_id, $address);
-        if (!$stmt->execute()) {
-            throw new Exception("Error al insertar en la tabla CUSTOMERS: " . $stmt->error);
-        }
-        $stmt->close();
-
-        mysqli_commit($connection);
-    } catch (Exception $e) {
-        mysqli_rollback($connection);
-        throw $e;
-    } finally {
-        $connection->close();
-    }
-}
-
-// Importa una biblioteca de validación o define funciones de validación
+// Importar una biblioteca de validación o definir funciones de validación
 require_once('validations.php');
 
-// Comprueba si el formulario fue enviado
+// Verificar si se envió el formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Recolecta y sanitiza los datos de entrada
-    $username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
-    $password = $_POST['password'];
-    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL); // Sanitizar el email
-    $address = trim(htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8'));
+  // Validar token CSRF
+  if (!validateCsrfToken($_POST['csrf_token'])) {
+    die("Token CSRF inválido");
+  }
 
-    // Inicializa un array para almacenar errores de validación
-    $errors = [];
+  // Recopilar y sanitizar datos de entrada
+  $username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
+  $password = $_POST['password']; // No sanitizar contraseñas
+  // Inicializar un array para almacenar errores de validación
+  $errors = [];
 
-    // Valida el nombre de usuario
-    if (empty($username)) {
-        $errors['username'] = "El nombre de usuario es obligatorio.";
-    } elseif (strlen($username) < 3 || strlen($username) > 20) {
-        $errors['username'] = "El nombre de usuario debe tener entre 3 y 20 caracteres.";
-    } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-        $errors['username'] = "El nombre de usuario solo puede contener letras, números y guiones bajos.";
-    } elseif (usernameExists($username)) { // Asegúrate de que esta función esté definida en validations.php
-        $errors['username'] = "Este nombre de usuario ya está en uso.";
+  // Verificar si el usuario está bloqueado
+  if (isUserLocked($username)) {
+    $errors['username'] = "La cuenta está temporalmente bloqueada. Por favor, inténtelo más tarde.";
+  } else {
+    // Validaciones
+    $username_errors = Validator::validateUsername($_POST['username']);
+    $password_errors = Validator::validatePassword($_POST['password']);
+
+    if (!empty($username_errors)) {
+      $errors['username'] = $username_errors;
     }
 
-    // Valida la contraseña
-    if (empty($password)) {
-        $errors['password'] = "La contraseña es obligatoria.";
-    } elseif (strlen($password) < 8) {
-        $errors['password'] = "La contraseña debe tener al menos 8 caracteres.";
-    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,}$/', $password)) {
-        $errors['password'] = "La contraseña debe contener al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
+    if (!empty($password_errors)) {
+      $errors['password'] = $password_errors;
     }
-
-    // Valida el email
-    if (empty($email)) {
-        $errors['email'] = "El email es obligatorio.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors['email'] = "Por favor, introduce una dirección de email válida.";
-    } else {
-        // Definir una lista de dominios de correo electrónico permitidos
-        $dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'example.com', 'test.com'];
-        $dominio = substr(strrchr($email, "@"), 1);
-        if (!in_array($dominio, $dominiosPermitidos)) {
-            $errors['email'] = "Por favor, utiliza un dominio de correo electrónico válido.";
-        } elseif (emailExists($email)) { // Asegúrate de que esta función esté definida
-            $errors['email'] = "Este email ya está registrado.";
-        }
-    }
-
-    // Valida la dirección
-    if (empty($address)) {
-        $errors['address'] = "La dirección es obligatoria.";
-    }
-
-    // Validación CSRF
-    if (!validateCsrfToken($_POST['csrf_token'])) {
-        throw new Exception("Token CSRF inválido");
-    }
-
-    // Comprueba si hay errores de validación
+    // Si el nombre de usuario existe, entonces validar la contraseña
     if (empty($errors)) {
-        try {
-            RegisterUser($username, $password, $email, $address);
-            // Registro exitoso
-            $_SESSION['success_message'] = "Usuario registrado con éxito.";
-            header("Location: login.php");
-            exit();
-        } catch (Exception $e) {
-            error_log("Error de registro: " . $e->getMessage());
-            $errors['registration'] = "Error de registro: " . $e->getMessage();
-        }
+      $user = LoginUser($username, $password);
+      if ($user === false) {
+        $errors['password'] = "Contraseña inválida.";
+        logFailedAttempt($username);
+      }
     }
+  }
 
-    // Almacena los errores en la sesión para mostrarlos en el formulario
-    $_SESSION['register_errors'] = $errors;
+  // Verificar errores de validación
+  if (empty($errors)) {
+    // Inicio de sesión exitoso
+    $user = LoginUser($username, $password);
+    if ($user === false) {
+      $errors['password'] = "Contraseña inválida.";
+      logFailedAttempt($username);
+    } elseif ($user === 'inactive') {
+      $errors['username'] = "Esta cuenta de manager está inactiva.";
+    } else {
+      session_regenerate_id(true); // Regenerar ID de sesión
+      $_SESSION['user_id'] = $user['user_id'];
+      $_SESSION['username'] = $username;
+      $_SESSION['email'] = $user['email'];
+      $_SESSION['user_type'] = $user['user_type'];
+      $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
+      $_SESSION['img_src'] = $user['img_src'];
+
+      // Eliminar variables innecesarias
+      unset($_SESSION['failed_attempts']);
+      unset($_SESSION['csrf_token']);
+      unset($_SESSION['csrf_token_expire']);
+
+      // Redirección basada en el user_type
+      switch ($_SESSION['user_type']) {
+        case 'admin':
+          header("Location: ./admin.php");
+          break;
+        case 'manager':
+          header("Location: ./manager_index.php");
+          break;
+        case 'customer':
+          header("Location: ./dashboard.php");
+          break;
+        default:
+          header("Location: ./login.php");
+          break;
+      }
+      exit();
+    }
+  } else {
+    // Almacenar errores en la sesión para mostrarlos en el formulario
+    $_SESSION['login_errors'] = $errors;
+    header("Location: ./login.php"); // Redirigir de vuelta a la página de inicio de sesión
+    exit();
+  }
 }
 
-// Fuerza HTTPS
+// Renovación automática de sesión
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+
+  session_unset();
+  session_destroy();
+  session_regenerate_id(true);
+  $_SESSION['last_activity'] = time();
+  header("Location: ../index.php");
+  exit();
+}
+
+// Forzar HTTPS
 if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
-    header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-    exit();
+  header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+  exit();
+}
+
+// Función para generar token CSRF
+function generateCsrfToken()
+{
+  if (empty($_SESSION['csrf_token']) || time() > $_SESSION['csrf_token_expire']) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token_expire'] = time() + SECURITY['csrf_token_expire'];
+  }
+  return $_SESSION['csrf_token'];
+}
+
+// Función para validar token CSRF
+function validateCsrfToken($token)
+{
+  return hash_equals($_SESSION['csrf_token'], $token) && time() < $_SESSION['csrf_token_expire'];
+}
+
+// Función para iniciar sesión del usuario
+function LoginUser($username, $pass)
+{
+  $connection = include('./conexion.php');
+  // Obtener user_secret, user_id, y verificar si es un manager activo
+  $stmt = $connection->prepare("
+    SELECT u.user_id, u.user_secret, u.user_type, u.email, u.img_src, m.employee 
+    FROM USERS u
+    LEFT JOIN MANAGERS m ON u.user_id = m.user_id
+    WHERE u.username = ?
+  ");
+  $stmt->bind_param("s", $username);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  if ($result->num_rows === 0) {
+    $stmt->close();
+    $connection->close();
+    return false;
+  }
+
+  $user = $result->fetch_assoc();
+  $stmt->close();
+
+  // Verificar contraseña y si es un manager activo
+  if (password_verify($pass, $user['user_secret'])) {
+    if ($user['user_type'] === 'manager' && $user['employee'] != 1) {
+      return 'inactive';
+    }
+    return $user;
+  } else {
+    return false;
+  }
+}
+
+// Función para registrar intentos de inicio de sesión fallidos (sin consultas a la base de datos)
+function logFailedAttempt($username)
+{
+  if (!isset($_SESSION['failed_attempts'])) {
+    $_SESSION['failed_attempts'] = [];
+  }
+
+  if (!isset($_SESSION['failed_attempts'][$username])) {
+    $_SESSION['failed_attempts'][$username] = [
+      'count' => 0,
+      'last_failed_attempt' => 0
+    ];
+  }
+
+  $_SESSION['failed_attempts'][$username]['count']++;
+  $_SESSION['failed_attempts'][$username]['last_failed_attempt'] = time();
+}
+
+// Función para verificar si el usuario está bloqueado (basado en datos de sesión).
+
+function isUserLocked($username)
+{
+  if (!isset($_SESSION['failed_attempts'][$username])) {
+    return false; // El usuario no está bloqueado
+  }
+
+  $failed_attempts = $_SESSION['failed_attempts'][$username]['count'];
+  $last_failed_attempt = $_SESSION['failed_attempts'][$username]['last_failed_attempt'];
+  $lockout_time = SECURITY['lockout_time'];
+  $max_attempts = SECURITY['max_attempts'];
+
+  if ($failed_attempts >= $max_attempts) {
+    $lockout_time_remaining = (time() - $last_failed_attempt);
+    if ($lockout_time_remaining < $lockout_time) {
+      return true; // El usuario está bloqueado
+    } else {
+      // Reiniciar intentos fallidos si el tiempo de bloqueo ha pasado
+      unset($_SESSION['failed_attempts'][$username]);
+      return false; // El usuario no está bloqueado
+    }
+  }
+  return false; // El usuario no está bloqueado
 }
 ?>
-<!DOCTYPE html>
-<html lang="es">
+
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
-    <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/register.css">
-    </style>
+  <meta charset="UTF-8">
+  <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/register.css">
 </head>
 
 <body>
-    <?php include('./navbar.php'); ?>
-    <main>
-        <h1>Regístrate</h1>
-        <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-            <?php
-            // Muestra errores si los hay
-            if (isset($_SESSION['register_errors'])) {
-                echo "<div class='error-container'>";
-                foreach ($_SESSION['register_errors'] as $key => $error) {
-                    echo "<p class='error'>$error</p>";
-                }
-                echo "</div>";
-                unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
+  <?php
+  include('./navbar.php');
+  ?>
+  <main>
+    <h1>Inicia Sesión</h1>
+    <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+      <input type="text" name="username" placeholder="Nombre de usuario" required>
+      <input type="password" name="password" placeholder="Contraseña" required>
+      <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+      <button type="submit" name="login">Iniciar sesión</button>
+
+      <?php
+      // Muestra errores si los hay
+      if (isset($_SESSION['login_errors'])) {
+        echo "<div class='error-container'>";
+        foreach ($_SESSION['login_errors'] as $key => $errors) {
+          if (is_array($errors)) {
+            foreach ($errors as $error) {
+              echo "<p class='error'>" . htmlspecialchars($error) . "</p>";
             }
-            ?>
-            <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
-            <input type="text" name="username" placeholder="Nombre de usuario" required
-                value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
-            <div>
-                <input type="password" name="password" id="password" placeholder="Contraseña" required>
-                <!-- Barra de fortaleza -->
-                <div class="password-strength-meter">
-                    <div class="password-strength-meter-fill"></div>
-                </div>
-                <!-- Lista de verificación -->
-                <ul class="password-checklist">
-                    <li id="length">Al menos 8 caracteres de longitud</li>
-                    <li id="uppercase">Contiene letra mayúscula</li>
-                    <li id="lowercase">Contiene letra minúscula</li>
-                    <li id="number">Contiene número</li>
-                    <li id="special">Contiene carácter especial</li>
-                </ul>
-            </div>
+          } else {
+            echo "<p class='error'>" . htmlspecialchars($errors) . "</p>";
+          }
+        }
+        echo "</div>";
+        unset($_SESSION['login_errors']); // Limpia los errores después de mostrarlos
+      }
+      ?>
 
-            <input type="text" name="email" placeholder="Email" required
-                value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
-            <input type="text" name="address" placeholder="Dirección" required
-                value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>">
-            <button type="submit" name="register">Registrarse</button>
-        </form>
-
-        <p>¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
-        <script src="../assets/js/password-strength-meter.js"></script>
-    </main>
-    <?php include('./footer.php'); ?>
+    </form>
+    <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
+  </main>
+  <?php include('./footer.php'); ?>
 </body>
 
 </html>

@@ -96,3 +96,74 @@ function validatePassword($username, $password){
         $connection->close();
     }
 }
+
+class Validator {
+    private const ALLOWED_DOMAINS = [
+        'gmail.com', 'hotmail.com', 'outlook.com', 
+        'yahoo.com', 'example.com', 'test.com'
+    ];
+
+    public static function validateUsername(string $username): array {
+        $errors = [];
+        
+        switch (true) {
+            case empty($username):
+                $errors[] = "El nombre de usuario es obligatorio.";
+                break;
+            case strlen($username) < 3 || strlen($username) > 20:
+                $errors[] = "El nombre de usuario debe tener entre 3 y 20 caracteres.";
+                break;
+            case !preg_match('/^[a-zA-Z0-9_]+$/', $username):
+                $errors[] = "El nombre de usuario solo puede contener letras, números y guiones bajos.";
+                break;
+            case usernameExists($username):
+                $errors[] = "Este nombre de usuario ya está en uso.";
+        }
+
+        return $errors;
+    }
+
+    public static function validatePassword(string $password): array {
+        $errors = [];
+        $requirements = [
+            'length' => strlen($password) >= 8,
+            'lowercase' => preg_match('/[a-z]/', $password),
+            'uppercase' => preg_match('/[A-Z]/', $password),
+            'number' => preg_match('/\d/', $password),
+            'special' => preg_match('/[@$!%*?&\_-]/', $password)
+        ];
+    
+        if (empty($password)) {
+            $errors[] = "La contraseña es obligatoria.";
+        } elseif (in_array(false, $requirements, true)) {
+            $errors[] = "La contraseña debe contener al menos:";
+            if (!$requirements['length']) $errors[] = "- 8 caracteres mínimo";
+            if (!$requirements['lowercase']) $errors[] = "- Una letra minúscula";
+            if (!$requirements['uppercase']) $errors[] = "- Una letra mayúscula";
+            if (!$requirements['number']) $errors[] = "- Un número";
+            if (!$requirements['special']) $errors[] = "- Un carácter especial (@$!%*?&_-)";
+        }
+    
+        return $errors;
+    }
+    
+
+    public static function validateEmail(string $email): array {
+        $errors = [];
+        
+        if (empty($email)) {
+            $errors[] = "El email es obligatorio.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Por favor, introduce una dirección de email válida.";
+        } else {
+            $domain = substr(strrchr($email, "@"), 1);
+            if (!in_array($domain, self::ALLOWED_DOMAINS)) {
+                $errors[] = "Por favor, utiliza un dominio de correo electrónico válido.";
+            } elseif (emailExists($email)) {
+                $errors[] = "Este email ya está registrado.";
+            }
+        }
+
+        return $errors;
+    }
+}

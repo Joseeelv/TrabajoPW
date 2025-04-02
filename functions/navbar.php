@@ -59,8 +59,11 @@ if (isset($_SESSION['user_type'])) {
             echo "<div id=\"kebabito-container\">";
             echo "<img id=\"kebabito-image\" src=\"../assets/images/logo/DKS.png\" alt=\"Kebabito image\"><span> " . $_SESSION['points'] . "</span>";
             echo "</div>";
-            echo "<img id=\"profile-image\" src=\"../assets/images/perfiles/" . $_SESSION['img_src'] . "\" alt=\"Profile
-                Image\">";
+            $profileImagePath = "../assets/images/perfiles/" . $_SESSION['img_src'];
+            if (!file_exists($profileImagePath) || empty($_SESSION['img_src'])) {
+                $profileImagePath = "../assets/images/perfiles/default.jpg";
+            }
+            echo "<img id=\"profile-image\" src=\"$profileImagePath\" alt=\"Profile Image\">";
 
         }
         ?>
