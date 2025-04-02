@@ -281,23 +281,22 @@ INSERT INTO INGREDIENTS_ALLERGENS (ingredient_id, allergen_id) VALUES
 (15, 12), -- Salsa picante - Sulfitos
 (15, 10), -- Salsa picante - Mostaza
 
--- Carne de pollo, ternera y cordero pueden contener sulfitos (conservantes)
+-- Carne de pollo, ternera, cordero y sal pueden contener sulfitos (conservantes)
 (4, 12),  -- Carne de pollo - Sulfitos
 (5, 12),  -- Carne de ternera - Sulfitos
-(6, 12);  -- Carne de cordero - Sulfitos
+(6, 12),  -- Carne de cordero - Sulfitos
+(18, 12); -- Sal - Sulfitos
 
 INSERT INTO PRODUCTS_NO_INGREDIENTS_ALLERGENS (product_id, allergen_id) VALUES
 -- Cerveza contiene gluten
-(5, 1),  -- Cerveza - Gluten
+(19, 1), -- Cerveza - Gluten
 
--- Baklava contiene gluten y frutos secos
-(7, 1),  -- Baklava - Gluten
-(7, 8),  -- Baklava - Frutos secos
+-- Baklava contiene frutos secos y gluten
+(21, 1), -- Baklava - Gluten
+(21, 8), -- Baklava - Frutos secos
 
--- Helado puede contener lácteos y frutos secos (según el tipo)
-(8, 7),  -- Helado - Lácteos
-(8, 8)   -- Helado - Frutos secos
-;
+-- helado lacteos
+(22, 7); -- Helado - Lácteos
 
 -- Insertar productos_ingredientes
 INSERT INTO PRODUCTS_INGREDIENTS (product_id, ingredient_id) VALUES
@@ -428,7 +427,7 @@ INSERT INTO PRODUCTS_INGREDIENTS (product_id, ingredient_id) VALUES
 
 -- Insertar ofertas en la tabla OFFERS
 INSERT INTO OFFERS (prod_id, cost, discount, offer_text) VALUES
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de pollo'), 300, 20.00, '¡20% de descuento en Döner de pollo esta semana!'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Grande'), 100, 10.00, 'Refresco Grande con 10% de descuento al pedir cualquier menú.'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Durum de ternera'), 50, 25.00, '¡OFERTA FLASH! 25% de descuento en Durum de ternera solo hoy.'),
-((SELECT product_id FROM PRODUCTS WHERE product_name = 'Lahmacun de pollo'), 200, 30.00, 'Lahmacun de pollo con un 30% de descuento esta semana.');
+((SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de pollo'), 300, 20.00, '20% de descuento en Döner de pollo'),
+((SELECT product_id FROM PRODUCTS WHERE product_name = 'Refresco Grande'), 100, 10.00, '10% de descuento en refresco grande'),
+((SELECT product_id FROM PRODUCTS WHERE product_name = 'Döner de falafel'), 200, 15.00, '15% de descuento en Döner de falafel'),
+((SELECT product_id FROM PRODUCTS WHERE product_name = 'Durum de pollo'), 150, 20.00, '20% de descuento en Durum de pollo');

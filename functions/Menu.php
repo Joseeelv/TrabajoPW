@@ -1,16 +1,18 @@
 <?php
 session_start();
-$_SESSION['connection'] = new mysqli("localhost", "root", "", "DB_Kebab");
 
 try {
     // Establish a connection to the MySQL database using mysqli
-    $conn = $_SESSION['connection'];
+    $connection = require_once('./conexion.php');
+    if (!$connection) {
+        die("Error en la conexión a la base de datos: " . mysqli_connect_error());
+    }
 
-    if (!isset($_SESSION['categoria'])) {
+    if (!isset($_SESSION['categorias'])) {
         $query = "SELECT PRODUCTS.category as cat FROM PRODUCTS group by PRODUCTS.category";
-        $stmt = $_SESSION['connection']->prepare($query);
+        $stmt = $connection->prepare($query);
         $stmt->execute();
-        $_SESSION['categoria'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $_SESSION['categorias'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
     if (!isset($_SESSION['menu']) || isset($_POST['category'])) {
@@ -20,13 +22,13 @@ try {
             $category = "Ninguna";
         if ($category != "Ninguna") {
             $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS where PRODUCTS.category = ?";
-            $stmt = $_SESSION['connection']->prepare($query);
+            $stmt = $connection->prepare($query);
             $stmt->bind_param("s", $category);
             $stmt->execute();
             $_SESSION['menu'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         } else {
             $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS";
-            $stmt = $_SESSION['connection']->prepare($query);
+            $stmt = $connection->prepare($query);
             $stmt->execute();
             $_SESSION['menu'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         }
@@ -55,7 +57,7 @@ try {
                 <form method="POST"><input type="hidden" name="category" value="Ninguna"><button
                         type="submit">Ninguna</button></form>
                 <?php
-                foreach ($_SESSION['categoria'] as $c) {
+                foreach ($_SESSION['categorias'] as $c) {
                     $categoryName = htmlspecialchars($c['cat'], ENT_QUOTES, 'UTF-8'); // Sanitize category name
                     echo "
                             <form method=\"POST\">

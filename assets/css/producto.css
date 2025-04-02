@@ -1,11 +1,11 @@
 /* Contenedor principal */
-.main-container {
+main {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #fdf3e3; /* Fondo cálido beige */
-
+    flex-direction: column;
 }
 
 /* Contenedor de modificación de producto */
@@ -107,4 +107,9 @@
 
 #add_to_carrito:hover {
     background-color: #e68900;
-}   
+}
+#allergen
+{
+    width: 50px;
+    margin: 10px;
+}

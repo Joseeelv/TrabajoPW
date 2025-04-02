@@ -7,7 +7,6 @@ try {
     $conn = $_SESSION['connection'];
 
     if (!isset($_SESSION['ofertas'])) {
-
         $query = "SELECT OFFERS.offer_text as of_name, OFFERS.offer_id as id, OFFERS.cost as coronas, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
         $stmt = $_SESSION['connection']->prepare($query);
         $stmt->execute();
@@ -34,7 +33,6 @@ try {
 
             // Loop through each row in the result set
             foreach ($_SESSION['ofertas'] as $f) {
-
                 $query = "SELECT * FROM CUSTOMERS_OFFERS WHERE user_id = ? AND offer_id = ?";
                 $stmt = $_SESSION['connection']->prepare($query);
                 $stmt->bind_param("ii", $_SESSION['user_id'], $f['id']);
@@ -50,26 +48,39 @@ try {
                     $_SESSION['Aceptada'] = True;
                 }
 
+
                 // For each row, create a list item (li) with an image and product name and discount
                 // The image source and product name are pulled from the database results
                 echo "<li>
                         <form method=\"POST\">
                         <input type=\"hidden\" name=\"Oferta\" value=\"" . $f['id'] . "\">
                         <input type=\"image\" width=\"100px\"src=../assets/images/productos/" . $f["img"] . " alt=\"\">
-                            </form>";
+                        </form>";
 
-                    if (!empty($_SESSION['Aceptada'])) {
-                        echo "Oferta: " . $f["nombre"] . "<br>Precio: " . $f["coronas"] . "<img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'><br>Descuento: " . $f["discount"]
-                            . "%<br>Activa</li>";
-                    } else {
-                        echo "Oferta: " . $f["nombre"] . "<br>Precio: " . $f["coronas"] . "<img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'><br>Descuento: " . $f["discount"]
-                        . "%<br>No Activa</li>";
-                }
-            }
+                ?>
+                <?php if (!empty($_SESSION['Aceptada'])) { ?>
+                    <p>Oferta: <?= $f["nombre"] ?></p>
+                    <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
+                    <p>Descuento: <?= $f["discount"] ?>%</p>
+                    <p>Activa</p>
+                    </li>
+                <?php } else {
+                    ?>
+                    <p>Oferta: <?= $f["nombre"] ?></p>
+                    <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
+                    <p>Descuento: <?= $f["discount"] ?>%</p>
+                    <p>No Activa</p>
+                    </li>
+                <?php }
+            } ?>
+
+            <?php
 
             // Close the unordered list (ul)
             echo "</ul>";
 } catch (Exception $e) {
+    // Handle the exception and display an error message
+
     // If a D_Error exception is thrown, redirect to the 500 error page
     header("Location: 500.php");
 }
