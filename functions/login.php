@@ -40,10 +40,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isUserLocked($username)) {
     $errors['username'] = "La cuenta está temporalmente bloqueada. Por favor, inténtelo más tarde.";
   } else {
-    // Validar nombre de usuario
-    if (!usernameExists($username)) {
-      $errors['username'] = "El nombre de usuario no existe.";
-    }
 
     // Validamos la contraseña
     if (!validatePassword($username, $password)) {
@@ -234,18 +230,7 @@ function isUserLocked($username)
 </head>
 
 <body>
-  <?php
-  include('./navbar.php');
-  // Mostrar errores si los hay
-  if (isset($_SESSION['login_errors'])) {
-    echo "<div class='error-container'>";
-    foreach ($_SESSION['login_errors'] as $error) {
-      echo "<p class='error'>$error</p>";
-    }
-    echo "</div>";
-    unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
-  }
-  ?>
+  <?php include('./navbar.php'); ?>
   <main>
     <h1>Inicia Sesión</h1>
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -258,8 +243,8 @@ function isUserLocked($username)
       // Mostrar errores si los hay
       if (isset($_SESSION['login_errors'])) {
         echo "<div class='error-container'>";
-        foreach ($_SESSION['login_errors'] as $error) {
-          echo "<p class='error'>$error</p>";
+        foreach ($_SESSION['login_errors'] as $field => $error) {
+          echo "<p class='error'>" . htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . "</p>";
         }
         echo "</div>";
         unset($_SESSION['login_errors']); // Limpia los errores después de mostrarlos
