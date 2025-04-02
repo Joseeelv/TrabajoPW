@@ -23,7 +23,6 @@ if (isset($_SESSION['conexión'])) {
     <?php include('./navbar.php'); ?>
     <main>
         <h1>Carrito de compra</h1>
-
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -32,9 +31,7 @@ if (isset($_SESSION['conexión'])) {
                         try {
                             // Si no se han cargado las ofertas en la sesión, las traemos de la base de datos
                             if (!isset($_SESSION['ofertas'])) {
-
                                 $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
-
                                 $stmt = $connection->prepare($query);
                                 $stmt->execute();
                                 $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);

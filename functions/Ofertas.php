@@ -2,16 +2,15 @@
 session_start();
 $_SESSION['connection'] = new mysqli("localhost", "root", "", "DB_Kebab");
 
-try {
-    // Establish a connection to the MySQL database using mysqli
-    $conn = $_SESSION['connection'];
 
-    if (!isset($_SESSION['ofertas'])) {
-        $query = "SELECT OFFERS.offer_text as of_name, OFFERS.offer_id as id, OFFERS.cost as coronas, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
-        $stmt = $_SESSION['connection']->prepare($query);
-        $stmt->execute();
-        $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    }
+$conn = $_SESSION['connection'];
+
+try {
+    $query = "SELECT OFFERS.offer_text as of_name, OFFERS.offer_id as id, OFFERS.cost as coronas, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
+    $stmt = $_SESSION['connection']->prepare($query);
+    $stmt->execute();
+    $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
     ?>
     <html lang="es">
 
@@ -28,10 +27,8 @@ try {
         <?php include("./navbar.php"); ?>
         <main>
             <?php
-            // Begin an unordered list (ul) to display products
             echo "<ul>";
 
-            // Loop through each row in the result set
             foreach ($_SESSION['ofertas'] as $f) {
                 $query = "SELECT * FROM CUSTOMERS_OFFERS WHERE user_id = ? AND offer_id = ?";
                 $stmt = $_SESSION['connection']->prepare($query);
@@ -39,18 +36,31 @@ try {
                 $stmt->execute();
                 $_SESSION['Aceptada'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+                $mensaje = ""; // Variable para almacenar el mensaje de error o éxito
+        
                 if (isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
-                    $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
-                    $stmt = $_SESSION['connection']->prepare($query);
-                    $fecha = date('Y-m-d');
-                    $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
-                    $stmt->execute();
-                    $_SESSION['Aceptada'] = True;
+                    if ($_SESSION['points'] >= $f['coronas']) {
+                        $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
+                        $stmt = $_SESSION['connection']->prepare($query);
+                        $fecha = date('Y-m-d');
+                        $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
+                        $stmt->execute();
+                        $_SESSION['points'] -= $f['coronas']; // Restar el coste de la oferta
+                        $_SESSION['Aceptada'] = True;
+                        // guardar los puntos del usuario de la session a la base de datos
+                        if (isset($_SESSION['user_id'])) {
+                            $connection = $_SESSION['connection'];
+                            $stmt = $connection->prepare("UPDATE CUSTOMERS SET points = ? WHERE user_id = ?");
+                            $stmt->bind_param("ii", $_SESSION['points'], $_SESSION['user_id']);
+                            $stmt->execute();
+                            $stmt->close();
+                        }
+                        $mensaje = "Oferta activada correctamente.";
+                    } else {
+                        $mensaje = "No tienes suficientes puntos para activar esta oferta.";
+                    }
                 }
 
-
-                // For each row, create a list item (li) with an image and product name and discount
-                // The image source and product name are pulled from the database results
                 echo "<li>
                         <form method=\"POST\">
                         <input type=\"hidden\" name=\"Oferta\" value=\"" . $f['id'] . "\">
@@ -63,31 +73,26 @@ try {
                     <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
                     <p>Descuento: <?= $f["discount"] ?>%</p>
                     <p>Activa</p>
-                    </li>
-                <?php } else {
-                    ?>
+                <?php } else { ?>
                     <p>Oferta: <?= $f["nombre"] ?></p>
                     <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
                     <p>Descuento: <?= $f["discount"] ?>%</p>
                     <p>No Activa</p>
-                    </li>
-                <?php }
-            } ?>
+                <?php } ?>
+                <?php if (!empty($mensaje)) { ?>
+                    <p><?= $mensaje ?></p>
+                <?php } ?>
+                </li>
+            <?php } ?>
 
             <?php
-
-            // Close the unordered list (ul)
             echo "</ul>";
-} catch (Exception $e) {
-    // Handle the exception and display an error message
 
-    // If a D_Error exception is thrown, redirect to the 500 error page
-    header("Location: 500.php");
-}
-?>
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+} ?>
     </main>
-    <?php include("./footer.php");
-    ?>
+    <?php include("./footer.php"); ?>
 </body>
 
 </html>
