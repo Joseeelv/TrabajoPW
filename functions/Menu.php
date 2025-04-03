@@ -16,13 +16,16 @@ try {
     }
 
     if (isset($_POST['category'])) {
-        $category = $_POST['category'];
-    } else {$category = 'Ninguna';}
-    
-    if ($category != "Ninguna") {
+        $_SESSION['actual_category'] = $_POST['category'];
+        header("Location: Menu.php");
+    } elseif (!isset($_SESSION['actual_category'])) {
+        $_SESSION['actual_category'] = 'Ninguna';
+    }
+
+    if ($_SESSION['actual_category'] != "Ninguna") {
         $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS where PRODUCTS.category = ?";
         $stmt = $connection->prepare($query);
-        $stmt->bind_param("s", $category);
+        $stmt->bind_param("s", $_SESSION['actual_category']);
         $stmt->execute();
         $_SESSION['menu'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     } else {
