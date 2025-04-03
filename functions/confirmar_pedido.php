@@ -76,6 +76,7 @@ try {
             foreach ($p['lista_ingredientes'] as $ingrediente) {
                 $ing_id = $ingrediente[0];
                 $cantidad = $ingrediente[1];
+                
                 $stmt = $connection->prepare("INSERT INTO ORDER_ITEMS_INGREDIENTS(order_item_id, ingredient_id, quantity) VALUES (?, ?, ?)");
                 $stmt->bind_param("iii", $order_item_id, $ing_id, $cantidad);
                 $stmt->execute();

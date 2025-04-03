@@ -68,7 +68,9 @@ session_start();
                                     if (!empty($p['lista_ingredientes'])) {
                                         echo "<ul>";
                                         foreach ($p['lista_ingredientes'] as $ingrediente) {
-                                            echo "<li>" . htmlspecialchars($ingrediente) . "</li>";
+                                            $nombre_ingrediente = htmlspecialchars($ingrediente['nombre']); 
+                                            $cantidad_ingrediente = htmlspecialchars($ingrediente['cantidad']); 
+                                            echo "<li>" . $nombre_ingrediente . " - Cantidad: " . $cantidad_ingrediente . "</li>";
                                         }
                                         echo "</ul>";
                                     }

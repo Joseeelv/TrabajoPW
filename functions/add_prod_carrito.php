@@ -31,7 +31,6 @@ if (isset($_POST['product_id'], $_POST['product_name'], $_POST['product_price'],
         foreach ($lista_ingredientes as $ingr) {
             $id = $ingr[0]; // ID del ingrediente
             $cantidad = $ingr[1]; // Nueva cantidad
-            $estado = $ingr[2]; // Estado (Añadido/Eliminado)
 
             // Consultar el nombre del ingrediente
             $query = "SELECT ingredient_name FROM ingredients WHERE ingredient_id = ?";
@@ -39,11 +38,15 @@ if (isset($_POST['product_id'], $_POST['product_name'], $_POST['product_price'],
             $stmt->bind_param("s", $id);
             $stmt->execute();
             $resultado = $stmt->get_result();
-            $nombre_ingrediente = $resultado->fetch_assoc()['ingredient_name'] ?? "Desconocido";
+            $nombre = $resultado->fetch_assoc()['ingredient_name'] ?? "Desconocido";
 
-            // Formatear el texto del ingrediente
-            $texto_ingr = "{$nombre_ingrediente} ({$estado})";
-            $ingredientes_formateados[] = $texto_ingr;
+            $stmt->close();
+            // Formatear el nombre del ingrediente y agregarlo a la lista
+            $ingredientes_formateados[] = [
+                'id' => $id,
+                'cantidad' => $cantidad, // Escapar caracteres especiales
+                'nombre' => htmlspecialchars($nombre) // Escapar caracteres especiales
+            ];
         }
     }
 
