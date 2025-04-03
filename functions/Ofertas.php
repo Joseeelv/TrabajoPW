@@ -75,6 +75,7 @@ try {
                     <p>Activa</p>
                 <?php } else { ?>
                     <p>No Activa</p>
+                    
                 <?php } ?>
                 <?php if (!empty($mensaje)) { ?>
                     <p><?= $mensaje ?></p>
