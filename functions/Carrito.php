@@ -155,8 +155,7 @@ if (isset($_SESSION['conexión'])) {
                                         if (!empty($p['lista_ingredientes']) && is_array($p['lista_ingredientes'])) {
                                             echo "<ul>";
                                             foreach ($p['lista_ingredientes'] as $ingrediente) {
-                                                $tipo = $ingrediente[2] === 'extra' ? 'Añadido' : 'Eliminado';
-                                                echo "<li>" . $ingrediente[0] . " ($tipo) -> " . $ingrediente[1] . "</li>";
+                                                echo "<li>" . $ingrediente[0] ."  ". $ingrediente[2]  ."  " . $ingrediente[1] . "</li>";
                                             }
                                             echo "</ul>";
                                         }
