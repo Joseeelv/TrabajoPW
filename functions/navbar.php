@@ -26,7 +26,7 @@ if (isset($_SESSION['user_type'])) {
             $menuItems = [
                 'Inicio' => './dashboard.php',
                 'Ofertas' => './ofertas.php',
-                'Carta' => './Menu.php',
+                'Carta' => './menu.php',
                 'Carrito' => './Carrito.php',
                 'Pedidos Recientes' => './pedidos.php',
                 'Perfil' => './perfil.php',

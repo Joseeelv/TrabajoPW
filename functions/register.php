@@ -10,7 +10,9 @@ session_set_cookie_params([
   'samesite' => 'Strict' // Estrategia de SameSite para prevenir CSRF
 ]);
 
-session_start(); // Iniciar la sesión... // Configuración de seguridad
+session_start(); // Iniciar la sesión... 
+
+// Configuración de seguridad
 const SECURITY = [
   'max_attempts' => 5,
   'lockout_time' => 1800, // 30 minutos

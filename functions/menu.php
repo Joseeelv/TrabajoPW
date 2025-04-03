@@ -3,7 +3,7 @@ session_start();
 
 try {
     // Establish a connection to the MySQL database using mysqli
-    $connection = require_once('./conexion.php');
+    $connection = include('./conexion.php');
     if (!$connection) {
         die("Error en la conexión a la base de datos: " . mysqli_connect_error());
     }
@@ -82,7 +82,7 @@ try {
             if (isset($_SESSION['user_id'])) {
 
                 // Create the list item with an image, product name, and link to 'producto.php' with a product ID
-                echo "<form method=\"POST\" action=\"producto.php\">
+                echo "<form method=\"POST\" action=\"./producto.php\">
                         <input type=\"hidden\" name=\"idProdSelecCarta\" value=\"" . $id . "\" />
                         <button type=\"submit\" class=\"container-producto\">
                             <img class=\"imagen-producto\" src=\"" . $productImg . "\" alt=\"" . $productName . "\" />
