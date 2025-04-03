@@ -84,7 +84,7 @@ if (isset($_SESSION['conexión'])) {
                                 echo "</ul>";
 
                                 // Formulario de confirmación de compra
-                                echo "<form action=\"Carrito.php\" method=\"POST\">";
+                                echo "<form action=\"confirmar_pedido.php\" method=\"POST\">";
                                 echo "Precio total: " . number_format($v_total, 2) . " € ";
                                 echo "<input type=\"submit\" name=\"Confirmar\" value=\"Confirmar\"/>";
                                 echo "</form>";
