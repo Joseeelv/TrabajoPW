@@ -84,6 +84,10 @@ main {
     cursor: pointer;
     font-weight: bold;
     border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .ingr-cant {
