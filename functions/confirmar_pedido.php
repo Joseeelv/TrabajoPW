@@ -104,6 +104,13 @@ try {
                 $stmt->execute();
             }
         }
+        // insertar en transacciones
+        $stmt = $connection->prepare("INSERT INTO TRANSACTIONS(order_id, replenishment_id, transaction_money) VALUES (?, NULL, ?)");
+        $transaction_money = $precio_final;
+        $stmt->bind_param("id", $order_id, $transaction_money);
+        $stmt->execute();
+        $transaction_id = $connection->insert_id;
+
     }
 
     // Marcar ofertas como usadas
