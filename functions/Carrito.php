@@ -42,8 +42,8 @@ if (isset($_SESSION['conexión'])) {
                                 $_SESSION['ofertasActivas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                             }
                             $v_total = 0;  // Inicializamos el total de la compra
-                        
-                            ?>
+
+                        ?>
                             <h2>Ofertas activas:</h2>
                             <?php
                             // Mostramos las ofertas activas
@@ -54,7 +54,7 @@ if (isset($_SESSION['conexión'])) {
                             }
                             ?>
                             <h2>Productos en el carrito:</h2>
-                            <?php
+                        <?php
                             // Si hay productos en el carrito
                             if (isset($_SESSION['compra'])) {
                                 // Si el formulario es enviado y el usuario confirma la compra
@@ -75,7 +75,7 @@ if (isset($_SESSION['conexión'])) {
                                     // Insertamos los productos de la compra en la tabla ORDER_ITEMS
                                     foreach ($_SESSION['compra'] as $p) {
                                         $descuento = $p['precio'];  // Obtenemos el precio base del producto
-                        
+
                                         // Aplicamos el descuento si hay alguna oferta
                                         if (isset($_SESSION['ofertasActivas'])) {
                                             foreach ($_SESSION['ofertasActivas'] as $f) {
@@ -108,13 +108,13 @@ if (isset($_SESSION['conexión'])) {
                                                 $stmt = $connection->prepare("INSERT INTO ORDER_ITEMS_INGREDIENTS(order_item_id, ingredient_id, quantity) VALUES (?, ?, ?)");
                                                 $stmt->bind_param("iii", $order_item_id, $i[0], $i[1]);
                                                 $stmt->execute();
-                                                
+
                                                 // Obtenemos el stock actual del ingrediente
                                                 $stmt = $connection->prepare("SELECT ingredients.stock from ingredients where ingredients.ingredient_id = ?");
                                                 $stmt->bind_param("i", $i[0]);
                                                 $stmt->execute();
                                                 $s = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-                                                
+
                                                 // Actualizamos el stock de los ingredientes
                                                 $stmt = $connection->prepare("UPDATE Ingredients SET stock = ? where ingredient_id = ?");
                                                 $aux = $s[0]['stock'] - $i[1];
@@ -135,12 +135,12 @@ if (isset($_SESSION['conexión'])) {
                                     }
                                 }
                                 echo "<ul>";  // Comenzamos a mostrar la lista de productos
-                        
+
                                 // Recorremos los productos del carrito
                                 if (isset($_SESSION['compra'])) {
                                     foreach ($_SESSION['compra'] as $p) {
                                         $descuento = $p['precio'] * $p['cantidad'];  // Calculamos el precio base del producto
-                        
+
                                         // Verificamos si hay alguna oferta para este producto
                                         if (isset($_SESSION['ofertasActivas'])) {
                                             foreach ($_SESSION['ofertasActivas'] as $f) {
@@ -153,12 +153,15 @@ if (isset($_SESSION['conexión'])) {
                                         // Mostramos el nombre del producto y su precio con descuento
                                         echo "<li>" . $p['nombre'] . " Precio: " . $descuento . " €";
                                         if (!empty($p['lista_ingredientes']) && is_array($p['lista_ingredientes'])) {
+                                            echo "<ul>";
                                             foreach ($p['lista_ingredientes'] as $ingrediente) {
-                                                echo " {$ingrediente[0]} -> {$ingrediente[1]}";
+                                                $tipo = $ingrediente[2] === 'extra' ? 'Añadido' : 'Eliminado';
+                                                echo "<li>" . $ingrediente[0] . " ($tipo) -> " . $ingrediente[1] . "</li>";
                                             }
+                                            echo "</ul>";
                                         }
                                         echo "</li>";
-                                        $v_total += $descuento;  // Añadimos el precio al total de la compra
+                                        $v_total += $descuento;
                                     }
                                 }
                                 echo "</ul>";  // Terminamos la lista de productos
@@ -168,8 +171,8 @@ if (isset($_SESSION['conexión'])) {
                             }
 
                             // Creamos el formulario para confirmar la compra
-                            echo "<form action=\"Carrito.php\" method=\"POST\">";
-                            echo "Price: " . $v_total . "\t<input type=\"submit\" name=\"Confirmar\" value=\"Confirmar\"/>";
+                            echo "<form action=\"confirmar_pedido.php\" method=\"POST\">";
+                            echo "Precio total: " . $v_total . " €\t<input type=\"submit\" name=\"Confirmar\" value=\"Confirmar\"/>";
                             echo "</form>";
                         } catch (Exception $e) {
                             // Si ocurre una excepción, redirigimos a la página de error 500

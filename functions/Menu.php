@@ -17,8 +17,10 @@ try {
 
     if (isset($_POST['category'])) {
         $category = $_POST['category'];
-    } else {$category = 'Ninguna';}
-    
+    } else {
+        $category = 'Ninguna';
+    }
+
     if ($category != "Ninguna") {
         $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS where PRODUCTS.category = ?";
         $stmt = $connection->prepare($query);

@@ -98,7 +98,7 @@ main {
 /* Botón de añadir al carrito */
 #add_to_carrito {
     width: 150px;
-    height: 40px;
+    height: auto;
     background-color: #ff9800;
     color: white;
     font-weight: bold;
