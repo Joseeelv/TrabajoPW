@@ -15,11 +15,9 @@ try {
         $_SESSION['categorias'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    if (!isset($_SESSION['menu']) || isset($_POST['category'])) {
-        if (isset($_POST['category']))
-            $category = $_POST['category'];
-        else
-            $category = "Ninguna";
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['category'])) {
+        $category = $_POST['category'];
+    
         if ($category != "Ninguna") {
             $query = "SELECT PRODUCTS.product_id as id, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM PRODUCTS where PRODUCTS.category = ?";
             $stmt = $connection->prepare($query);
@@ -32,6 +30,10 @@ try {
             $stmt->execute();
             $_SESSION['menu'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         }
+    
+        // Redirigir para limpiar el POST y evitar "ERR_CACHE_MISS"
+        header("Location: menu.php");
+        exit();
     }
 
 } catch (Exception $e) {

@@ -30,6 +30,7 @@ try {
             echo "<ul>";
 
             foreach ($_SESSION['ofertas'] as $f) {
+                // Comprobar si la oferta ya ha sido aceptada por el usuario 
                 $query = "SELECT * FROM CUSTOMERS_OFFERS WHERE user_id = ? AND offer_id = ?";
                 $stmt = $_SESSION['connection']->prepare($query);
                 $stmt->bind_param("ii", $_SESSION['user_id'], $f['id']);
@@ -46,7 +47,6 @@ try {
                         $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
                         $stmt->execute();
                         $_SESSION['points'] -= $f['coronas']; // Restar el coste de la oferta
-                        $_SESSION['Aceptada'] = True;
                         // guardar los puntos del usuario de la session a la base de datos
                         if (isset($_SESSION['user_id'])) {
                             $connection = $_SESSION['connection'];
@@ -68,15 +68,12 @@ try {
                         </form>";
 
                 ?>
+                <p>Oferta: <?= $f["nombre"] ?></p>
+                <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
+                <p>Descuento: <?= $f["discount"] ?>%</p>
                 <?php if (!empty($_SESSION['Aceptada'])) { ?>
-                    <p>Oferta: <?= $f["nombre"] ?></p>
-                    <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
-                    <p>Descuento: <?= $f["discount"] ?>%</p>
                     <p>Activa</p>
                 <?php } else { ?>
-                    <p>Oferta: <?= $f["nombre"] ?></p>
-                    <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
-                    <p>Descuento: <?= $f["discount"] ?>%</p>
                     <p>No Activa</p>
                 <?php } ?>
                 <?php if (!empty($mensaje)) { ?>

@@ -31,7 +31,7 @@ if (isset($_SESSION['conexión'])) {
                         try {
                             // Si no se han cargado las ofertas en la sesión, las traemos de la base de datos
                             if (!isset($_SESSION['ofertasActivas'])) {
-                                $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas 
+                                $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas, CUSTOMERS_OFFERS.used as used 
                                           FROM CUSTOMERS_OFFERS 
                                           JOIN OFFERS ON CUSTOMERS_OFFERS.offer_id = OFFERS.offer_id 
                                           JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id 
@@ -104,19 +104,31 @@ if (isset($_SESSION['conexión'])) {
                                             $stmt->execute();
                                         } else {
                                             foreach ($p['lista_ingredientes'] as $i) {
+                                                // Insertamos los ingredientes de la orden en la tabla ORDER_ITEMS_INGREDIENTS
                                                 $stmt = $connection->prepare("INSERT INTO ORDER_ITEMS_INGREDIENTS(order_item_id, ingredient_id, quantity) VALUES (?, ?, ?)");
                                                 $stmt->bind_param("iii", $order_item_id, $i[0], $i[1]);
                                                 $stmt->execute();
-
+                                                
+                                                // Obtenemos el stock actual del ingrediente
                                                 $stmt = $connection->prepare("SELECT ingredients.stock from ingredients where ingredients.ingredient_id = ?");
                                                 $stmt->bind_param("i", $i[0]);
                                                 $stmt->execute();
                                                 $s = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-
+                                                
+                                                // Actualizamos el stock de los ingredientes
                                                 $stmt = $connection->prepare("UPDATE Ingredients SET stock = ? where ingredient_id = ?");
                                                 $aux = $s[0]['stock'] - $i[1];
                                                 $stmt->bind_param("ii", $aux, $i[0]);
                                                 $stmt->execute();
+
+                                                // Actualizamos la tabla CUSTOMERS_OFFERS para marcar las ofertas como usadas
+                                                if (isset($_SESSION['ofertasActivas'])) {
+                                                    foreach ($_SESSION['ofertasActivas'] as $f) {
+                                                        $stmt = $connection->prepare("UPDATE CUSTOMERS_OFFERS SET used = 1 WHERE user_id = ? AND offer_id = ?");
+                                                        $stmt->bind_param("ii", $_SESSION['user_id'], $f['offer_id']);
+                                                        $stmt->execute();
+                                                    }
+                                                }
                                             }
                                         }
                                         $_SESSION['compra'] = null;
@@ -140,8 +152,10 @@ if (isset($_SESSION['conexión'])) {
 
                                         // Mostramos el nombre del producto y su precio con descuento
                                         echo "<li>" . $p['nombre'] . " Precio: " . $descuento . " €";
-                                        foreach ($p['lista_ingredientes'] as $ingrediente) {
-                                            echo " {$ingrediente[0]} -> {$ingrediente[1]}";
+                                        if (!empty($p['lista_ingredientes']) && is_array($p['lista_ingredientes'])) {
+                                            foreach ($p['lista_ingredientes'] as $ingrediente) {
+                                                echo " {$ingrediente[0]} -> {$ingrediente[1]}";
+                                            }
                                         }
                                         echo "</li>";
                                         $v_total += $descuento;  // Añadimos el precio al total de la compra

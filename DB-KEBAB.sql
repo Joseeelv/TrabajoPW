@@ -141,6 +141,7 @@ CREATE TABLE CUSTOMERS_OFFERS (
     user_id INT NOT NULL,
     offer_id INT NOT NULL,
     activation_date DATE NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (user_id, offer_id),
     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE,
     FOREIGN KEY (offer_id) REFERENCES OFFERS(offer_id) ON DELETE CASCADE
@@ -194,8 +195,6 @@ INSERT INTO CUSTOMERS (user_id, customer_address, points) VALUE
 -- Insertar managers
 INSERT INTO MANAGERS (user_id, salary) VALUES
 (3, 2500);
-
-
 
 -- Insertar productos
 INSERT INTO PRODUCTS (product_name, product_price, category, img_src, cost, stock) VALUES
