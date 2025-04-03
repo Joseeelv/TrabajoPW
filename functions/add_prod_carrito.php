@@ -1,13 +1,14 @@
 <?php 
 session_start();
-include './.configDB.php';
-require_once('./.configDB.php');
 
-if (isset($_SESSION['conexión'])) {
-    $connection = $_SESSION['conexión'];
-} else {
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-}
+$connection = include('./conexion.php');
+
+//Eror reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// Habilitar excepciones en MySQLi
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 
 // Guardar datos de formulario de producto seleccionado en sesión
 if (isset($_POST['product_id'], $_POST['product_name'], $_POST['product_price'], $_POST['category'])) {
@@ -34,7 +35,7 @@ if (isset($_POST['product_id'], $_POST['product_name'], $_POST['product_price'],
             $estado = $ingr[2]; // Estado (Añadido/Eliminado)
 
             // Consultar el nombre del ingrediente
-            $query = "SELECT ingredient_name FROM ingredients WHERE ingredient_id = ?";
+            $query = "SELECT ingredient_name FROM INGREDIENTS WHERE ingredient_id = ?";
             $stmt = $connection->prepare($query);
             $stmt->bind_param("s", $id);
             $stmt->execute();

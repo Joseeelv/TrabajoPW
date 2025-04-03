@@ -3,6 +3,10 @@ session_start();
 
 $connection = include('./conexion.php');
 
+//Error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 ?>
 <html>
 
@@ -26,10 +30,10 @@ $connection = include('./conexion.php');
               // Obtener ofertas activas si no están en sesión
               if (!isset($_SESSION['ofertasActivas'])) {
                 $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas, CUSTOMERS_OFFERS.used as used 
-                                          FROM CUSTOMERS_OFFERS 
-                                          JOIN OFFERS ON CUSTOMERS_OFFERS.offer_id = OFFERS.offer_id 
-                                          JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id 
-                                          WHERE CUSTOMERS_OFFERS.user_id = ?";
+                          FROM CUSTOMERS_OFFERS 
+                          JOIN OFFERS ON CUSTOMERS_OFFERS.offer_id = OFFERS.offer_id 
+                          JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id 
+                          WHERE CUSTOMERS_OFFERS.user_id = ?";
                 $stmt = $connection->prepare($query);
                 $stmt->bind_param("i", $_SESSION['user_id']);
                 $stmt->execute();
@@ -65,10 +69,11 @@ $connection = include('./conexion.php');
 
                   echo "<li><strong>" . htmlspecialchars($p['nombre']) . "</strong> - Precio: " . number_format($precio_final, 2) . " €";
 
-                  if (!empty($p['lista_ingredientes'])) {
+                  if (!empty($p['lista_ingredientes']) && is_array($p['lista_ingredientes'])) {
                     echo "<ul>";
                     foreach ($p['lista_ingredientes'] as $ingrediente) {
-                      echo "<li>" . htmlspecialchars($ingrediente) . "</li>";
+                      $nombre_ingrediente = is_array($ingrediente) ? ($ingrediente['nombre'] ?? 'Ingrediente desconocido') : $ingrediente;
+                      echo "<li>" . htmlspecialchars($nombre_ingrediente) . "</li>";
                     }
                     echo "</ul>";
                   }

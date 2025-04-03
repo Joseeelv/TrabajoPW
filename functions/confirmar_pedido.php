@@ -1,21 +1,14 @@
 <?php
 session_start();
 
-$connection = include('./conexion.php');
-// Verificar si el usuario está autenticado
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-//Error reporting
+// Habilitar errores
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-
+$connection = include('./conexion.php');
 
 try {
-    // Verificar si el carrito está vacío
     if (!isset($_SESSION['compra']) || empty($_SESSION['compra'])) {
         header("Location: carrito.php");
         exit();
@@ -40,7 +33,7 @@ try {
     }
 
     // Actualizar puntos del usuario
-    $puntos = ((int)($v_total / 10)) * 100;
+    $puntos = (int)($v_total * 10);
     $stmt = $connection->prepare("UPDATE CUSTOMERS SET points = points + ? WHERE user_id = ?");
     $stmt->bind_param("ii", $puntos, $_SESSION['user_id']);
     $stmt->execute();
@@ -81,11 +74,51 @@ try {
         } else {
             // Insertar ingredientes eliminados/añadidos en ORDER_ITEMS_INGREDIENTS
             foreach ($p['lista_ingredientes'] as $ingrediente) {
-                $ing_id = $ingrediente[0];
-                $cantidad = $ingrediente[1];
-                $stmt = $connection->prepare("INSERT INTO ORDER_ITEMS_INGREDIENTS(order_item_id, ingredient_id, quantity) VALUES (?, ?, ?)");
-                $stmt->bind_param("iii", $order_item_id, $ing_id, $cantidad);
-                $stmt->execute();
+                // Insertar ingredientes eliminados/añadidos en ORDER_ITEMS_INGREDIENTS
+                $ing_id = intval($ingrediente['id']);
+                $cantidad = intval($ingrediente['cantidad']);
+
+                // Verificar que el ingrediente exista en INGREDIENTS
+                $stmt_check_ing = $connection->prepare("SELECT COUNT(*) FROM INGREDIENTS WHERE ingredient_id = ?");
+                $stmt_check_ing->bind_param("i", $ing_id);
+                $stmt_check_ing->execute();
+                $stmt_check_ing->bind_result($ing_exists);
+                $stmt_check_ing->fetch();
+                $stmt_check_ing->close();
+
+                if ($ing_exists == 0) {
+                    error_log("Error: Ingrediente con ID $ing_id no existe.");
+                    die("Error: Ingrediente con ID $ing_id no existe.");
+                }
+
+                // Verificar que el order_item_id existe en ORDER_ITEMS
+                $stmt_check_item = $connection->prepare("SELECT COUNT(*) FROM ORDER_ITEMS WHERE order_item_id = ?");
+                $stmt_check_item->bind_param("i", $order_item_id);
+                $stmt_check_item->execute();
+                $stmt_check_item->bind_result($item_exists);
+                $stmt_check_item->fetch();
+                $stmt_check_item->close();
+
+                if ($item_exists == 0) {
+                    error_log("Error: ORDER_ITEM_ID $order_item_id no existe.");
+                    die("Error: ORDER_ITEM_ID $order_item_id no existe.");
+                }
+
+                // Verificar que cantidad sea mayor que 0
+                if ($cantidad < 0) {
+                    error_log("Error: Cantidad de ingrediente inválida (ID: $ing_id, cantidad: $cantidad).");
+                    die("Error: Cantidad de ingrediente inválida.");
+                }
+
+                // Insertar en ORDER_ITEMS_INGREDIENTS
+                if (isset($order_item_id, $ing_id, $cantidad) && $order_item_id > 0 && $ing_id > 0 && $cantidad >= 0) {
+                    $stmt = $connection->prepare("INSERT INTO ORDER_ITEMS_INGREDIENTS(order_item_id, ingredient_id, quantity) VALUES (?, ?, ?)");
+                    $stmt->bind_param("iii", $order_item_id, $ing_id, $cantidad);
+                    $stmt->execute();
+                } else {
+                    error_log("Error: Invalid data for ORDER_ITEMS_INGREDIENTS ");
+                    die("Error: Invalid data for ORDER_ITEMS_INGREDIENTS. (order_item_id: $order_item_id, ingredient_id: $ing_id, quantity: $cantidad).");
+                }
 
                 // Actualizar stock del ingrediente
                 $stmt = $connection->prepare("UPDATE Ingredients SET stock = stock - ? WHERE ingredient_id = ?");
@@ -110,9 +143,7 @@ try {
     // Redirigir al carrito con mensaje de éxito
     header("Location: carrito.php");
     exit();
-
-}catch (Exception $e) {
-    error_log("Error en la compra: " . $e->getMessage()); // Registra el error en logs
-    die("Error en la compra: " . $e->getMessage()); // Muestra el error en la pantalla temporalmente
+} catch (Exception $e) {
+    header("Location: 500.php");
+    exit();
 }
-?>
