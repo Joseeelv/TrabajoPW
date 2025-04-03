@@ -27,7 +27,7 @@ if (isset($_SESSION['user_type'])) {
                 'Inicio' => './dashboard.php',
                 'Ofertas' => './ofertas.php',
                 'Carta' => './menu.php',
-                'Carrito' => './Carrito.php',
+                'Carrito' => './carrito.php',
                 'Pedidos Recientes' => './pedidos.php',
                 'Perfil' => './perfil.php',
                 'Cerrar Sesión' => './logout.php'
