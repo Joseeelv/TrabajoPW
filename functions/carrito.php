@@ -1,8 +1,7 @@
 <?php
 session_start();
 
-    $connection = include('./conexion.php.php');
-
+    $connection = include('./conexion.php');
 
 ?>
 <html>
