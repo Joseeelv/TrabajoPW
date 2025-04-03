@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-   /** Manejo de cantidades de ingrediente con botones */
+   // Manejo de cantidades de ingrediente con botones
    let botones = document.querySelectorAll('.ingr_btn');
    botones.forEach(boton => {
       boton.addEventListener('click', () => {
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
    });
 
-   /** Envío de cantidades de todos los ingredientes a la sesión */
+   // Envío de cantidades de todos los ingredientes a la sesión
    let envio = document.getElementById("add_to_carrito");
    envio.addEventListener('click', (event) => {
       event.preventDefault(); // Evita el envío automático del formulario

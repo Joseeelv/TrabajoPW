@@ -2,7 +2,6 @@
 session_start();
 $_SESSION['connection'] = new mysqli("localhost", "root", "", "DB_Kebab");
 
-
 $conn = $_SESSION['connection'];
 
 try {
@@ -75,7 +74,7 @@ try {
                     <p>Activa</p>
                 <?php } else { ?>
                     <p>No Activa</p>
-                    
+
                 <?php } ?>
                 <?php if (!empty($mensaje)) { ?>
                     <p><?= $mensaje ?></p>

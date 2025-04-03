@@ -37,6 +37,7 @@ try {
     $stmt = $connection->prepare("UPDATE CUSTOMERS SET points = points + ? WHERE user_id = ?");
     $stmt->bind_param("ii", $puntos, $_SESSION['user_id']);
     $stmt->execute();
+    $_SESSION['puntos'] += $puntos; // Actualizar puntos en la sesión
 
     // Crear la orden
     $stmt = $connection->prepare("INSERT INTO ORDERS(user_id, order_date, order_status) VALUES (?, ?, ?)");
