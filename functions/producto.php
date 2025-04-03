@@ -1,14 +1,7 @@
 <?php
 session_start();
 
-include ".configDB.php";
-require_once('.configDB.php');
-
-if (isset($_SESSION['conexión'])) {
-   $connection = $_SESSION['conexión'];
-} else {
-   $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-}
+$connection = include('./conexion.php');
 
 /** Obtener id de Producto */
 if (isset($_POST['idProdSelecCarta'])) {

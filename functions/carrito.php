@@ -1,14 +1,9 @@
 <?php
 session_start();
 
-include './.configDB.php';
+    $connection = include('./conexion.php.php');
 
-require_once('./.configDB.php');
-if (isset($_SESSION['conexión'])) {
-    $connection = $_SESSION['conexión'];
-} else {
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-}
+
 ?>
 <html>
 
