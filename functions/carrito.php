@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-    $connection = include('./conexion.php');
+$connection = include('./conexion.php');
 
 ?>
 <html>
@@ -24,17 +24,16 @@ session_start();
                         <?php
                         try {
                             // Obtener ofertas activas si no están en sesión
-                            if (!isset($_SESSION['ofertasActivas'])) {
-                                $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas, CUSTOMERS_OFFERS.used as used 
+                            $query = "SELECT OFFERS.offer_text as of_name, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img, OFFERS.cost as coronas, CUSTOMERS_OFFERS.used as used 
                                           FROM CUSTOMERS_OFFERS 
                                           JOIN OFFERS ON CUSTOMERS_OFFERS.offer_id = OFFERS.offer_id 
                                           JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id 
                                           WHERE CUSTOMERS_OFFERS.user_id = ?";
-                                $stmt = $connection->prepare($query);
-                                $stmt->bind_param("i", $_SESSION['user_id']);
-                                $stmt->execute();
-                                $_SESSION['ofertasActivas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-                            }
+                            $stmt = $connection->prepare($query);
+                            $stmt->bind_param("i", $_SESSION['user_id']);
+                            $stmt->execute();
+                            $_SESSION['ofertasActivas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
                             $v_total = 0; // Total de la compra
 
                             echo "<h2>Ofertas activas:</h2>";
@@ -68,8 +67,8 @@ session_start();
                                     if (!empty($p['lista_ingredientes'])) {
                                         echo "<ul>";
                                         foreach ($p['lista_ingredientes'] as $ingrediente) {
-                                            $nombre_ingrediente = htmlspecialchars($ingrediente['nombre']); 
-                                            $cantidad_ingrediente = htmlspecialchars($ingrediente['cantidad']); 
+                                            $nombre_ingrediente = htmlspecialchars($ingrediente['nombre']);
+                                            $cantidad_ingrediente = htmlspecialchars($ingrediente['cantidad']);
                                             echo "<li>" . $nombre_ingrediente . " - Cantidad: " . $cantidad_ingrediente . "</li>";
                                         }
                                         echo "</ul>";
@@ -99,4 +98,5 @@ session_start();
     </main>
     <?php include('./footer.php'); ?>
 </body>
+
 </html>
