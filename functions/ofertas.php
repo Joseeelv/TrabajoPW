@@ -1,12 +1,9 @@
 <?php
 session_start();
-$_SESSION['connection'] = new mysqli("localhost", "root", "", "DB_Kebab");
-
-$conn = $_SESSION['connection'];
-
+$conn = include('./conexion.php');
 try {
     $query = "SELECT OFFERS.offer_text as of_name, OFFERS.offer_id as id, OFFERS.cost as coronas, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
-    $stmt = $_SESSION['connection']->prepare($query);
+    $stmt = $conn->prepare($query);
     $stmt->execute();
     $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
@@ -31,7 +28,7 @@ try {
             foreach ($_SESSION['ofertas'] as $f) {
                 // Comprobar si la oferta ya ha sido aceptada por el usuario 
                 $query = "SELECT * FROM CUSTOMERS_OFFERS WHERE user_id = ? AND offer_id = ?";
-                $stmt = $_SESSION['connection']->prepare($query);
+                $stmt = $conn->prepare($query);
                 $stmt->bind_param("ii", $_SESSION['user_id'], $f['id']);
                 $stmt->execute();
                 $_SESSION['Aceptada'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -41,15 +38,14 @@ try {
                 if (isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
                     if ($_SESSION['points'] >= $f['coronas']) {
                         $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
-                        $stmt = $_SESSION['connection']->prepare($query);
+                        $stmt = $conn->prepare($query);
                         $fecha = date('Y-m-d');
                         $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
                         $stmt->execute();
                         $_SESSION['points'] -= $f['coronas']; // Restar el coste de la oferta
                         // guardar los puntos del usuario de la session a la base de datos
                         if (isset($_SESSION['user_id'])) {
-                            $connection = $_SESSION['connection'];
-                            $stmt = $connection->prepare("UPDATE CUSTOMERS SET points = ? WHERE user_id = ?");
+                            $stmt = $conn->prepare("UPDATE CUSTOMERS SET points = ? WHERE user_id = ?");
                             $stmt->bind_param("ii", $_SESSION['points'], $_SESSION['user_id']);
                             $stmt->execute();
                             $stmt->close();
