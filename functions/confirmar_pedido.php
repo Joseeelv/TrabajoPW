@@ -1,16 +1,23 @@
 <?php
 session_start();
-include './.configDB.php';
 
-if (isset($_SESSION['conexión'])) {
-    $connection = $_SESSION['conexión'];
-} else {
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+$connection = include('./conexion.php');
+// Verificar si el usuario está autenticado
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
 }
 
+//Error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
+
 try {
+    // Verificar si el carrito está vacío
     if (!isset($_SESSION['compra']) || empty($_SESSION['compra'])) {
-        header("Location: Carrito.php");
+        header("Location: carrito.php");
         exit();
     }
 
@@ -33,7 +40,7 @@ try {
     }
 
     // Actualizar puntos del usuario
-    $puntos = (intdiv($v_total, 10)) * 100;
+    $puntos = ((int)($v_total / 10)) * 100;
     $stmt = $connection->prepare("UPDATE CUSTOMERS SET points = points + ? WHERE user_id = ?");
     $stmt->bind_param("ii", $puntos, $_SESSION['user_id']);
     $stmt->execute();
@@ -42,7 +49,7 @@ try {
     // Crear la orden
     $stmt = $connection->prepare("INSERT INTO ORDERS(user_id, order_date, order_status) VALUES (?, ?, ?)");
     $order_date = date('Y-m-d');
-    $order_status = 'Pending';
+    $order_status = 'pendiente';
     $stmt->bind_param("iss", $_SESSION['user_id'], $order_date, $order_status);
     $stmt->execute();
     $order_id = $connection->insert_id;
@@ -101,11 +108,11 @@ try {
     $_SESSION['compra'] = [];
 
     // Redirigir al carrito con mensaje de éxito
-    header("Location: Carrito.php?success=1");
+    header("Location: carrito.php");
     exit();
 
-} catch (Exception $e) {
-    header("Location: 500.php");
-    exit();
+}catch (Exception $e) {
+    error_log("Error en la compra: " . $e->getMessage()); // Registra el error en logs
+    die("Error en la compra: " . $e->getMessage()); // Muestra el error en la pantalla temporalmente
 }
 ?>

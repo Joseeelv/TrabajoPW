@@ -1,10 +1,12 @@
 <?php
 session_start();
 
-//Error reporting
+// Habilitar reporte de errores
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Habilitar excepciones en MySQLi
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $connection = include('./conexion.php');
 
@@ -17,7 +19,7 @@ if (!$idProdSelecCarta) {
 $cantidad = 1;
 
 /* Obtener datos del producto */
-$query_producto = "SELECT category, product_id, product_name, product_price, img_src FROM PRODUCTS WHERE product_id=?";
+$query_producto = "SELECT category, product_id, product_name, product_price, img_src FROM PRODUCTS WHERE product_id = ?";
 $stmt = $connection->prepare($query_producto);
 $stmt->bind_param("s", $idProdSelecCarta);
 $stmt->execute();
@@ -32,8 +34,8 @@ $product_name = $producto['product_name'];
 $product_price = $producto['product_price'];
 $category = $producto['category'];
 
-/* Verificar si la tabla products_ingredients existe */
-$query_check_table = "SHOW TABLES LIKE 'products_ingredients'";
+/* Verificar si la tabla PRODUCTS_INGREDIENTS existe */
+$query_check_table = "SHOW TABLES LIKE 'PRODUCTS_INGREDIENTS'";
 $resultado_check = $connection->query($query_check_table);
 $tabla_existe = $resultado_check->num_rows > 0;
 
@@ -42,13 +44,21 @@ if ($tabla_existe) {
    /* Obtener ingredientes del producto */
    $query_ingredientes = "SELECT i.ingredient_id, i.ingredient_name, i.img_src 
                            FROM PRODUCTS_INGREDIENTS pi 
-                           JOIN ingredients i ON pi.ingredient_id = i.ingredient_id 
+                           JOIN INGREDIENTS i ON pi.ingredient_id = i.ingredient_id 
                            WHERE pi.product_id = ?";
    $stmt = $connection->prepare($query_ingredientes);
    $stmt->bind_param("s", $idProdSelecCarta);
    $stmt->execute();
    $resultado_ingredientes = $stmt->get_result();
    $ingredientes = $resultado_ingredientes->fetch_all(MYSQLI_ASSOC);
+}
+
+// Depuración: Imprimir ingredientes si están vacíos
+if (empty($ingredientes)) {
+   echo "<p>⚠ No hay ingredientes para este producto.</p>";
+   echo "<pre>";
+   print_r($ingredientes);
+   echo "</pre>";
 }
 
 /* Obtener alérgenos */
@@ -76,7 +86,7 @@ while ($fila = $resultado_alergenos_ingredientes->fetch_assoc()) {
 if (empty($alergenos)) {
    $query_alergenos_producto = "SELECT a.img_src
                                  FROM PRODUCTS_NO_INGREDIENTS_ALLERGENS pa 
-                                 JOIN allergens a ON pa.allergen_id = a.allergen_id 
+                                 JOIN ALLERGENS a ON pa.allergen_id = a.allergen_id 
                                  WHERE pa.product_id = ?";
    $stmt = $connection->prepare($query_alergenos_producto);
    $stmt->bind_param("s", $idProdSelecCarta);

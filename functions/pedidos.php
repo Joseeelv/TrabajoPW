@@ -13,8 +13,7 @@
   <?php
   session_start();
   $conn = include('./conexion.php');
-  $_SESSION['user_id'] = 2;
-
+  
   try {
     // Obtener pedidos del usuario
     $query = "SELECT * FROM ORDERS WHERE user_id = ?";
