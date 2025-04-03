@@ -36,17 +36,17 @@ try {
                 $mensaje = ""; // Variable para almacenar el mensaje de error o éxito
         
                 if (isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
-                    if ($_SESSION['points'] >= $f['coronas']) {
+                    if ($_SESSION['puntos'] >= $f['coronas']) {
                         $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
                         $stmt = $conn->prepare($query);
                         $fecha = date('Y-m-d');
                         $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
                         $stmt->execute();
-                        $_SESSION['points'] -= $f['coronas']; // Restar el coste de la oferta
+                        $_SESSION['puntos'] -= $f['coronas']; // Restar el coste de la oferta
                         // guardar los puntos del usuario de la session a la base de datos
                         if (isset($_SESSION['user_id'])) {
                             $stmt = $conn->prepare("UPDATE CUSTOMERS SET points = ? WHERE user_id = ?");
-                            $stmt->bind_param("ii", $_SESSION['points'], $_SESSION['user_id']);
+                            $stmt->bind_param("ii", $_SESSION['puntos'], $_SESSION['user_id']);
                             $stmt->execute();
                             $stmt->close();
                         }

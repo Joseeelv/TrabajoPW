@@ -8,17 +8,11 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $connection = include('./conexion.php');
 
-// Habilitar errores
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$connection = include('./conexion.php');
 
 try {
     if (!isset($_SESSION['compra']) || empty($_SESSION['compra'])) {
         header("Location: carrito.php");
-        header("Location: carrito.php");
+
         exit();
     }
 
@@ -41,7 +35,6 @@ try {
     }
 
     // Actualizar puntos del usuario
-    $puntos = (int)($v_total * 10);
     $puntos = (int)($v_total * 10);
     $stmt = $connection->prepare("UPDATE CUSTOMERS SET points = points + ? WHERE user_id = ?");
     $stmt->bind_param("ii", $puntos, $_SESSION['user_id']);

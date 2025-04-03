@@ -57,7 +57,7 @@ if (isset($_SESSION['user_type'])) {
 
         if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'customer') {
             echo "<div id=\"kebabito-container\">";
-            echo "<img id=\"kebabito-image\" src=\"../assets/images/logo/DKS.png\" alt=\"Kebabito image\"><span> " . $_SESSION['points'] . "</span>";
+            echo "<img id=\"kebabito-image\" src=\"../assets/images/logo/DKS.png\" alt=\"Kebabito image\"><span> " . $_SESSION['puntos'] . "</span>";
             echo "</div>";
             $profileImagePath = "../assets/images/perfiles/" . $_SESSION['img_src'];
             if (!file_exists($profileImagePath) || empty($_SESSION['img_src'])) {
