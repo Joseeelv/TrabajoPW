@@ -158,6 +158,7 @@ if (isset($_SESSION['conexión'])) {
                                                 $tipo = $ingrediente[2] === 'extra' ? 'Añadido' : 'Eliminado';
                                                 echo "<li>" . $ingrediente[0] . " ($tipo) -> " . $ingrediente[1] . "</li>";
                                             }
+                                            
                                             echo "</ul>";
                                         }
                                         echo "</li>";
