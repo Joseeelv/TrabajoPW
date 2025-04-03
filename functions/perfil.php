@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once('./.configDB.php');
+
 require_once('./validations.php');
 
 // Obtener conexión
@@ -66,6 +66,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_errors = Validator::validatePassword($password);
     if (!empty($password_errors)) {
       $errors['password'] = implode(" ", $password_errors);
+    }
+    //Ambas contraseñas deben coincidir
+    if (isset($_POST['confirm_password']) && $_POST['confirm_password'] !== $password) {
+      $errors['confirm_password'] = "Las contraseñas no coinciden.";
     }
   }
 
@@ -148,8 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Verificar si la ruta de destino existe y tiene permisos de escritura
         if (!is_dir(dirname($upload_path))) {
-          if (!mkdir(dirname($upload_path), 0750, true) && !is_dir(dirname($upload_path))) {
-
+          if (!mkdir(dirname($upload_path), 0007, true) && !is_dir(dirname($upload_path))) {
             $errors['foto'] = "No se pudo crear el directorio para subir la imagen.";
           }
         }
@@ -266,6 +269,7 @@ $connection->close();
         <label for="confirm_password">Confirmar Contraseña:</label>
         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
       </div>
+      <?php echo htmlspecialchars("hola"); ?>
       <?php if ($_SESSION['user_type'] === 'customer'): ?>
         <div class="form-group">
           <label for="address">Nueva dirección:</label>
