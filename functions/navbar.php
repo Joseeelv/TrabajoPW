@@ -37,7 +37,7 @@ if (isset($_SESSION['user_type'])) {
 } else {
     $menuItems = [
         'Inicio' => '../index.php',
-        'Carta' => './Menu.php',
+        'Carta' => './menu.php',
         'Contacto' => './contact.php',
         'Iniciar Sesión' => './login.php',
         'Registrarse' => './register.php'
