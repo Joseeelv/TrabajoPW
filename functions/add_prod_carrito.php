@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 
 $connection = include('./conexion.php');
@@ -56,4 +56,3 @@ if (isset($_POST['product_id'], $_POST['product_name'], $_POST['product_price'],
 }
 
 header('Location: ./menu.php');
-?>
