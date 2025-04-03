@@ -10,7 +10,7 @@ $connection = include('./conexion.php');
     <title>Carrito</title>
     <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="../assets/css/menu.css">
+    <link rel="stylesheet" href="../assets/css/carrito.css">
 </head>
 
 <body>
@@ -56,20 +56,36 @@ $connection = include('./conexion.php');
                                     $precio_final = $precio_base;
 
                                     // Aplicamos descuentos si hay ofertas
+                                    $hay_descuento = false;
                                     foreach ($_SESSION['ofertasActivas'] as $f) {
                                         if ($f['nombre'] == $p['nombre']) {
                                             $precio_final *= (1 - $f['discount'] / 100);
+                                            $hay_descuento = true;
+                                            break;
                                         }
                                     }
 
-                                    echo "<li><strong>" . htmlspecialchars($p['nombre']) . "</strong> - Precio: " . number_format($precio_final, 2) . " €";
+                                    echo "<li><strong>" . htmlspecialchars($p['nombre']) . "</strong> - ";
+
+
+                                    echo "Precio: ";
+
+                                    if ($hay_descuento) {
+                                        echo "<span style='text-decoration: line-through; color: red;'>" . number_format($precio_base, 2) . " €</span> ";
+                                    }
+                                    echo number_format($precio_final, 2) . " €";
 
                                     if (!empty($p['lista_ingredientes'])) {
                                         echo "<ul>";
                                         foreach ($p['lista_ingredientes'] as $ingrediente) {
                                             $nombre_ingrediente = htmlspecialchars($ingrediente['nombre']);
-                                            $cantidad_ingrediente = htmlspecialchars($ingrediente['cantidad']);
-                                            echo "<li>" . $nombre_ingrediente . " - Cantidad: " . $cantidad_ingrediente . "</li>";
+                                            $cantidad_ingrediente = (int) $ingrediente['cantidad'];
+
+                                            if ($cantidad_ingrediente === 0) {
+                                                echo "<li>SIN " . $nombre_ingrediente . "</li>";
+                                            } elseif ($cantidad_ingrediente === 2) {
+                                                echo "<li>EXTRA " . $nombre_ingrediente . "</li>";
+                                            }
                                         }
                                         echo "</ul>";
                                     }

@@ -126,7 +126,7 @@ try {
     $_SESSION['compra'] = [];
 
     // Redirigir al carrito con mensaje de éxito
-    header("Location: carrito.php");
+    header("Location: pedido_confirmado.php");
     exit();
 } catch (Exception $e) {
     error_log("Error en la compra: " . $e->getMessage());

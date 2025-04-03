@@ -49,7 +49,7 @@ if (isset($_SESSION['user_type'])) {
 ?>
 <header>
     <nav class="navbar">
-        <h1>DÖNER KEBAB SOCIETY</h1>
+        <img id="logo" src="../assets/images/logo/logo.png" alt="Logo DKS" class="logo">
         <?php
         foreach ($menuItems as $label => $url) {
             echo "<a href=\"$url\" class=\"menu-link\">$label</a>";
@@ -64,7 +64,6 @@ if (isset($_SESSION['user_type'])) {
                 $profileImagePath = "../assets/images/perfiles/default.jpg";
             }
             echo "<img id=\"profile-image\" src=\"$profileImagePath\" alt=\"Profile Image\">";
-
         }
         ?>
     </nav>
