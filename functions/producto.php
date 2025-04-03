@@ -81,7 +81,7 @@ if (empty($alergenos)) {
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    
-  <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
+   <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
    <link rel="stylesheet" href="../assets/css/styles.css">
    <link rel="stylesheet" href="../assets/css/producto.css">
    <title>KEBAB SOCIETY - CARTA</title>
@@ -103,7 +103,10 @@ if (empty($alergenos)) {
             }
             ?>
          </div>
+
          <p><?php echo htmlspecialchars($product_name); ?></p>
+         <p><?php echo htmlspecialchars($product_price); ?> €</p>
+
          <div class="allergens-container">
             <?php if (!empty($alergenos)) { ?>
                <p>Alérgenos:</p>
