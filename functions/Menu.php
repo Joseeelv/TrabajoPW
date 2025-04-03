@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['menu'])) {
+    $_SESSION['menu'] = []; // Initialize 'menu' as an empty array if not set
+}
+
 try {
     // Establish a connection to the MySQL database using mysqli
     $connection = require_once('./conexion.php');
