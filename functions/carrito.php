@@ -74,7 +74,8 @@ $connection = include('./conexion.php');
                                         echo "<span style='text-decoration: line-through; color: red;'>" . number_format($precio_base, 2) . " €</span> ";
                                     }
                                     echo number_format($precio_final, 2) . " €";
-
+                                    
+                                    // Mostrar imagen del producto
                                     if (!empty($p['lista_ingredientes'])) {
                                         echo "<ul>";
                                         foreach ($p['lista_ingredientes'] as $ingrediente) {
