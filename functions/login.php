@@ -67,12 +67,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $errors['username'] = "Esta cuenta de manager está inactiva.";
     } else {
       session_regenerate_id(true); // Regenerar ID de sesión
-      $_SESSION['user_id'] = $user['user_id'];
-      $_SESSION['username'] = $username;
-      $_SESSION['email'] = $user['email'];
-      $_SESSION['user_type'] = $user['user_type'];
+      $_SESSION['user_id'] = htmlspecialchars($user['user_id']);
+      $_SESSION['username'] = htmlspecialchars($username);
+      $_SESSION['email'] = htmlspecialchars($user['email']);
+      $_SESSION['user_type'] = htmlspecialchars($user['user_type']);
       $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
-      $_SESSION['img_src'] = $user['img_src'];
+      $_SESSION['img_src'] = htmlspecialchars($user['img_src']);
 
       // Obtener puntos del usuario
       $connection = include('./conexion.php');
@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $stmt->bind_result($points);
       $stmt->fetch();
       $stmt->close();
-      $_SESSION['puntos'] = $points; // Guardar puntos en la sesión
+      $_SESSION['puntos'] = htmlspecialchars($points); // Guardar puntos en la sesión
 
       // Eliminar variables innecesarias
       unset($_SESSION['failed_attempts']);

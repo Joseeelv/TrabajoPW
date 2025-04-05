@@ -19,11 +19,11 @@
                 <h2>676 84 13 38</h2>
             </div>
             <div>
-                <h4>Para más información escribenos al:</h4>
+                <h4>Para más información escríbenos al:</h4>
                 <h2>alejandro160698@hotmail.com</h2>
             </div>
             <div>
-                <h4>Echale un vistazo a nuestras redes sociales:</h4>
+                <h4>Échale un vistazo a nuestras redes sociales:</h4>
                 <div id="redes">
                     <a href="https://www.facebook.com/andreualexander" target="_blank"><button>Facebook</button></a>
 
@@ -34,7 +34,7 @@
         </div>
         <div class="contacto">
             <div>
-                <h4>Encuentranos en:</h4>
+                <h4>Encuéntralos en:</h4>
                 <h2>Avenida Al-Andalus 12, San Fernando (La isla de Camarón)</h2>
             </div>
         </div>

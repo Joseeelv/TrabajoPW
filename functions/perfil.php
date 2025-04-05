@@ -164,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $updates[] = "img_src = ?";
             $types .= "s";
             $params[] = $new_filename;
-            $_SESSION['img_src'] = $new_filename;
+            $_SESSION['img_src'] = htmlspecialchars($new_filename);
           } else {
             $errors['foto'] = "Hubo un error al subir la imagen. Verifica los permisos del directorio.";
           }

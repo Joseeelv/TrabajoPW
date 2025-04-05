@@ -16,7 +16,7 @@ try {
     }
 
     if (isset($_POST['category'])) {
-        $_SESSION['actual_category'] = $_POST['category'];
+        $_SESSION['actual_category'] = htmlspecialchars($_POST['category']);
         header("Location: Menu.php");
     } elseif (!isset($_SESSION['actual_category'])) {
         $_SESSION['actual_category'] = 'Ninguna';

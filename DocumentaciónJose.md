@@ -555,6 +555,43 @@ public static function validatePassword(string $password): array {
     return $errors;
 }
 ```
+5. ## Mitigaciones contra inclusion de sesiones en PHP
+
+1. **Mover Archivos de Sesión Fuera del Alcance del Servidor Web**:  
+   Configurar `session.save_path` en `php.ini` para usar un directorio no accesible desde la web:
+
+```php
+session.save_path = "/var/secure/sessions"
+```
+
+Asegurar permisos: `chmod 600 /var/secure/sessions`.
+
+2. **Validación Estricta en LFI**:  
+   Usar listas blancas y sanitización de rutas:
+
+```php
+$allowed = ['home', 'about'];
+if (!in_array($_GET['file'], $allowed)) die("Acceso denegado");
+```
+
+3. **Sanitizar Datos de Sesión**:  
+   Validar y filtrar entradas antes de almacenarlas en `$_SESSION`, sobretodo en el login:
+```php
+$_SESSION['user_id'] = htmlspecialchars($user['user_id']);
+$_SESSION['username'] = htmlspecialchars($username);
+$_SESSION['email'] = htmlspecialchars($user['email']);
+$_SESSION['user_type'] = htmlspecialchars($user['user_type']);
+$_SESSION['last_activity'] = time(); // Para renovación automática de sesión
+$_SESSION['img_src'] = htmlspecialchars($user['img_src']);
+```
+
+4. **Configurar `open_basedir`**:  
+   Restringir el acceso a directorios específicos:
+
+```php
+open_basedir = /var/www/html:/var/secure/sessions
+```
+
 
 Estas funciones aseguran una validación segura y eficiente para nombres de usuario, contraseñas y correos electrónicos en un sistema de autenticación.
 

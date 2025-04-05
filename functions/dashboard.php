@@ -9,7 +9,7 @@ $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
-$_SESSION['points'] = $row['points'];
+$_SESSION['points'] = htmlspecialchars($row['points']);
 
 
 ?>
