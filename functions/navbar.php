@@ -1,7 +1,7 @@
 <?php
 // Definir los elementos del menú según el tipo de usuario
 if (isset($_SESSION['user_type'])) {
-
+    
     switch ($_SESSION['user_type']) {
         case 'admin':
             $menuItems = [
