@@ -121,10 +121,9 @@ CREATE TABLE ORDER_ITEMS_INGREDIENTS (
     order_item_ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
     order_item_id INT NOT NULL,
     ingredient_id INT NOT NULL,
-    quantity INT NOT NULL,
+    quantity INT,
     FOREIGN KEY (order_item_id) REFERENCES ORDER_ITEMS(order_item_id),
-    FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id),
-    CHECK (quantity = 1 OR quantity = -1)
+    FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id)
 );
 
 /* Tabla de ofertas: Almacena las ofertas disponibles */

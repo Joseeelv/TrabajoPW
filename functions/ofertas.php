@@ -1,7 +1,6 @@
 <?php
 session_start();
 $conn = include('./conexion.php');
-
 try {
     $query = "SELECT OFFERS.offer_text as of_name, OFFERS.offer_id as id, OFFERS.cost as coronas, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
     $stmt = $conn->prepare($query);
@@ -37,13 +36,13 @@ try {
                 $mensaje = ""; // Variable para almacenar el mensaje de error o éxito
         
                 if (isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
-                    if ($_SESSION['points'] >= $f['coronas']) {
+                    if ($_SESSION['puntos'] >= $f['coronas']) {
                         $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
                         $stmt = $conn->prepare($query);
                         $fecha = date('Y-m-d');
                         $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
                         $stmt->execute();
-                        $_SESSION['points'] -= $f['coronas']; // Restar el coste de la oferta
+                        $_SESSION['puntos'] -= $f['coronas']; // Restar el coste de la oferta
                         // guardar los puntos del usuario de la session a la base de datos
                         if (isset($_SESSION['user_id'])) {
                             $stmt = $conn->prepare("UPDATE CUSTOMERS SET points = ? WHERE user_id = ?");

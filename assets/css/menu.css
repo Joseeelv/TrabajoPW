@@ -15,7 +15,7 @@ body {
 main
 {
     width: 100%;
-    margin-top: 50px
+    margin-top: 80px;
 }
 
 ul
@@ -36,6 +36,7 @@ ul
     display: flex;
     flex-direction: column;
     padding: 20px;
+    
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
 }
 .sidebar button{
@@ -43,6 +44,11 @@ ul
     font-weight: bold;
     font-size: large;
 }
+
+#ninguna{
+    margin-top: 80px;
+}
+
 .container-producto
 {
     display: flex;

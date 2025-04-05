@@ -34,7 +34,6 @@ try {
         $stmt->execute();
         $_SESSION['menu'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
-
 } catch (Exception $e) {
     // If a D_Error exception is thrown, redirect to the 500 error page
     header("Location: 500.php");
@@ -55,7 +54,7 @@ try {
     <main>
         <aside class="sidebar">
             <ul>
-                <form method="POST"><input type="hidden" name="category" value="Ninguna"><button
+                <form method="POST"id="Ninguna"><input type="hidden" name="category" value="Ninguna" ><button
                         type="submit">Ninguna</button></form>
                 <?php
                 foreach ($_SESSION['categorias'] as $c) {

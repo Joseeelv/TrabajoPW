@@ -74,6 +74,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
       $_SESSION['img_src'] = $user['img_src'];
 
+      // Obtener puntos del usuario
+      $connection = include('./conexion.php');
+      $stmt = $connection->prepare("SELECT points FROM CUSTOMERS WHERE user_id = ?");
+      $stmt->bind_param("i", $_SESSION['user_id']);
+      $stmt->execute();
+      $stmt->bind_result($points);
+      $stmt->fetch();
+      $stmt->close();
+      $_SESSION['puntos'] = $points; // Guardar puntos en la sesión
+
       // Eliminar variables innecesarias
       unset($_SESSION['failed_attempts']);
       unset($_SESSION['csrf_token']);

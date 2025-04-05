@@ -1,7 +1,7 @@
 <?php
 // Definir los elementos del menú según el tipo de usuario
 if (isset($_SESSION['user_type'])) {
-
+    
     switch ($_SESSION['user_type']) {
         case 'admin':
             $menuItems = [
@@ -26,8 +26,8 @@ if (isset($_SESSION['user_type'])) {
             $menuItems = [
                 'Inicio' => './dashboard.php',
                 'Ofertas' => './ofertas.php',
-                'Carta' => './menu.php',
-                'Carrito' => './carrito.php',
+                'Carta' => './Menu.php',
+                'Carrito' => './Carrito.php',
                 'Pedidos Recientes' => './pedidos.php',
                 'Perfil' => './perfil.php',
                 'Cerrar Sesión' => './logout.php'
@@ -37,7 +37,7 @@ if (isset($_SESSION['user_type'])) {
 } else {
     $menuItems = [
         'Inicio' => '../index.php',
-        'Carta' => './Menu.php',
+        'Carta' => './menu.php',
         'Contacto' => './contact.php',
         'Iniciar Sesión' => './login.php',
         'Registrarse' => './register.php'
@@ -57,14 +57,13 @@ if (isset($_SESSION['user_type'])) {
 
         if (isset($_SESSION['user_type']) && $_SESSION['user_type'] == 'customer') {
             echo "<div id=\"kebabito-container\">";
-            echo "<img id=\"kebabito-image\" src=\"../assets/images/logo/DKS.png\" alt=\"Kebabito image\"><span> " . $_SESSION['points'] . "</span>";
+            echo "<img id=\"kebabito-image\" src=\"../assets/images/logo/DKS.png\" alt=\"Kebabito image\"><span> " . $_SESSION['puntos'] . "</span>";
             echo "</div>";
             $profileImagePath = "../assets/images/perfiles/" . $_SESSION['img_src'];
             if (!file_exists($profileImagePath) || empty($_SESSION['img_src'])) {
                 $profileImagePath = "../assets/images/perfiles/default.jpg";
             }
             echo "<img id=\"profile-image\" src=\"$profileImagePath\" alt=\"Profile Image\">";
-
         }
         ?>
     </nav>
