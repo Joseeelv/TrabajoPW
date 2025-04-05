@@ -18,45 +18,33 @@ $_SESSION['points'] = $row['points'];
 
 <head>
   <meta charset="UTF-8">
+
+  <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kebab Society</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
   <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/carrusel.css">
+  <script src="../assets/js/carrusel.js" defer></script>
 </head>
 
 <body>
   <header>
     <?php include('./navbar.php'); ?>
   </header>
-  <main>
-    <h1>
-      Hola
-      <?php
-      // Verificar si el usuario está logueado
-      if (isset($_SESSION['username']) && isset($_SESSION['user_id'])) {
-        $username = $_SESSION['username'];
-        echo htmlspecialchars($username);
-        $image = "../assets/images/perfiles/" . $_SESSION['img_src'] ?? '../assets/images/perfiles/default.jpg'; // Imagen por defecto si no hay imagen
-      } else {
-        echo "Invitado!";
-        $image = '../assets/images/perfiles/default.jpg'; // Imagen por defecto para invitados
-      }
-      ?>
-    </h1>
-    <div style="text-align: right;">
-      <img src="<?php echo htmlspecialchars($image); ?>" alt="ImagenUser"
-        style="width: 50px; height: 50px; border-radius: 50%; vertical-align: middle; margin-left: 10px; position: absolute; top: 50px; right: 10px;">
-    </div>
-    <p style="margin: 0 auto; text-align: center;">Tienes <?php echo htmlspecialchars($_SESSION['points']); ?> puntos</p>
-    <div class="carousel">
-      <div class="carousel-images">
-        <img src="../assets/images/image2.jpg" alt="Imagen 2">
+
+    <main>
+      <div class="carousel-container">
+        <div class="carousel">
+          <div class="slide"><img src="../assets/images/carrusel/1.png" alt="Kebab 1"></div>
+          <div class="slide"><img src="../assets/images/carrusel/2.png" alt="Kebab 2"></div>
+          <div class="slide"><img src="../assets/images/carrusel/3.png" alt="Kebab 3"></div>
+        </div>
+        <button class="btn btn-left" onclick="prevSlide()">&#9664;</button>
+        <button class="btn btn-right" onclick="nextSlide()">&#9654;</button>
       </div>
-    </div>
-    <script href="../assets/js/carrousel.js"></script>
-  </main>
+    </main>
+    <?php include('./footer.php'); ?>
 
-  <?php include('./footer.php'); ?>
-</body>
+  </body>
 
-</html>
+  </html>

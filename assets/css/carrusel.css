@@ -1,0 +1,111 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body,
+html {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+/* Fijar el header arriba */
+header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	background: rgba(0, 0, 0, 0.8); /* Fondo semi-transparente */
+	color: white;
+	padding: 15px;
+	z-index: 10; /* Para que siempre esté arriba */
+}
+
+/* Contenedor del carrusel */
+.carousel-container {
+    width: 100vw;
+    height: calc(100vh - 100px); /* Resta la altura del header */
+    position: relative;
+    overflow: hidden;
+    transition: opacity 1s ease-in-out; /* Suaviza la transición del fondo */
+}
+
+.carousel-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Oscurecer el fondo */
+    z-index: 1; /* Colocar detrás del contenido del carrusel */
+}
+
+/* Carrusel */
+.carousel {
+	display: flex;
+	width: 300vw;
+	height: 100%;
+	transition: transform 1.5s ease-in-out;
+	position: relative;
+	z-index: 2; /* Asegurar que esté encima del fondo oscuro */
+}
+/* Cada slide ocupa el 100% del contenedor */
+.slide {
+	width: 100vw;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+/* Imágenes del carrusel */
+.slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	filter: brightness(1);
+}
+
+.slide_bg {
+	background-size: cover;
+	background-position: center;
+	object-fit: cover;
+}
+
+/* Botones de navegación */
+.btn {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	font-size: 1.5rem;
+	cursor: pointer;
+	z-index: 3; /* Se asegura de que los botones estén por encima */
+}
+
+.btn-left {
+	left: 10px;
+}
+.btn-right {
+	right: 10px;
+}
+.btn-register {
+    left: 50%;
+	top:80%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 217, 0, 1);
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out; /* Transición suave */
+	color: black;
+}
+.hidden {
+    opacity: 0;
+    pointer-events: none; /* Evita que sea clickeable cuando esté oculto */
+}

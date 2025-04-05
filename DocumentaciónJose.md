@@ -1,329 +1,194 @@
-# Sistema de Registro de Usuarios
+# Documentación PHP: Registro y Login
 
-Esta documentación describe un sistema de registro de usuarios basado en PHP. El sistema incluye características como protección CSRF, validación de entrada, hash de contraseñas e interacción con la base de datos.
-
-## Componentes Principales
-
-El sistema se compone de:
-
-- Configuración de seguridad
-- Protección CSRF
-- Función de registro de usuarios
-- Validación y saneamiento de la entrada
-- Manejo de errores
-- Cabeceras de seguridad
+Este documento detalla las medidas de seguridad implementadas en el código PHP proporcionado, enfocándose en las prácticas recomendadas para proteger contra vulnerabilidades comunes y ataques maliciosos. El código abarca funcionalidades de registro, inicio de sesión, y gestión de sesiones.
 
 ## Configuración de Seguridad
 
-El sistema utiliza una constante `SECURITY` para definir parámetros clave de seguridad:
-
 ```php
 const SECURITY = [
-	'csrf_token_expire' => 3600, // 1 hour
-	'rate_limit' => 5, // Maximum attempts per hour
-	'password_min_strength' => 3 // Password security level (0-4)
+  'csrf_token_expire' => 3600, // 1 hora
+  'token_length' => 32 // Longitud del token en bytes
 ];
 ```
 
-## Protección CSRF
+Esta sección define constantes de seguridad cruciales para la aplicación:
 
-La protección CSRF (Cross-Site Request Forgery) se implementa utilizando verificación basada en tokens:
+- `csrf_token_expire`: Especifica la duración de validez de los tokens CSRF, crucial para prevenir ataques de falsificación de petición en sitios cruzados (CSRF).
+- `token_length`: Define la longitud en bytes del token CSRF generado aleatoriamente. Una longitud mayor incrementa la entropía y dificulta la predicción del token por atacantes.
 
-### Funciones:
+## Protección contra CSRF
 
-- `generateCsrfToken()`: Genera un nuevo token CSRF o devuelve uno existente si aún es válido.
-- `validateCsrfToken($token)`: Valida el token CSRF proporcionado contra el almacenado.
-
-## Función de Registro de Usuario
-
-La función `RegisterUser($username, $pass, $email)` maneja el proceso de registro de un nuevo usuario:
+La protección contra CSRF se implementa mediante la generación y validación de tokens únicos para cada sesión de usuario.
 
 ```php
-function RegisterUser($username, $pass, $email) {
-  require_once('.configDB.php');
-  $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-  if (!$connection) {
-      die("Connection failed: " . mysqli_connect_error());
-  }
-
-  // Hash the password
-  $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
-
-  // Insert into USERS table
-  $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
-  $stmt->bind_param("sss", $username, $hashed_password, $email);
-  if (!$stmt->execute()) {
-      throw new Exception("Error inserting into USERS table: " . $stmt->error);
-  }
-  $user_id = $connection->insert_id;
-  $stmt->close();
-
-  // Insert into CUSTOMERS table
-  $stmt = $connection->prepare("INSERT INTO CUSTOMERS (user_id, customer_address) VALUES (?, ?)");
-  $address = "No address";
-  $stmt->bind_param("is", $user_id, $address);
-  if (!$stmt->execute()) {
-      throw new Exception("Error inserting into CUSTOMERS table: " . $stmt->error);
-  }
-  $stmt->close();
-  $connection->close();
-}
-```
-
-### Propósito
-
-El propósito principal de esta función es registrar un nuevo usuario en la base de datos insertando su información en las tablas `USERS` y `CUSTOMERS`.
-
-## Validación de Entrada
-
-El sistema realiza una validación exhaustiva de la entrada:
-
-### Validación del Nombre de Usuario
-
-- Obligatorio.
-- Longitud entre 3 y 20 caracteres.
-- Solo permite letras, números y guiones bajos.
-- Comprueba la unicidad en la base de datos.
-
-```php
-// Validate username
-  if (empty($username)) {
-      $errors['username'] = "Username is required.";
-  } elseif (strlen($username) < 3 || strlen($username) > 20) {
-      $errors['username'] = "Username must be between 3 and 20 characters long.";
-  } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-      $errors['username'] = "Username can only contain letters, numbers, and underscores.";
-  } elseif (usernameExists($username)) { // Very if the username already exists
-      $errors['username'] = "This username is already taken.";
-}
-```
-
-### Validación del Correo Electrónico
-
-- Obligatorio.
-- Debe ser un formato de correo electrónico válido.
-- Comprueba la unicidad en la base de datos.
-
-```php
-// Validate email
-  if (empty($email)) {
-      $errors['email'] = "Email is required.";
-  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $errors['email'] = "Please enter a valid email address.";
-  } elseif (emailExists($email)) { // Verify if the email already exists
-      $errors['email'] = "This email is already registered.";
-  }
-```
-
-### Validación de la Contraseña
-
-- Obligatorio.
-- Longitud mínima de 8 caracteres.
-- Debe contener mayúsculas, minúsculas, números y caracteres especiales.
-
-```php
-// Validate password
-	if (empty($password)) {
-		$errors['password'] = "Password is required.";
-	} elseif (strlen($password) < 8) {
-		$errors['password'] = "The password must be at least 8 characters long.";
-	} elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,}$/', $password)) {
-		$errors['password'] = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.";
-}
-```
-
-## Flujo de Ejecución Principal
-
-1. Inicia una sesión PHP
-2. Comprueba si el formulario fue enviado vía POST
-3. Sanitiza y valida los datos de entrada
-4. Valida el token CSRF
-5. Implementa limitación de intentos
-6. Si la validación pasa, intenta registrar al usuario
-7. Maneja escenarios de éxito o fracaso
-
-## Cabeceras de Seguridad
-
-El sistema establece varias cabeceras de seguridad para mejorar la protección:
-
-```php
-header("Content-Security-Policy: default-src 'self'");
-header("X-Frame-Options: DENY");
-header("Strict-Transport-Security: max-age=63072000; includeSubDomains");
-header("X-Content-Type-Options: nosniff");
-```
-
-## Manejo de Errores
-
-- Los errores de validación se almacenan en el array `$errors`.
-- Si el registro falla, se registra un error y se muestra un mensaje amigable al usuario.
-- Los errores se almacenan en la sesión para ser mostrados en el formulario.
-
-```php
-// Initialize an array to store validation errors
-$errors = [];
-  // Check for validation errors
-  if (empty($errors)) {
-    try {
-      RegisterUser($username, $password, $email);
-      // Successful registration
-      $_SESSION['success_message'] = "User registered successfully.";
-      header("Location: login.php");
-      exit();
-    } catch (Exception $e) {
-      error_log("Registration error: " . $e->getMessage());
-      $errors['registration'] = "An error occurred during registration. Please try again later.";
-    }
-  }
-
-// Store errors in session to display them on the form
-$_SESSION['register_errors'] = $errors;
-```
-
-## Uso del Sistema
-
-1. El usuario envía el formulario de registro.
-2. El sistema valida y sanea la entrada.
-3. Si la validación tiene éxito, se llama a `RegisterUser`.
-4. En caso de registro exitoso, el usuario es redirigido a la página de inicio de sesión.
-5. Si el registro falla, se muestra un mensaje de error.
-
-## Medidas de seguridad
-
-En esta función de registro, se han implementado varias medidas de seguridad para proteger los datos y prevenir ataques comunes:
-
-### Prevención de Inyección SQL
-
-Se utilizan sentencias preparadas (prepared statements) para todas las consultas SQL. Esto separa los datos de la estructura de la consulta, evitando así la inyección SQL.
-
-```php
-$stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
-	$stmt->bind_param("sss", $username, $hashed_password, $email);
-	if (!$stmt->execute()) {
-		throw new Exception("Error inserting into USERS table: " . $stmt->error);
-	}
-	$user_id = $connection->insert_id;
-	$stmt->close();
-```
-
-### Hasheo de contraseñas
-
-Se almacenan las contraseñas hasheadas para una mayor seguridad y prevenir ataques de robo de credenciales.
-
-```php
-$hashed_password = password_hash($pass, PASSWORD_BCRYPT);
-```
-
-### Prevención contra XSS
-
-Se hace uso de funciones específicas para el saneamiento de algunos campos con el fin de prevenir ataques **XSS persistente**, esto se hace mediante la validación con `htmlspecialchars`:
-
-```php
-$username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
-$email = trim(htmlspecialchars($_POST['email'], ENT_QUOTES, 'UTF-8'));
-```
-
-### Prevención de ataques CSRF
-
-Se implementa un sistema de tokens CSRF para proteger contra ataques de falsificación de solicitudes entre sitios:
-
-```php
-function generateCsrfToken()
-{
-	if (empty($_SESSION['csrf_token']) || time() > $_SESSION['csrf_token_expire']) {
-		$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-		$_SESSION['csrf_token_expire'] = time() + SECURITY['csrf_token_expire'];
-	}
-	return $_SESSION['csrf_token'];
-}
-
-function validateCsrfToken($token)
-{
-	return hash_equals($_SESSION['csrf_token'], $token) && time() < $_SESSION['csrf_token_expire'];
-}
-
-// Uso en el flujo principal
-if (!validateCsrfToken($_POST['csrf_token'])) {
-throw new Exception("Invalid CSRF token");
-}
-```
-
-### Limitación del número de intentos
-
-Se implementa una limitación de intentos para prevenir ataques de fuerza bruta:
-
-```php
-$_SESSION['attempts'] = ($_SESSION['attempts'] ?? 0) + 1;
-if ($_SESSION['attempts'] > 5) {
-  die("Demasiados intentos. Intenta más tarde.");
-}
-```
-
-### Forzar HTTPS
-
-Se fuerza el uso de HTTPS para proteger la información transmitida:
-
-```php
-if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
-  header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
-  exit();
-}
-```
-
-# Sistema de Inicio de Sesión de Usuarios
-
-Este documento describe un sistema de inicio de sesión de usuarios basado en PHP. El sistema incluye características como protección CSRF, limitación de intentos, validación de entrada, hash de contraseñas y manejo de sesiones seguras.
-
-## Componentes Principales
-
-El sistema se compone de:
-
-- Configuración de seguridad.
-- Protección CSRF
-- Funciones auxiliares (registro de intentos, bloqueo).
-- Función de inicio de sesión.
-- Validación y saneamiento de la entrada.
-- Manejo de errores.
-- Medidas de seguridad.
-
-## Configuración de Seguridad
-
-El sistema utiliza una constante `SECURITY` para definir parámetros clave de seguridad:
-
-```php
-// Security configuration
-const SECURITY = [
-  'max_attempts' => 5,
-  'lockout_time' => 1800, // 30 minutes
-  'csrf_token_expire' => 3600 // 1 hour
-];
-```
-
-## Protección CSRF
-
-La función `generateCsrfToken()` genera un token CSRF para proteger contra ataques de falsificación de solicitudes entre sitios. La función `validateCsrfToken($token)` valida el token CSRF proporcionado contra el almacenado:
-
-```php
-function generateCsrfToken()
+function generateCsrfToken(): string
 {
   if (empty($_SESSION['csrf_token']) || time() > $_SESSION['csrf_token_expire']) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(SECURITY['token_length']));
     $_SESSION['csrf_token_expire'] = time() + SECURITY['csrf_token_expire'];
   }
   return $_SESSION['csrf_token'];
 }
 
-// Function to validate CSRF token
-function validateCsrfToken($token)
+function validateCsrfToken(string $token): bool
 {
-  return hash_equals($_SESSION['csrf_token'], $token) && time() < $_SESSION['csrf_token_expire'];
+  return isset($_SESSION['csrf_token']) &&
+  hash_equals($_SESSION['csrf_token'], $token) &&
+  time() < $_SESSION['csrf_token_expire'];
 }
-
 ```
 
-## Registrar Intento Fallido
+- `generateCsrfToken()`: Genera un token CSRF único y lo almacena en la sesión del usuario. Si ya existe un token y aún es válido, se reutiliza.
+- `validateCsrfToken()`: Valida el token CSRF enviado con el formulario comparándolo con el almacenado en la sesión. La función `hash_equals()` se utiliza para evitar ataques de temporización.
 
-La función `logFailedAttempt($username)` registra los intentos fallidos de inicio de sesión en la sesión:
+## Cabeceras de Seguridad
+
+Las cabeceras HTTP de seguridad son configuradas para fortalecer la seguridad de la aplicación.
+
+```php
+header("Content-Security-Policy: default-src 'self'; script-src 'self' cdnjs.cloudflare.com");
+header("X-Frame-Options: DENY");
+header("Strict-Transport-Security: max-age=63072000; includeSubDomains; preload");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+header("Permissions-Policy: geolocation=(), camera=(), microphone=()");
+```
+
+- `Content-Security-Policy`: Define una política de seguridad de contenido para controlar los recursos que el navegador puede cargar. En este caso, solo se permiten recursos del mismo origen y scripts de cdnjs.cloudflare.com.
+- `X-Frame-Options: DENY`: Protege contra ataques de clickjacking impidiendo que la página sea incluida en un iframe.
+- `Strict-Transport-Security`: Fuerza el uso de HTTPS y protege contra ataques de intermediario. El atributo `preload` permite que el dominio sea incluido en la lista de precarga de HSTS en los navegadores.
+- `X-Content-Type-Options: nosniff`: Evita que el navegador interprete incorrectamente los tipos MIME de los archivos, mitigando ataques de inyección de HTML.
+- `Referrer-Policy: strict-origin-when-cross-origin`: Define la política de referencia para controlar la cantidad de información enviada en el encabezado Referer.
+- `Permissions-Policy`: Controla el acceso a características del navegador, como la geolocalización y el uso de la cámara.
+
+## Función de Registro
+
+La función `RegisterUser` se encarga de registrar nuevos usuarios en el sistema.
+
+```php
+function RegisterUser(string $username, string $pass, string $email, string $address): void
+{
+  $connection = include('./conexion.php');
+  mysqli_begin_transaction($connection);
+
+  try {
+    $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
+    // Validación de unicidad antes de insertar
+    $stmt = $connection->prepare("SELECT user_id FROM USERS WHERE username = ? OR email = ?");
+    $stmt->bind_param("ss", $username, $email);
+    $stmt->execute();
+    if ($stmt->get_result()->num_rows > 0) {
+      throw new Exception("Nombre de usuario o email ya registrado");
+    }
+    $stmt->close();
+
+    // Inserción en USERS
+    $stmt = $connection->prepare("INSERT INTO USERS (username, user_secret, email) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $username, $hashed_password, $email);
+    if (!$stmt->execute()) {
+      throw new Exception("Error en USERS: " . $stmt->error);
+    }
+    $user_id = $connection->insert_id;
+    $stmt->close();
+
+    // Inserción en CUSTOMERS
+    $stmt = $connection->prepare("INSERT INTO CUSTOMERS (user_id, customer_address) VALUES (?, ?)");
+    $stmt->bind_param("is", $user_id, $address);
+    if (!$stmt->execute()) {
+      throw new Exception("Error en CUSTOMERS: " . $stmt->error);
+    }
+    $stmt->close();
+
+    mysqli_commit($connection);
+  } catch (Exception $e) {
+  mysqli_rollback($connection);
+  throw $e;
+    } finally {
+      $connection->close();
+    }
+}
+```
+
+- La contraseña se hashea utilizando `password_hash` con el algoritmo `BCRYPT`, proporcionando una seguridad robusta contra ataques de fuerza bruta y rainbow tables.
+- Se utiliza una transacción para asegurar la integridad de los datos. Si alguna operación falla, se revierte la transacción.
+- Se implementa una validación de unicidad antes de la inserción para evitar la creación de usuarios duplicados.
+
+## Validación del Formulario
+
+Antes de registrar al usuario, los datos del formulario se validan para asegurar que cumplen con los requisitos de seguridad y formato.
+
+```php
+$username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
+$password = $_POST['password'];
+$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+$address = trim(htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8'));
+$errors = [];
+```
+
+- Los datos se sanitizan utilizando `htmlspecialchars` para prevenir ataques XSS y `filter_var` con `FILTER_SANITIZE_EMAIL` para limpiar el email.
+- Se utilizan funciones de validación personalizadas (definidas en `validations.php`) para verificar el formato y la validez de los datos.
+
+## Función de Inicio de Sesión
+
+```php
+function LoginUser($username, $pass)
+{
+  $connection = include('./conexion.php');
+  // Obtener user_secret, user_id, y verificar si es un manager activo
+  $stmt = $connection->prepare("
+  SELECT u.user_id, u.user_secret, u.user_type, u.email, u.img_src, m.employee
+  FROM USERS u
+  LEFT JOIN MANAGERS m ON u.user_id = m.user_id
+  WHERE u.username = ?
+  ");
+  $stmt->bind_param("s", $username);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  if ($result->num_rows === 0) {
+    $stmt->close();
+    $connection->close();
+    return false;
+  }
+
+  $user = $result->fetch_assoc();
+  $stmt->close();
+
+  // Verificar contraseña y si es un manager activo
+  if (password_verify($pass, $user['user_secret'])) {
+    if ($user['user_type'] === 'manager' && $user['employee'] != 1) {
+      return 'inactive';
+    }
+    return $user;
+  } else {
+    return false;
+  }
+}
+```
+
+1. Selección Segura de Datos:
+
+- La función ahora usa una sentencia preparada para buscar los detalles del usuario por nombre de usuario, previniendo la inyección SQL.
+
+2. Protección contra Ataques de Fuerza Bruta:
+
+- La sesión se regenera al inicio de sesión para evitar la fijación de sesión.
+- Control de intentos fallidos para prevenir ataques de fuerza bruta, bloqueando cuentas temporalmente.
+- Se registran los intentos fallidos de inicio de sesión en una variable de sesión
+
+4. Verificación de Estado de la Cuenta:
+
+- Los usuarios con cuentas de administrador inactivas no pueden iniciar sesión, y se les notifica que su cuenta está inactiva.
+
+5. Manejo Adecuado de la Información de la Sesión:
+
+- La sesión se regenera después de la autenticación para evitar la fijación de sesión.
+- Se establece una variable de última actividad para la renovación automática de la sesión y la caducidad del tiempo de inactividad, mejorando la seguridad y la gestión de los recursos del servidor.
+- La sesión está configurada para utilizar cookies seguras (HTTPOnly, Secure y SameSite) para proteger contra ataques de secuencias de comandos entre sitios (XSS) y falsificación de solicitudes entre sitios (CSRF).
+
+## Protección contra Fuerza Bruta
+
+Para mitigar ataques de fuerza bruta, se implementa un sistema de bloqueo de cuentas basado en el número de intentos fallidos de inicio de sesión.
 
 ```php
 function logFailedAttempt($username)
@@ -341,313 +206,355 @@ function logFailedAttempt($username)
 
   $_SESSION['failed_attempts'][$username]['count']++;
   $_SESSION['failed_attempts'][$username]['last_failed_attempt'] = time();
-}
-```
-
-## Verificar Usuario Bloqueado
-
-La función `isUserLocked($username)` verifica si un usuario está bloqueado basándose en los datos de la sesión:
-
-```php
-function isUserLocked($username)
-{
-  if (!isset($_SESSION['failed_attempts'][$username])) {
-    return false; // User is not locked
   }
 
-  $failed_attempts = $_SESSION['failed_attempts'][$username]['count'];
-  $last_failed_attempt = $_SESSION['failed_attempts'][$username]['last_failed_attempt'];
-  $lockout_time = SECURITY['lockout_time'];
-  $max_attempts = SECURITY['max_attempts'];
+  // Función para verificar si el usuario está bloqueado (basado en datos de sesión).
 
-  if ($failed_attempts >= $max_attempts) {
-    $lockout_time_remaining = (time() - $last_failed_attempt);
+  function isUserLocked($username)
+  {
+    if (!isset($_SESSION['failed_attempts'][$username])) {
+      return false; // El usuario no está bloqueado
+    }
+
+    $failed_attempts = $_SESSION['failed_attempts'][$username]['count'];
+    $last_failed_attempt = $_SESSION['failed_attempts'][$username]['last_failed_attempt'];
+    $lockout_time = SECURITY['lockout_time'];
+    $max_attempts = SECURITY['max_attempts'];
+
+    if ($failed_attempts >= $max_attempts) {
+      $lockout_time_remaining = (time() - $last_failed_attempt);
     if ($lockout_time_remaining < $lockout_time) {
-      return true; // User is locked
+      return true; // El usuario está bloqueado
     } else {
-      // Reset failed attempts if lockout time has passed
+      // Reiniciar intentos fallidos si el tiempo de bloqueo ha pasado
       unset($_SESSION['failed_attempts'][$username]);
-      return false; // User is not locked
+      return false; // El usuario no está bloqueado
     }
   }
-
-  return false; // User is not locked
+    return false; // El usuario no está bloqueado
 }
 ```
 
-# Función de Inicio de Sesión
+- `logFailedAttempt()`: Registra cada intento fallido de inicio de sesión en la sesión del usuario.
+- `isUserLocked()`: Verifica si un usuario está bloqueado basándose en el número de intentos fallidos y el tiempo transcurrido desde el último intento.
 
-La función `LoginUser($username, $pass)` maneja el proceso de autenticación de un usuario:
+## HTTPS
 
-```php
-function LoginUser($username, $pass)
-{
-  require_once('.configDB.php');
-  $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-  if (!$connection) {
-    die("Connection failed: " . mysqli_connect_error());
-  }
-
-  // Get user_secret and user_id in order to verify password & login
-  $stmt = $connection->prepare("SELECT user_id, user_secret FROM USERS WHERE username = ?");
-  $stmt->bind_param("s", $username);
-  $stmt->execute();
-  $result = $stmt->get_result();
-
-  if ($result->num_rows === 0) {
-    $stmt->close();
-    $connection->close();
-    return false;
-  }
-
-  $user = $result->fetch_assoc();
-  $stmt->close();
-  $connection->close();
-
-  // Verify password
-  if (password_verify($pass, $user['user_secret'])) {
-    return $user;
-  } else {
-    return false;
-  }
-}
-```
-
-## Validación de Entrada
-
-El sistema realiza las siguientes validaciones:
+Se fuerza el uso de HTTPS para proteger la comunicación entre el cliente y el servidor.
 
 ```php
-// If username exists, then validate password
-if (empty($errors)) {
-  $user = LoginUser($username, $password);
-  if ($user === false) {
-    $errors['password'] = "Invalid password.";
-    logFailedAttempt($username);
-  }
-}
-```
-
-## Flujo de Ejecución Principal
-
-1. Inicia una sesión PHP con parámetros de cookie seguros.
-2. Valida el token CSRF.
-3. Recolecta y sanitiza los datos de entrada.
-4. Verifica si el usuario está bloqueado.
-5. Valida el nombre de usuario y la contraseña.
-6. Si la validación es exitosa, regenera el ID de sesión e inicia la sesión del usuario.
-7. Si hay errores, los almacena en la sesión y redirige al usuario al formulario de inicio de sesión.
-
-## Manejo de Errores
-
-- Los errores de validación se almacenan en el array `$errors`.
-- Si hay errores, se almacenan en la sesión y se redirige al usuario de vuelta al formulario de inicio de sesión.
-
-```php
-// Initialize an array to store validation errors
-$errors = [];
-
-// Check for validation errors
-if (empty($errors)) {
-  // Successful login
-  session_regenerate_id(true); // Regenerate session ID
-  $_SESSION['success_message'] = "User logged in successfully.";
-  $_SESSION['User_ID'] = $user['user_id'];
-  $_SESSION['last_activity'] = time(); // For automatic session renewal
-  header("Location: dashboard.php"); // Redirect to the dashboard
-  exit();
-} else {
-  // Store errors in session to display them on the form
-  $_SESSION['login_errors'] = $errors;
-  header("Location: login.php"); // Redirect back to the login page
-  exit();
-}
-```
-
-## Medidas de Seguridad
-
-### Parámetros de Cookie Seguros
-
-Se configuran parámetros de cookie seguros para la sesión:
-
-```php
-// Set secure cookie parameters
-session_set_cookie_params([
-  'lifetime' => 3600,
-  'path' => '/',
-  'domain' => $_SERVER['HTTP_HOST'],
-  'secure' => true,
-  'httponly' => true,
-  'samesite' => 'Strict'
-]);
-```
-
-### Prevención de Inyección SQL
-
-Se utilizan sentencias preparadas para todas las consultas SQL:
-
-```php
-$stmt = $connection->prepare("SELECT user_id, user_secret FROM USERS WHERE username = ?");
-$stmt->bind_param("s", $username);
-```
-
-### Protección de Contraseñas
-
-Las contraseñas se verifican de forma segura utilizando la función `password_verify()`:
-
-```php
-if (password_verify($pass, $user['user_secret']))
-```
-
-### Sanitización de Entrada
-
-El nombre de usuario se sanitiza para prevenir ataques XSS:
-
-```php
-$username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
-```
-
-### Prevención de Ataques CSRF
-
-Se implementa un sistema de tokens CSRF para proteger contra ataques de falsificación de solicitudes entre sitios.
-
-### Limitación de Intentos
-
-Se implementa una limitación de intentos de inicio de sesión para prevenir ataques de fuerza bruta.
-
-## Uso del Sistema
-
-1. El usuario envía el formulario de inicio de sesión.
-2. El sistema valida el token CSRF.
-3. El sistema valida y sanitiza la entrada.
-4. Si la validación es exitosa, se autentica al usuario.
-5. En caso de inicio de sesión exitoso, el usuario es redirigido al dashboard.
-6. Si hay errores, se redirige al usuario de vuelta al formulario de inicio de sesión con mensajes de error.
-
-## Renovación Automática de Sesión
-
-Se implementa una renovación automática de sesión para mejorar la seguridad:
-
-```php
-if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
-  session_regenerate_id(true);
-  $_SESSION['last_activity'] = time();
-}
-```
-
-## Forzar HTTPS
-
-Se fuerza el uso de HTTPS para proteger la información transmitida:
-
-```php
-if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+if ($_SERVER['HTTPS'] !== 'on' && $_SERVER['HTTP_HOST'] !== 'localhost') {
   header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
   exit();
 }
 ```
 
-# Implementación de funciones de validación
+Este código redirige automáticamente a la versión HTTPS del sitio si se detecta una conexión no segura, protegiendo contra ataques de intermediario.
 
-Encontramos tres funciones esenciales para la validación de credenciales en un sistema de autenticación:
+# Documentación PHP: Actualización de Perfil
 
-1. `usernameExists()`: Verifica la existencia de un nombre de usuario.
-2. `emailExists()`: Comprueba si un email está registrado.
-3. `validatePassword()`: Valida una contraseña (implementación actual con advertencia).
+Este documento detalla las medidas de seguridad implementadas en la funcionalidad de actualización de perfil en PHP, enfocándose en las mejores prácticas para proteger contra vulnerabilidades comunes y ataques maliciosos.
 
-## Función `usernameExists()`
-
-### Propósito
-
-La función `usernameExists` se utiliza para comprobar de forma segura si el nombre de usuario ya está registrado en la base de datos. Está diseñada para garantizar la seguridad y prevenir ataques comunes como inyección SQL.
-
-### Implementación
+## Configuración de Seguridad
 
 ```php
-function usernameExists($username) {
-  // Conexión y lógica de verificación...
+const SECURITY = [
+  'csrf_token_expire' => 3600, // 1 hora
+  'token_length' => 32, // Longitud del token en bytes
+  'max_attempts' => 5, // Máximo de intentos fallidos
+  'lockout_time' => 900 // Tiempo de bloqueo en segundos (15 minutos)
+];
+```
+
+- `csrf_token_expire`: Especifica la duración de validez de los tokens CSRF.
+- `token_length`: Define la longitud del token CSRF para mayor seguridad.
+- `max_attempts` y `lockout_time`: Previenen ataques de fuerza bruta limitando los intentos de actualización fallidos.
+
+## Protección contra CSRF
+
+Cada solicitud de actualización de perfil debe incluir un token CSRF válido.
+
+```php
+function generateCsrfToken(): string
+{
+  if (empty($_SESSION['csrf_token']) || time() > $_SESSION['csrf_token_expire']) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(SECURITY['token_length']));
+    $_SESSION['csrf_token_expire'] = time() + SECURITY['csrf_token_expire'];
+  }
+  return $_SESSION['csrf_token'];
+}
+
+function validateCsrfToken(string $token): bool
+{
+  return isset($_SESSION['csrf_token']) &&
+    hash_equals($_SESSION['csrf_token'], $token) &&
+    time() < $_SESSION['csrf_token_expire'];
 }
 ```
 
-#### Parámetros
-
-- `$username`: Nombre de usuario a verificar (string)
-
-#### Proceso de verificación del username
-
-1. Establece conexión con la base de datos.
-2. Prepara sentencia SQL con parámetros vinculados.
-3. Ejecuta la consulta.
-4. Retorna `true` si el usuario existe, `false` en caso contrario.
-
-#### Seguridad
-
-- Usa prepared statements para prevenir inyección SQL.
-- Cierra conexiones después de cada consulta.
-
-## Función `emailExists()`
-
-### Propósito
-
-La función `emailExists` se utiliza para comprobar de forma segura si el email de un usuario ya está registrado en la base de datos. Está diseñada para garantizar la seguridad y prevenir ataques comunes como inyección SQL.
-
-### Implementación
+## Cabeceras de Seguridad
 
 ```php
-function emailExists($email) {
-  // Conexión y lógica de verificación...
+header("Content-Security-Policy: default-src 'self'; script-src 'self' cdnjs.cloudflare.com");
+header("X-Frame-Options: DENY");
+header("Strict-Transport-Security: max-age=63072000; includeSubDomains; preload");
+header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+header("Permissions-Policy: geolocation=(), camera=(), microphone=()");
+```
+
+## Validación del Formulario
+
+Los datos del formulario se validan y sanitizan antes de procesarlos.
+
+```php
+$password = $_POST['password'];
+$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+$address = trim(htmlspecialchars($_POST['address'], ENT_QUOTES, 'UTF-8'));
+$errors = [];
+```
+
+- Se sanitizan los datos para prevenir ataques XSS.
+- Se valida que el email sea válido y no esté duplicado.
+- Se usa `Validator::validatePassword($password)` para verificar la seguridad de la contraseña.
+
+## Funcionalidad de Actualización de Perfil
+
+```php
+function UpdateProfile($connection, $pass, $email, $address, $image)
+{
+  mysqli_begin_transaction($connection);
+  try {
+    $hashed_password = !empty($pass) ? password_hash($pass, PASSWORD_BCRYPT) : null;
+
+    $stmt = $connection->prepare("UPDATE USERS SET
+                                  user_secret = COALESCE(?, user_secret),
+                                  img_src = COALESCE(?, img_src)
+                                  WHERE user_id = ?");
+    $stmt->bind_param("ssi", $hashed_password, $image, $_SESSION['user_id']);
+
+    if (!$stmt->execute()) {
+      throw new Exception("Error al actualizar USERS: " . $stmt->error);
+    }
+    $stmt->close();
+
+    if ($_SESSION['user_type'] === 'customer' && !empty($address)) {
+      $stmt = $connection->prepare("UPDATE CUSTOMERS SET customer_address = ? WHERE user_id = ?");
+      $stmt->bind_param("si", $address, $_SESSION['user_id']);
+      if (!$stmt->execute()) {
+        throw new Exception("Error al actualizar CUSTOMERS: " . $stmt->error);
+      }
+      $stmt->close();
+    }
+
+    mysqli_commit($connection);
+  } catch (Exception $e) {
+    mysqli_rollback($connection);
+    throw $e;
+  }
 }
 ```
 
-#### Parámetros
+- Se usa `password_hash` con `BCRYPT` para proteger contraseñas.
+- Se valida la unicidad del email antes de actualizarlo.
+- Se ejecuta dentro de una transacción para garantizar la integridad de los datos.
 
-- `$email`: Dirección de email a verificar (string).
+## Protección contra Fuerza Bruta
 
-#### Proceso de verificación del email
-
-1. Conexión a MySQL usando credenciales de `.configDB.php`.
-2. Consulta preparada con `COUNT(*)`.
-3. Vinculación de parámetros tipo string.
-4. Retorno booleano basado en resultados.
-
-#### Medidas Clave
-
-- Mismo nivel de seguridad que `usernameExists()`.
-- Aislamiento de consultas por función.
-
-## Función `validatePassword()`
-
-### Propósito
-
-La función `validatePassword` se utiliza para validar de forma segura las credenciales de un usuario (nombre de usuario y contraseña) contra los datos almacenados en una base de datos. Está diseñada para garantizar la seguridad y prevenir ataques comunes como inyección SQL, fuerza bruta y ataques de tiempo.
-
-### Implementación
+Para prevenir intentos de actualización masivos, se implementa un sistema de bloqueo temporal.
 
 ```php
-function validatePassword($username, $password) {
-  // Conexión y lógica de verificación...
+function logFailedAttempt($username)
+{
+  if (!isset($_SESSION['failed_attempts'][$username])) {
+    $_SESSION['failed_attempts'][$username] = ['count' => 0, 'last_failed_attempt' => 0];
+  }
+
+  $_SESSION['failed_attempts'][$username]['count']++;
+  $_SESSION['failed_attempts'][$username]['last_failed_attempt'] = time();
+}
+
+function isUserLocked($username)
+{
+  if (!isset($_SESSION['failed_attempts'][$username])) return false;
+
+  $failed_attempts = $_SESSION['failed_attempts'][$username]['count'];
+  $last_failed_attempt = $_SESSION['failed_attempts'][$username]['last_failed_attempt'];
+  $lockout_time_remaining = time() - $last_failed_attempt;
+
+  if ($failed_attempts >= SECURITY['max_attempts'] && $lockout_time_remaining < SECURITY['lockout_time']) {
+    return true;
+  } elseif ($lockout_time_remaining >= SECURITY['lockout_time']) {
+    unset($_SESSION['failed_attempts'][$username]);
+  }
+  return false;
 }
 ```
 
-#### Parámetros
+- `logFailedAttempt()`: Registra intentos fallidos.
+- `isUserLocked()`: Bloquea temporalmente al usuario si excede el límite de intentos fallidos.
 
-- **`$username`**: El nombre de usuario ingresado por el usuario (string).
-- **`$password`**: La contraseña ingresada por el usuario en texto plano (string).
+## Forzar HTTPS
 
-#### Proceso de verificación de la contraseña
+Se redirige a HTTPS si la conexión no es segura.
 
-1. Obtener la contraseña ingresada por el usuario del formulario de inicio de sesión.
-2. Recuperar el hash almacenado de la contraseña del usuario desde la base de datos.
-3. Utilizar la función `password_verify()` para comparar la contraseña ingresada con el hash almacenado.
-4. Si `password_verify()` devuelve `true`, la contraseña es válida y se permite el acceso.
-5. Si `password_verify()` devuelve `false`, la contraseña es inválida y se deniega el acceso.
-6. Verificar si el hash necesita ser actualizado usando `password_needs_rehash()`.
-7. Si se requiere actualización, generar un nuevo hash con `password_hash()` y actualizar la base de datos.
-8. Manejar adecuadamente los errores y excepciones que puedan surgir durante el proceso.
+```php
+if ($_SERVER['HTTPS'] !== 'on' && $_SERVER['HTTP_HOST'] !== 'localhost') {
+  header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+  exit();
+}
+```
 
-#### Medidas Clave
+Con estas medidas, se mejora significativamente la seguridad en la actualización de perfiles.
+# Documentación PHP: Validaciones
 
-- Usa prepared statements para prevenir inyección SQL.
-- Utiliza `password_verify()` para comparación segura de contraseñas.
-- Implementa actualización del hash para mantener estándares modernos.
-- Maneja errores sin exponer información sensible al usuario.
-- Garantiza cierre adecuado de conexiones y recursos abiertos.
+Veremos la funcionalidad y el propósito de las funciones PHP utilizadas para la validación de usuarios en un sistema de autenticación. Se incluyen funciones para verificar la existencia de nombres de usuario y correos electrónicos, validar credenciales y aplicar reglas de validación para nombres de usuario, contraseñas y correos electrónicos.
+
+## 2. Conexión a la Base de Datos
+Cada función que interactúa con la base de datos utiliza `mysqli_connect()` para establecer la conexión. Se recomienda mantener credenciales seguras y utilizar `prepared statements` para prevenir ataques de inyección SQL.
+
+## 3. Funciones de Validación en la Base de Datos
+
+### 3.1. Verificar si un Nombre de Usuario Existe
+**Función:** `usernameExists($username)`
+
+**Descripción:**
+Verifica si un nombre de usuario ya está registrado en la base de datos.
+
+**Código:**
+```php
+function usernameExists($username){
+    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if (!$connection) {
+        die("Conexión fallida: " . mysqli_connect_error());
+    }
+    $stmt = $connection->prepare("SELECT COUNT(*) FROM USERS WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $count = $result->fetch_row()[0];
+    $stmt->close();
+    $connection->close();
+    return $count > 0;
+}
+```
+
+### 3.2. Verificar si un Correo Electrónico Existe
+**Función:** `emailExists($email)`
+
+**Descripción:**
+Verifica si un correo electrónico ya está registrado en la base de datos.
+
+**Código:**
+```php
+function emailExists($email){
+    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if (!$connection) {
+        die("Conexión fallida: " . mysqli_connect_error());
+    }
+    $stmt = $connection->prepare("SELECT COUNT(*) FROM USERS WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $count = $result->fetch_row()[0];
+    $stmt->close();
+    $connection->close();
+    return $count > 0;
+}
+```
+
+### 3.3. Validar Contraseña del Usuario
+**Función:** `validatePassword($username, $password)`
+
+**Descripción:**
+Verifica si la contraseña ingresada coincide con la almacenada en la base de datos y, si es necesario, actualiza el hash de la contraseña.
+
+**Código:**
+```php
+function validatePassword($username, $password){
+    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    if (!$connection) {
+        error_log("Conexión fallida: " . mysqli_connect_error());
+        return false;
+    }
+    try {
+        $stmt = $connection->prepare("SELECT user_secret FROM USERS WHERE username = ? LIMIT 1");
+        if (!$stmt) {
+            throw new Exception("Error al preparar la consulta: " . $connection->error);
+        }
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0) {
+            return false;
+        }
+        $row = $result->fetch_assoc();
+        $storedHash = $row['user_secret'];
+        if (password_verify($password, $storedHash)) {
+            if (password_needs_rehash($storedHash, PASSWORD_BCRYPT)) {
+                $newHash = password_hash($password, PASSWORD_BCRYPT);
+                $updateStmt = $connection->prepare("UPDATE USERS SET user_secret = ? WHERE username = ?");
+                if ($updateStmt) {
+                    $updateStmt->bind_param("ss", $newHash, $username);
+                    $updateStmt->execute();
+                    $updateStmt->close();
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    } catch (Exception $e) {
+        error_log("Error en validatePassword: " . $e->getMessage());
+        return false;
+    } finally {
+        if (isset($stmt) && $stmt instanceof mysqli_stmt) {
+            $stmt->close();
+        }
+        $connection->close();
+    }
+}
+```
+
+## 4. Validaciones con la Clase `Validator`
+La clase `Validator` proporciona métodos estáticos para validar nombres de usuario, correos electrónicos y contraseñas antes de su almacenamiento.
+
+### 4.1. Validación del Nombre de Usuario
+```php
+public static function validateUsername(string $username): array {
+    $errors = [];
+    if (empty($username)) {
+        $errors[] = "El nombre de usuario es obligatorio.";
+    } elseif (strlen($username) < 3 || strlen($username) > 20) {
+        $errors[] = "Debe tener entre 3 y 20 caracteres.";
+    } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+        $errors[] = "Solo puede contener letras, números y guiones bajos.";
+    } elseif (usernameExists($username)) {
+        $errors[] = "Este nombre de usuario ya está en uso.";
+    }
+    return $errors;
+}
+```
+
+### 4.2. Validación de Contraseña
+```php
+public static function validatePassword(string $password): array {
+    $errors = [];
+    $requirements = [
+        'length' => strlen($password) >= 8,
+        'lowercase' => preg_match('/[a-z]/', $password),
+        'uppercase' => preg_match('/[A-Z]/', $password),
+        'number' => preg_match('/\d/', $password),
+        'special' => preg_match('/[@$!%*?&\_-]/', $password)
+    ];
+    if (empty($password)) {
+        $errors[] = "La contraseña es obligatoria.";
+    } elseif (in_array(false, $requirements, true)) {
+        $errors[] = "Debe cumplir con los requisitos de seguridad.";
+    }
+    return $errors;
+}
+```
+
+Estas funciones aseguran una validación segura y eficiente para nombres de usuario, contraseñas y correos electrónicos en un sistema de autenticación.
+

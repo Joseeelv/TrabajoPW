@@ -4,6 +4,7 @@
 
 <head>
     <title>Manager Replineshment</title>
+    <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="../assets/css/reabastecer.css">
 </head>
@@ -28,7 +29,7 @@
         $result_ing = $stmt->get_result();
 
         // Obtener productos con stock
-        $stmt = $connection->prepare("SELECT * FROM PRODUCTS WHERE CATEGORY = 'Drink' or CATEGORY = 'Dessert'");
+        $stmt = $connection->prepare("SELECT * FROM PRODUCTS WHERE CATEGORY = 'Bebida' or CATEGORY = 'Postre'");
         $stmt->execute();
         $result_prod = $stmt->get_result();
         ?>

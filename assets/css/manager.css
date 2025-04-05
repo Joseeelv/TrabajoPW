@@ -1,0 +1,23 @@
+main {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+#profile-image {
+	width: 10em;
+	height: 10em;
+	border-radius: 50%;
+	vertical-align: middle;
+	margin-left: 10px;
+}
+
+#manager-options {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+#manager-options > button {
+	margin: 10px;
+}

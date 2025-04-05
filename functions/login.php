@@ -1,15 +1,17 @@
 <?php
 // Establecer parámetros de cookie seguros
 session_set_cookie_params([
-  'lifetime' => 3600,
+
+  'lifetime' => 3600, // segundos (1 hora)
   'path' => '/',
-  'domain' => $_SERVER['HTTP_HOST'],
-  'secure' => true,
-  'httponly' => true,
-  'samesite' => 'Strict'
+  'domain' => $_SERVER['HTTP_HOST'], // Dominio actual
+  'secure' => true, // Solo enviar cookies a través de HTTPS
+  'httponly' => true, // No permitir acceso a JavaScript
+  'samesite' => 'Strict' // Estrategia de SameSite para prevenir CSRF
 ]);
 
-session_start(); // Iniciar la sesión          
+session_start(); // Iniciar la sesión
+
 
 // Configuración de seguridad
 const SECURITY = [
@@ -17,7 +19,6 @@ const SECURITY = [
   'lockout_time' => 1800, // 30 minutos
   'csrf_token_expire' => 3600 // 1 hora
 ];
-
 
 // Importar una biblioteca de validación o definir funciones de validación
 require_once('validations.php');
@@ -32,7 +33,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Recopilar y sanitizar datos de entrada
   $username = trim(htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8'));
   $password = $_POST['password']; // No sanitizar contraseñas
-
   // Inicializar un array para almacenar errores de validación
   $errors = [];
 
@@ -40,9 +40,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isUserLocked($username)) {
     $errors['username'] = "La cuenta está temporalmente bloqueada. Por favor, inténtelo más tarde.";
   } else {
-    // Validar nombre de usuario
-    if (!usernameExists($username)) {
-      $errors['username'] = "El nombre de usuario no existe.";
+
+    // Validamos la contraseña
+    if (!validatePassword($username, $password)) {
+      $errors['password'] = "Contraseña inválida.";
     }
 
     // Si el nombre de usuario existe, entonces validar la contraseña
@@ -73,6 +74,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $_SESSION['last_activity'] = time(); // Para renovación automática de sesión
       $_SESSION['img_src'] = $user['img_src'];
 
+      // Obtener puntos del usuario
+      $connection = include('./conexion.php');
+      $stmt = $connection->prepare("SELECT points FROM CUSTOMERS WHERE user_id = ?");
+      $stmt->bind_param("i", $_SESSION['user_id']);
+      $stmt->execute();
+      $stmt->bind_result($points);
+      $stmt->fetch();
+      $stmt->close();
+      $_SESSION['puntos'] = $points; // Guardar puntos en la sesión
+
       // Eliminar variables innecesarias
       unset($_SESSION['failed_attempts']);
       unset($_SESSION['csrf_token']);
@@ -98,15 +109,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   } else {
     // Almacenar errores en la sesión para mostrarlos en el formulario
     $_SESSION['login_errors'] = $errors;
-    header("Location: login.php"); // Redirigir de vuelta a la página de inicio de sesión
+    header("Location: ./login.php"); // Redirigir de vuelta a la página de inicio de sesión
     exit();
   }
 }
 
 // Renovación automática de sesión
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+
+  session_unset();
+  session_destroy();
   session_regenerate_id(true);
   $_SESSION['last_activity'] = time();
+  header("Location: ../index.php");
+  exit();
+
 }
 
 // Forzar HTTPS
@@ -184,7 +201,8 @@ function logFailedAttempt($username)
   $_SESSION['failed_attempts'][$username]['last_failed_attempt'] = time();
 }
 
-// Función para verificar si el usuario está bloqueado (basado en datos de sesión)
+// Función para verificar si el usuario está bloqueado (basado en datos de sesión).
+
 function isUserLocked($username)
 {
   if (!isset($_SESSION['failed_attempts'][$username])) {
@@ -206,8 +224,6 @@ function isUserLocked($username)
       return false; // El usuario no está bloqueado
     }
   }
-
-
   return false; // El usuario no está bloqueado
 }
 ?>
@@ -216,26 +232,15 @@ function isUserLocked($username)
 
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iniciar sesión</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/register.css">
 </head>
 
-
 <body>
-  <?php
-  include('./navbar.php');
-  // Mostrar errores si los hay
-  if (isset($_SESSION['login_errors'])) {
-    echo "<div class='error-container'>";
-    foreach ($_SESSION['login_errors'] as $error) {
-      echo "<p class='error'>$error</p>";
-    }
-    echo "</div>";
-    unset($_SESSION['register_errors']); // Limpia los errores después de mostrarlos
-  }
-  ?>
+  <?php include('./navbar.php'); ?>
   <main>
     <h1>Inicia Sesión</h1>
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
@@ -243,6 +248,19 @@ function isUserLocked($username)
       <input type="password" name="password" placeholder="Contraseña" required>
       <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
       <button type="submit" name="login">Iniciar sesión</button>
+
+      <?php
+      // Mostrar errores si los hay
+      if (isset($_SESSION['login_errors'])) {
+        echo "<div class='error-container'>";
+        foreach ($_SESSION['login_errors'] as $field => $error) {
+          echo "<p class='error'>" . htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . "</p>";
+        }
+        echo "</div>";
+        unset($_SESSION['login_errors']); // Limpia los errores después de mostrarlos
+      }
+      ?>
+
     </form>
     <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
   </main>

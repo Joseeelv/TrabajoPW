@@ -1,0 +1,82 @@
+/* Estilos generales */
+body {
+	font-family: Arial, sans-serif;
+	background-color: #f4f4f4;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+/* Contenedor principal */
+main {
+	background: white;
+	padding: 30px;
+	border-radius: 10px;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+	width: 100%;
+	max-width: 450px;
+	text-align: center;
+}
+
+/* Título */
+h1 {
+	color: #333;
+	font-size: 24px;
+	margin-bottom: 20px;
+}
+
+/* Mensajes de éxito y error */
+.success {
+	color: #2e7d32;
+	background: #e8f5e9;
+	padding: 10px;
+	border-radius: 5px;
+	margin-bottom: 15px;
+}
+
+.error {
+	color: #d32f2f;
+	background: #ffebee;
+	padding: 10px;
+	border-radius: 5px;
+	margin-bottom: 15px;
+}
+
+/* Estilo del formulario */
+form {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+/* Estilos para los campos del formulario */
+.form-group {
+	text-align: left;
+}
+
+label {
+	font-weight: bold;
+	display: block;
+	margin-bottom: 5px;
+	color: #333;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+input[type="file"] {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 14px;
+	transition: border 0.3s ease;
+}
+
+input:focus {
+	border: 1px solid #d2691e;
+	outline: none;
+}

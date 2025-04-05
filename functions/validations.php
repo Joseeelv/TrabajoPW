@@ -1,9 +1,8 @@
 <?php
-require_once('.configDB.php');
 
 function usernameExists($username){
     // Lógica para verificar si el nombre de usuario ya existe
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    $connection = include('./conexion.php');
     if (!$connection) {
         die("Conexión fallida: " . mysqli_connect_error());
     }
@@ -19,9 +18,11 @@ function usernameExists($username){
     return $count > 0; // Es verdadero si el nombre de usuario existe
 }
 
-function emailExists($email){
+
+function emailExists($email)
+{
     // Lógica para verificar si el correo electrónico ya existe
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    $connection = include('./conexion.php');
     if (!$connection) {
         die("Conexión fallida: " . mysqli_connect_error());
     }
@@ -39,7 +40,7 @@ function emailExists($email){
 
 function validatePassword($username, $password){
     // Conexión a la base de datos
-    $connection = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+    $connection = include('./conexion.php');
     if (!$connection) {
         error_log("Conexión fallida: " . mysqli_connect_error());
         return false; // No revelamos detalles del error al usuario
@@ -91,5 +92,94 @@ function validatePassword($username, $password){
             $stmt->close();
         }
         $connection->close();
+    }
+}
+
+class Validator {
+    private const ALLOWED_DOMAINS = [
+        'gmail.com', 'hotmail.com', 'outlook.com', 
+        'yahoo.com', 'example.com', 'test.com'
+    ];
+
+    public static function validateUsername(string $username): array {
+        $errors = [];
+
+        if (empty($username)) {
+            $errors[] = "El nombre de usuario es obligatorio.";
+        }
+        if (strlen($username) < 3 || strlen($username) > 20) {
+            $errors[] = "El nombre de usuario debe tener entre 3 y 20 caracteres.";
+        }
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
+            $errors[] = "El nombre de usuario solo puede contener letras, números y guiones bajos.";
+        }
+        if (usernameExists($username)) {
+            $errors[] = "Este nombre de usuario ya está en uso.";
+        }
+
+        return $errors;
+    }
+
+    public static function validatePassword(string $password): array {
+        $errors = [];
+
+        if (empty($password)) {
+            $errors[] = "La contraseña es obligatoria.";
+        }
+
+        $rules = [
+            'longitud' => [
+            strlen($password) >= 8, 
+            "8 caracteres mínimo."
+            ],
+            'minúscula' => [
+            preg_match('/[a-z]/', $password), 
+            "Letra minúscula."
+            ],
+            'mayúscula' => [
+            preg_match('/[A-Z]/', $password), 
+            "Letra mayúscula."
+            ],
+            'número' => [
+            preg_match('/\d/', $password), 
+            "Números."
+            ],
+            'especial' => [
+            preg_match('/[@$!%*?&\_-]/', $password), 
+            "Caracteres especiales (@$!%*?&_-)."
+            ],
+        ];
+
+        $errorMessages = [];
+        foreach ($rules as [$valid, $message]) {
+            if (!$valid) $errorMessages[] = $message;
+        }
+        if (!empty($errorMessages)) {
+            $errors[] = "La contraseña debe cumplir con los siguientes requisitos:";
+            $errors = array_merge($errors, $errorMessages);
+        }
+
+        return $errors;
+    }
+
+    public static function validateEmail(string $email): array {
+        $errors = [];
+
+        if (empty($email)) {
+            $errors[] = "El email es obligatorio.";
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Por favor, introduce una dirección de email válida.";
+        } else {
+            $domain = substr(strrchr($email, "@"), 1);
+            if (!in_array($domain, self::ALLOWED_DOMAINS)) {
+                $errors[] = "Por favor, utiliza un dominio de correo electrónico válido.";
+            }
+            if (emailExists($email)) {
+                $errors[] = "Este email ya está registrado.";
+            }
+        }
+
+        return $errors;
     }
 }

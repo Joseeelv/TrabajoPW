@@ -1,0 +1,86 @@
+main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tables{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+#table1{
+    margin-right: 20px;
+}
+
+#table2{
+    margin-left: 20px;
+}
+
+#table1, #table2{
+    flex-direction: column;
+    align-items: center;
+}
+
+#table1 h2, #table2 h2{
+    /*centrar texto*/
+    text-align: center;
+}
+
+h1, h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+table
+{
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+
+}
+td, th
+{
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+td input
+{
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 1em;
+    padding: 5px;
+    box-sizing: border-box;
+}
+td img
+{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+td form 
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+td input[type="submit"]
+{
+        padding: 10px 15px;
+        background-color: #d2691e; /* Kebab-inspired orange */
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+}
+
+td input[type="submit"]:hover {
+    background-color: #a0522d; /* Darker brown-orange */
+}

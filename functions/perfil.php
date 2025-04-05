@@ -1,12 +1,15 @@
 <?php
 session_start();
 
-require_once('./.configDB.php');
+
 require_once('./validations.php');
+
+// Obtener conexión
 $connection = require_once('./conexion.php');
 if (!$connection) {
   die("Error en la conexión a la base de datos: " . mysqli_connect_error());
 }
+
 function UpdateProfile($connection, $pass, $email, $address, $image)
 {
   mysqli_begin_transaction($connection);
@@ -16,30 +19,30 @@ function UpdateProfile($connection, $pass, $email, $address, $image)
     if (!empty($pass)) {
       $hashed_password = password_hash($pass, PASSWORD_BCRYPT);
     }
-    if (empty($email)) {
-      $email = $_SESSION['email'];
-    }
 
     // Actualizar la tabla USERS
     $stmt = $connection->prepare("UPDATE USERS SET 
                                       user_secret = COALESCE(?, user_secret),
-                                      email = COALESCE(?, email),
                                       img_src = COALESCE(?, img_src)
                                       WHERE user_id = ?");
-    $stmt->bind_param("sssi", $hashed_password, $email, $image, $_SESSION['user_id']);
+    $stmt->bind_param("ssi", $hashed_password, $image, $_SESSION['user_id']);
+
     if (!$stmt->execute()) {
       throw new Exception("Error al actualizar USERS: " . $stmt->error);
     }
     $stmt->close();
 
-    // Actualizar la tabla CUSTOMERS solo si la dirección no está vacía
-    if (!empty($address)) {
-      $stmt = $connection->prepare("UPDATE CUSTOMERS SET customer_address = ? WHERE user_id = ?");
-      $stmt->bind_param("si", $address, $_SESSION['user_id']);
-      if (!$stmt->execute()) {
-        throw new Exception("Error al actualizar CUSTOMERS: " . $stmt->error);
+    // Solo los CUSTOMERS pueden modificar su dirección
+    if ($_SESSION['user_type'] === 'customer') {
+      // Actualizar la tabla CUSTOMERS solo si la dirección no está vacía
+      if (!empty($address)) {
+        $stmt = $connection->prepare("UPDATE CUSTOMERS SET customer_address = ? WHERE user_id = ?");
+        $stmt->bind_param("si", $address, $_SESSION['user_id']);
+        if (!$stmt->execute()) {
+          throw new Exception("Error al actualizar CUSTOMERS: " . $stmt->error);
+        }
+        $stmt->close();
       }
-      $stmt->close();
     }
 
     mysqli_commit($connection);
@@ -58,39 +61,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   $errors = [];
 
-  // Validación de la contraseña
+  // Validación contraseña
   if (!empty($password)) {
-    if (strlen($password) < 8) {
-      $errors['password'] = "La contraseña debe tener al menos 8 caracteres.";
-    } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_-])[A-Za-z\d@$!%*?&_-]{8,}$/', $password)) {
-      $errors['password'] = "Debe contener mayúscula, minúscula, número y carácter especial.";
+    $password_errors = Validator::validatePassword($password);
+    if (!empty($password_errors)) {
+      $errors['password'] = implode(" ", $password_errors);
+    }
+    //Ambas contraseñas deben coincidir
+    if (isset($_POST['confirm_password']) && $_POST['confirm_password'] !== $password) {
+      $errors['confirm_password'] = "Las contraseñas no coinciden.";
     }
   }
 
-  // Validación del email
-  if (!empty($email)) {
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $errors['email'] = "Introduce un email válido.";
-    } else {
-      $dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'example.com', 'test.com'];
-      $dominio = substr(strrchr($email, "@"), 1);
-      if (!in_array($dominio, $dominiosPermitidos)) {
-        $errors['email'] = "Usa un dominio de correo válido.";
+  // Si es admin o manager, no permitir modificar el email
+  if ($_SESSION['user_type'] === 'customer') {
+    // Validación del email
+    if (!empty($email)) {
+      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = "Introduce un email válido.";
       } else {
-        // Verificar si el email ya está registrado
-        $query = "SELECT COUNT(*) FROM USERS WHERE email = ? AND user_id != ?";
-        $stmt = $connection->prepare($query);
-        $stmt->bind_param("si", $email, $_SESSION['user_id']);
-        $stmt->execute();
-        $stmt->bind_result($email_count);
-        $stmt->fetch();
-        $stmt->close();
+        $dominiosPermitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'example.com', 'test.com'];
+        $dominio = substr(strrchr($email, "@"), 1);
+        if (!in_array($dominio, $dominiosPermitidos)) {
+          $errors['email'] = "Usa un dominio de correo válido.";
+        } else {
+          // Verificar si el email ya está registrado
+          $query = "SELECT COUNT(*) FROM USERS WHERE email = ? AND user_id != ?";
+          $stmt = $connection->prepare($query);
+          $stmt->bind_param("si", $email, $_SESSION['user_id']);
+          $stmt->execute();
+          $stmt->bind_result($email_count);
+          $stmt->fetch();
+          $stmt->close();
 
-        if ($email_count > 0) {
-          $errors['email'] = "Este email ya está registrado.";
+          if ($email_count > 0) {
+            $errors['email'] = "Este email ya está registrado.";
+          }
         }
       }
     }
+  } else {
+    // Si es admin o manager, ignorar el email
+    $email = null;
   }
 
   // Procesar imagen de perfil
@@ -123,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Verificar si existe una imagen previa que no sea default.jpg
         $query = "SELECT img_src FROM USERS WHERE user_id = ?";
         if ($stmt = mysqli_prepare($connection, $query)) {
-          mysqli_stmt_bind_param($stmt, "i", $user_id);
+          mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
           mysqli_stmt_execute($stmt);
           mysqli_stmt_bind_result($stmt, $old_img_src);
           mysqli_stmt_fetch($stmt);
@@ -140,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Verificar si la ruta de destino existe y tiene permisos de escritura
         if (!is_dir(dirname($upload_path))) {
-          if (!mkdir(dirname($upload_path), 0755, true) && !is_dir(dirname($upload_path))) {
+          if (!mkdir(dirname($upload_path), 0007, true) && !is_dir(dirname($upload_path))) {
             $errors['foto'] = "No se pudo crear el directorio para subir la imagen.";
           }
         }
@@ -194,10 +206,14 @@ $connection->close();
 
 <head>
   <meta charset="UTF-8">
+
+  <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Actualizar Perfil</title>
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/perfil.css">
+  <link rel="stylesheet" href="../assets/css/register.css">
   <script src="../assets/js/previewFoto.js" defer></script>
 </head>
 
@@ -213,37 +229,53 @@ $connection->close();
       unset($_SESSION['success_message']);
     }
     if (!empty($_SESSION['register_errors'])) {
-      foreach ($_SESSION['register_errors'] as $error) {
-        echo "<p class='error'>$error</p>";
+      echo "<div class='error-container'>";
+      foreach ($_SESSION['register_errors'] as $key => $error) {
+        if (is_array($error)) {
+          foreach ($error as $msg) {
+            echo "<p class='error'>" . htmlspecialchars($msg) . "</p>";
+          }
+        } else {
+          echo "<p class='error'>" . htmlspecialchars($error) . "</p>";
+        }
       }
+      echo "</div>";
       unset($_SESSION['register_errors']);
     }
     ?>
-
     <form id="updateProfileForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST"
       enctype="multipart/form-data">
-      <div class="form-group">
+      <div class="form-group" <?php if ($_SESSION['user_type'] !== 'customer') echo 'style="display:none;"'; ?>>
         <label for="email">Nuevo Email:</label>
         <input type="email" id="email" name="email"
           placeholder="<?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?>">
       </div>
-      <div class="form-group">
-        <label for="password">Nueva Contraseña:</label>
-        <input type="password" id="password" name="password" placeholder="Nueva contraseña">
+      <div>
+        <input type="password" name="password" id="password" placeholder="Contraseña">
+        <!-- Barra de fortaleza -->
+        <div class="password-strength-meter">
+          <div class="password-strength-meter-fill"></div>
+        </div>
+        <!-- Lista de verificación -->
+        <ul class="password-checklist">
+          <li id="length">Al menos 8 caracteres de longitud</li>
+          <li id="uppercase">Contiene letra mayúscula</li>
+          <li id="lowercase">Contiene letra minúscula</li>
+          <li id="number">Contiene número</li>
+          <li id="special">Contiene carácter especial</li>
+        </ul>
       </div>
       <div class="form-group">
         <label for="confirm_password">Confirmar Contraseña:</label>
         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirmar contraseña">
       </div>
-      <div class="form-group">
-        <label for="address" style="<?php if ($_SESSION['user_type'] !== 'customer') {
-          echo 'display: none;';
-        } ?>">Nueva
-          dirección:</label>
-        <input type="text" id="address" name="address" placeholder="Nueva dirección" style="<?php if ($_SESSION['user_type'] !== 'customer') {
-          echo 'display: none;';
-        } ?>">
-      </div>
+      <?php echo htmlspecialchars("hola"); ?>
+      <?php if ($_SESSION['user_type'] === 'customer'): ?>
+        <div class="form-group">
+          <label for="address">Nueva dirección:</label>
+          <input type="text" id="address" name="address" placeholder="Nueva dirección">
+        </div>
+      <?php endif; ?>
       <div class="form-group">
         <label for="foto">Nueva foto de perfil:</label>
         <input type="file" id="foto" name="foto" accept="image/*">
@@ -255,6 +287,7 @@ $connection->close();
   </main>
 
   <?php include('./footer.php'); ?>
+  <script src="../assets/js/password-strength-meter.js"></script>
 </body>
 
 </html>

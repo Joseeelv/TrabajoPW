@@ -1,24 +1,21 @@
 <?php
 session_start();
-$_SESSION['connection'] = new mysqli("localhost", "root", "", "DB_Kebab");
-
+$conn = include('./conexion.php');
 try {
-    // Establish a connection to the MySQL database using mysqli
-    $conn = $_SESSION['connection'];
+    $query = "SELECT OFFERS.offer_text as of_name, OFFERS.offer_id as id, OFFERS.cost as coronas, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
+    $stmt = $conn->prepare($query);
+    $stmt->execute();
+    $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    if (!isset($_SESSION['ofertas'])) {
-        $query = "SELECT OFFERS.offer_text as of_name, OFFERS.offer_id as id, OFFERS.cost as coronas, OFFERS.discount as discount, PRODUCTS.product_name as nombre, PRODUCTS.img_src as img FROM OFFERS JOIN PRODUCTS ON OFFERS.prod_id = PRODUCTS.product_id";
-        $stmt = $_SESSION['connection']->prepare($query);
-        $stmt->execute();
-        $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    }
     ?>
     <html lang="es">
 
     <head>
         <meta charset="UTF-8">
+        <link rel="icon" href="../assets/images/logo/DKS.ico" type="image/x-icon">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="../assets/css/styles.css">
+        <link rel="stylesheet" href="../assets/css/ofertas.css">
         <title>Ofertas</title>
     </head>
 
@@ -26,53 +23,69 @@ try {
         <?php include("./navbar.php"); ?>
         <main>
             <?php
-            // Begin an unordered list (ul) to display products
             echo "<ul>";
 
-            // Loop through each row in the result set
             foreach ($_SESSION['ofertas'] as $f) {
+                // Comprobar si la oferta ya ha sido aceptada por el usuario 
                 $query = "SELECT * FROM CUSTOMERS_OFFERS WHERE user_id = ? AND offer_id = ?";
-                $stmt = $_SESSION['connection']->prepare($query);
+                $stmt = $conn->prepare($query);
                 $stmt->bind_param("ii", $_SESSION['user_id'], $f['id']);
                 $stmt->execute();
                 $_SESSION['Aceptada'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-                if(isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
-                    $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
-                    $stmt = $_SESSION['connection']->prepare($query);
-                    $fecha = date('Y-m-d');
-                    $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
-                    $stmt->execute();
-                    $_SESSION['Aceptada'] = True;
+                $mensaje = ""; // Variable para almacenar el mensaje de error o éxito
+        
+                if (isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
+                    if ($_SESSION['puntos'] >= $f['coronas']) {
+                        $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
+                        $stmt = $conn->prepare($query);
+                        $fecha = date('Y-m-d');
+                        $stmt->bind_param("iis", $_SESSION['user_id'], $f['id'], $fecha);
+                        $stmt->execute();
+                        $_SESSION['puntos'] -= $f['coronas']; // Restar el coste de la oferta
+                        // guardar los puntos del usuario de la session a la base de datos
+                        if (isset($_SESSION['user_id'])) {
+                            $stmt = $conn->prepare("UPDATE CUSTOMERS SET points = ? WHERE user_id = ?");
+                            $stmt->bind_param("ii", $_SESSION['puntos'], $_SESSION['user_id']);
+                            $stmt->execute();
+                            $stmt->close();
+                        }
+                        $mensaje = "Oferta activada correctamente.";
+                    } else {
+                        $mensaje = "No tienes suficientes puntos para activar esta oferta.";
+                    }
                 }
 
-                // For each row, create a list item (li) with an image and product name and discount
-                // The image source and product name are pulled from the database results
                 echo "<li>
                         <form method=\"POST\">
-                        <input type=\"hidden\" name=\"Oferta\" value=\"". $f['id'] ."\">
-                        <input type=\"image\" width=\"100px\"src=../assets/images/productos/" . $f["img"] ." alt=\"\">
+                        <input type=\"hidden\" name=\"Oferta\" value=\"" . $f['id'] . "\">
+                        <input type=\"image\" width=\"100px\"src=../assets/images/productos/" . $f["img"] . " alt=\"\">
                         </form>";
 
-                        if(!empty($_SESSION['Aceptada'])) {
-                            echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
-                            . "% Activa</li>";
-                        } else {
-                            echo "Oferta: " . $f["nombre"] . " Precio: " . $f["coronas"] . " Coronas Descuento: " . $f["discount"]
-                            . "% No Activa</li>";
-                        }
-            }
+                ?>
+                <p>Oferta: <?= $f["nombre"] ?></p>
+                <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
+                <p>Descuento: <?= $f["discount"] ?>%</p>
+                <?php if (!empty($_SESSION['Aceptada'])) { ?>
+                    <p>Activa</p>
+                <?php } else { ?>
+                    <p>No Activa</p>
 
-            // Close the unordered list (ul)
+                <?php } ?>
+                <?php if (!empty($mensaje)) { ?>
+                    <p><?= $mensaje ?></p>
+                <?php } ?>
+                </li>
+            <?php } ?>
+
+            <?php
             echo "</ul>";
+
 } catch (Exception $e) {
-    // If a D_Error exception is thrown, redirect to the 500 error page
-    header("Location: 500.php");
-}
-?>
+    echo "Error: " . $e->getMessage();
+} ?>
     </main>
-    <?php include("./footer.php");
-    ?>
+    <?php include("./footer.php"); ?>
 </body>
 
 </html>
