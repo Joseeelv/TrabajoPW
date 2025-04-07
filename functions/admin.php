@@ -18,7 +18,7 @@ $image = '../assets/images/perfiles/' . $_SESSION['img_src'] ?? '../assets/image
     include('./navbar.php');
     ?>
     <main>
-        <h1> Bienvenido de nuevo <?php echo $_SESSION['username'];?>.</h1>
+        <h1> Bienvenido de nuevo <?php echo $_SESSION['username']; ?>.</h1>
 
         <img id="profile-image" src="<?php echo htmlspecialchars(file_exists($image) ? $image : '../assets/images/perfiles/default.jpg'); ?>" alt="ImagenUser">
         <h2>¿Qué desea hacer?</h2>

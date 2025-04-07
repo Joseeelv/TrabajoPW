@@ -123,7 +123,6 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
   $_SESSION['last_activity'] = time();
   header("Location: ../index.php");
   exit();
-
 }
 
 // Forzar HTTPS

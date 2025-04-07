@@ -1,6 +1,7 @@
 <?php
 
-function usernameExists($username){
+function usernameExists($username)
+{
     // Lógica para verificar si el nombre de usuario ya existe
     $connection = include('./conexion.php');
     if (!$connection) {
@@ -38,7 +39,8 @@ function emailExists($email)
     return $count > 0; // Es verdadero si el correo electrónico existe
 }
 
-function validatePassword($username, $password){
+function validatePassword($username, $password)
+{
     // Conexión a la base de datos
     $connection = include('./conexion.php');
     if (!$connection) {
@@ -95,13 +97,19 @@ function validatePassword($username, $password){
     }
 }
 
-class Validator {
+class Validator
+{
     private const ALLOWED_DOMAINS = [
-        'gmail.com', 'hotmail.com', 'outlook.com', 
-        'yahoo.com', 'example.com', 'test.com'
+        'gmail.com',
+        'hotmail.com',
+        'outlook.com',
+        'yahoo.com',
+        'example.com',
+        'test.com'
     ];
 
-    public static function validateUsername(string $username): array {
+    public static function validateUsername(string $username): array
+    {
         $errors = [];
 
         if (empty($username)) {
@@ -120,7 +128,8 @@ class Validator {
         return $errors;
     }
 
-    public static function validatePassword(string $password): array {
+    public static function validatePassword(string $password): array
+    {
         $errors = [];
 
         if (empty($password)) {
@@ -129,24 +138,24 @@ class Validator {
 
         $rules = [
             'longitud' => [
-            strlen($password) >= 8, 
-            "8 caracteres mínimo."
+                strlen($password) >= 8,
+                "8 caracteres mínimo."
             ],
             'minúscula' => [
-            preg_match('/[a-z]/', $password), 
-            "Letra minúscula."
+                preg_match('/[a-z]/', $password),
+                "Letra minúscula."
             ],
             'mayúscula' => [
-            preg_match('/[A-Z]/', $password), 
-            "Letra mayúscula."
+                preg_match('/[A-Z]/', $password),
+                "Letra mayúscula."
             ],
             'número' => [
-            preg_match('/\d/', $password), 
-            "Números."
+                preg_match('/\d/', $password),
+                "Números."
             ],
             'especial' => [
-            preg_match('/[@$!%*?&\_-]/', $password), 
-            "Caracteres especiales (@$!%*?&_-)."
+                preg_match('/[@$!%*?&\_-]/', $password),
+                "Caracteres especiales (@$!%*?&_-)."
             ],
         ];
 
@@ -162,7 +171,8 @@ class Validator {
         return $errors;
     }
 
-    public static function validateEmail(string $email): array {
+    public static function validateEmail(string $email): array
+    {
         $errors = [];
 
         if (empty($email)) {

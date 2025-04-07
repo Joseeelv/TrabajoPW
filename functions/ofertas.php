@@ -7,7 +7,7 @@ try {
     $stmt->execute();
     $_SESSION['ofertas'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    ?>
+?>
     <html lang="es">
 
     <head>
@@ -34,7 +34,7 @@ try {
                 $_SESSION['Aceptada'] = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
                 $mensaje = ""; // Variable para almacenar el mensaje de error o éxito
-        
+
                 if (isset($_POST['Oferta']) && $_POST['Oferta'] == $f['id'] && empty($_SESSION['Aceptada'])) {
                     if ($_SESSION['puntos'] >= $f['coronas']) {
                         $query = "INSERT INTO CUSTOMERS_OFFERS(user_id,offer_id,activation_date) values(?,?,?)";
@@ -62,7 +62,7 @@ try {
                         <input type=\"image\" width=\"100px\"src=../assets/images/productos/" . $f["img"] . " alt=\"\">
                         </form>";
 
-                ?>
+            ?>
                 <p>Oferta: <?= $f["nombre"] ?></p>
                 <p>Precio: <?= $f["coronas"] ?><img src='../assets/images/logo/DKS.png' alt='DKS Logo' width='20px'></p>
                 <p>Descuento: <?= $f["discount"] ?>%</p>
@@ -77,14 +77,13 @@ try {
                 </li>
             <?php } ?>
 
-            <?php
-            echo "</ul>";
+        <?php
+        echo "</ul>";
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
+    } ?>
+        </main>
+        <?php include("./footer.php"); ?>
+    </body>
 
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-} ?>
-    </main>
-    <?php include("./footer.php"); ?>
-</body>
-
-</html>
+    </html>

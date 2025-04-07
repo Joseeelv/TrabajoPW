@@ -89,8 +89,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1>Zona de contrato</h1>
     <form method="POST" action="<?= htmlspecialchars($_SERVER["PHP_SELF"]) ?>">
       <div>
-      <input type="text" name="username" placeholder="Nombre de usuario" required
-      value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>">
+        <input type="text" name="username" placeholder="Nombre de usuario" required
+          value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>">
         <input type="password" name="password" id="password" placeholder="Contraseña" required>
         <div class="password-strength-meter">
           <div class="password-strength-meter-fill"></div>

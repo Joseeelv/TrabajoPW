@@ -5,4 +5,3 @@ if (!$connection) {
   die("Conexión fallida: " . mysqli_connect_error());
 }
 return $connection;
-?>

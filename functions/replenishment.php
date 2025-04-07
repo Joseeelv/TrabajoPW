@@ -48,4 +48,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST["ingredient_id"]) || i
 } else {
     echo "Error: No se recibió una solicitud válida.";
 }
-?>

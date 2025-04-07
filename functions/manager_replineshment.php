@@ -55,7 +55,7 @@
                             echo "<td>" . $row["cost"] . " €</td>";
                             echo "<td>" . $row["stock"] . "</td>";
                             echo "<td>";
-                            ?>
+                    ?>
                             <form action='replenishment.php' method='POST'>
                                 <input type='hidden' name='ingredient_id' value='<?php echo $row["ingredient_id"]; ?>'>
                                 <input type='hidden' name='cost' value='<?php echo $row["cost"]; ?>'>
@@ -67,7 +67,7 @@
                             </form>
                             </td>
                             </tr>
-                            <?php
+                    <?php
                         }
                     } else {
                         echo "<tr><td colspan='6'>No hay ingredientes en stock</td></tr>";
@@ -96,7 +96,7 @@
                             echo "<td>" . $row["cost"] . " €</td>";
                             echo "<td>" . $row["stock"] . "</td>";
                             echo "<td>";
-                            ?>
+                    ?>
                             <form action='replenishment.php' method='POST'>
                                 <input type='hidden' name='product_id' value='<?php echo $row["product_id"]; ?>'>
                                 <input type='hidden' name='cost' value='<?php echo $row["cost"]; ?>'>
@@ -108,7 +108,7 @@
                             </form>
                             </td>
                             </tr>
-                            <?php
+                    <?php
                         }
                     } else {
                         echo "<tr><td colspan='6'>No hay productos en stock</td></tr>";

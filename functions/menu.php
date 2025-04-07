@@ -54,7 +54,7 @@ try {
     <main>
         <aside class="sidebar">
             <ul>
-                <form method="POST"id="Ninguna"><input type="hidden" name="category" value="Ninguna" ><button
+                <form method="POST" id="Ninguna"><input type="hidden" name="category" value="Ninguna"><button
                         type="submit">Ninguna</button></form>
                 <?php
                 foreach ($_SESSION['categorias'] as $c) {

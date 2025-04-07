@@ -48,4 +48,3 @@ try {
 // Redirigir al listado de empleados con mensajes de éxito o error
 header("Location: ./employees.php");
 exit();
-?>

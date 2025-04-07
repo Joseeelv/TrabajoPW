@@ -45,15 +45,15 @@ $query_check_table = "SHOW TABLES LIKE 'PRODUCTS_INGREDIENTS'";
 $resultado_check = $connection->query($query_check_table);
 $tabla_existe = $resultado_check->num_rows > 0;
 if ($tabla_existe) {
-/* Obtener filas de ingredientes de producto */
-$query_ingredientes = "SELECT i.ingredient_id, i.ingredient_name, i.img_src 
+   /* Obtener filas de ingredientes de producto */
+   $query_ingredientes = "SELECT i.ingredient_id, i.ingredient_name, i.img_src 
                            FROM PRODUCTS_INGREDIENTS pi 
                            JOIN INGREDIENTS i ON pi.ingredient_id = i.ingredient_id 
                            WHERE pi.product_id = ?";
-$stmt = $connection->prepare($query_ingredientes);
-$stmt->bind_param("s", $idProdSelecCarta);
-$stmt->execute();
-$resultado_ingredientes = $stmt->get_result();
+   $stmt = $connection->prepare($query_ingredientes);
+   $stmt->bind_param("s", $idProdSelecCarta);
+   $stmt->execute();
+   $resultado_ingredientes = $stmt->get_result();
 }
 
 

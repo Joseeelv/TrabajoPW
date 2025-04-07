@@ -110,7 +110,6 @@ try {
         $stmt->bind_param("id", $order_id, $transaction_money);
         $stmt->execute();
         $transaction_id = $connection->insert_id;
-
     }
 
     // Marcar ofertas como usadas

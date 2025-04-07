@@ -32,19 +32,19 @@ $_SESSION['points'] = $row['points'];
     <?php include('./navbar.php'); ?>
   </header>
 
-    <main>
-      <div class="carousel-container">
-        <div class="carousel">
-          <div class="slide"><img src="../assets/images/carrusel/1.png" alt="Kebab 1"></div>
-          <div class="slide"><img src="../assets/images/carrusel/2.png" alt="Kebab 2"></div>
-          <div class="slide"><img src="../assets/images/carrusel/3.png" alt="Kebab 3"></div>
-        </div>
-        <button class="btn btn-left" onclick="prevSlide()">&#9664;</button>
-        <button class="btn btn-right" onclick="nextSlide()">&#9654;</button>
+  <main>
+    <div class="carousel-container">
+      <div class="carousel">
+        <div class="slide"><img src="../assets/images/carrusel/1.png" alt="Kebab 1"></div>
+        <div class="slide"><img src="../assets/images/carrusel/2.png" alt="Kebab 2"></div>
+        <div class="slide"><img src="../assets/images/carrusel/3.png" alt="Kebab 3"></div>
       </div>
-    </main>
-    <?php include('./footer.php'); ?>
+      <button class="btn btn-left" onclick="prevSlide()">&#9664;</button>
+      <button class="btn btn-right" onclick="nextSlide()">&#9654;</button>
+    </div>
+  </main>
+  <?php include('./footer.php'); ?>
 
-  </body>
+</body>
 
-  </html>
+</html>

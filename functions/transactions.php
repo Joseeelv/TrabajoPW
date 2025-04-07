@@ -92,8 +92,7 @@
                 while ($row = $result->fetch_assoc()) {
                     if ($row["transaction_type"] == "Compra") {
                         echo "<tr style='background-color: #FDE3E3;'>"; // Color de fondo para compras
-                    }
-                    else {
+                    } else {
                         echo "<tr style='background-color: #E3FDE3;'>"; // Color de fondo para ventas
                     }
 
