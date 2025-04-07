@@ -14,7 +14,7 @@ CREATE TABLE USERS (
     img_src VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
 );
 ```
-En esta tabla se almacenan los datos de los usuarios registrados en la pagina web.
+En esta tabla se almacenan los datos de los usuarios registrados en la página web.
 
 - **user_id**: Identificador único del usuario.
 - **username**: Nombre de usuario.
@@ -22,7 +22,7 @@ En esta tabla se almacenan los datos de los usuarios registrados en la pagina we
 - **email**: Correo electrónico del usuario.
 - **img_src**: Ruta de la imagen de perfil del usuario.
 
-De esta tabla se diferencian dos tipos de usuarios:
+Los usuarios pueden clasificarse en dos tipos: **clientes** (almacenados en la tabla `CUSTOMERS`) y **managers** (almacenados en la tabla `MANAGERS`).
 
 ## Tabla CUSTOMERS
 ```sql
@@ -62,15 +62,15 @@ CREATE TABLE INGREDIENTS (
     vegan BOOLEAN NOT NULL DEFAULT FALSE
 );
 ```
-En esta tabla se almacenan los ingredientes que se utilizan en los productos personalizables, es decir, los que se pueden añadir o quitar infredientes.
+En esta tabla se almacenan los ingredientes que se utilizan en los productos personalizables.
 
 - **ingredient_id**: Identificador único del ingrediente.
 - **ingredient_name**: Nombre del ingrediente.
 - **cost**: Coste del ingrediente en euros.
-- **stock**: Stock del ingrediente. Se toma como stock inicial 0, y se va actualizando con las compras y ventas. Se mide en unidades. Por ejemplo: 5 unidades de tomate.
+- **stock**: Stock del ingrediente (en unidades).
 - **vegan**: Indica si el ingrediente es vegano.
 
-## Tabla ALLEGENS
+## Tabla ALLERGENS
 ```sql
 CREATE TABLE ALLERGENS (
     allergen_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -94,11 +94,7 @@ CREATE TABLE INGREDIENTS_ALLERGENS (
     FOREIGN KEY (allergen_id) REFERENCES ALLERGENS(allergen_id) ON DELETE CASCADE
 );
 ```
-
-En esta tabla se almacenan las relaciones entre los ingredientes y los alérgenos.
-
-- **ingredient_id**: Identificador único del ingrediente, clave foránea de la tabla INGREDIENTS.
-- **allergen_id**: Identificador único del alérgeno, clave foránea de la tabla ALLERGENS.
+Relaciona ingredientes con sus alérgenos.
 
 ## Tabla PRODUCTS
 ```sql
@@ -107,29 +103,16 @@ CREATE TABLE PRODUCTS (
     product_name VARCHAR(30) NOT NULL UNIQUE,
     product_price DECIMAL(5, 2) NOT NULL,
     category ENUM(
-        'Menu',
-        'Durum',
-        'Döner',
-        'Lahmacun',
-        'Starter',
-        'Drink',
-        'Dessert'
+        'Menu', 'Durum', 'Döner', 'Lahmacun', 'Starter', 'Drink', 'Dessert'
     ) NOT NULL,
     img_src VARCHAR(255),
     cost DECIMAL(5, 2) DEFAULT NULL,
     stock INT DEFAULT NULL
 );
 ```
+Contiene los productos que se pueden comprar.
 
-En esta tabla se almacenan los productos que se pueden comprar en la página web.
-
-- **product_id**: Identificador único del producto.
-- **product_name**: Nombre del producto.
-- **product_price**: Precio del producto en euros.
-- **category**: Categoría del producto. Las categorías posibles son: 'Menu', 'Durum', 'Döner', 'Lahmacun', 'Starter', 'Drink' y 'Dessert'.
-- **img_src**: Ruta de la imagen del producto.
-- **cost**: Coste del producto en euros. Solo se aplicará a los productos NO personalizables, es decir, drinks y dessert. 
-- **stock**: Stock del producto. Se toma como stock inicial 0, y se va actualizando con las compras y ventas. Se mide en unidades. Solo se aplicará a los productos NO personalizables, es decir, drinks y dessert. 
+- **cost** y **stock** solo aplican a productos no personalizables.
 
 ## Tabla MENUS_CONTENTS
 ```sql
@@ -142,14 +125,8 @@ CREATE TABLE MENUS_CONTENTS (
     FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
     CHECK (menu_product_id != product_id)
 );
-
 ```
-En esta tabla se almacenan las relaciones entre los productos que forman parte de un menú.
-
-- **menu_product_id**: Identificador único del menú, clave foránea de la tabla PRODUCTS.
-- **product_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS. No puede ser igual al menu_product_id.
-- **quantity**: Cantidad de unidades del producto que forman parte del menú.
-
+Relaciona menús con los productos que contienen.
 
 ## Tabla PRODUCTS_INGREDIENTS
 ```sql
@@ -161,15 +138,11 @@ CREATE TABLE PRODUCTS_INGREDIENTS (
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE
 );
 ```
+Relaciona productos personalizables con sus ingredientes.
 
-En esta tabla se almacenan las relaciones entre los productos y los ingredientes que los componen.
-
-- **product_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS.
-- **ingredient_id**: Identificador único del ingrediente, clave foránea de la tabla INGREDIENTS.
-
-## Tabla PRODUCTS_NO_INGREDIENTS_ALLERGENS
+## Tabla PRODUCTS_EXTRA_ALLERGENS
 ```sql
-CREATE TABLE PRODUCTS_NO_INGREDIENTS_ALLERGENS (
+CREATE TABLE PRODUCTS_EXTRA_ALLERGENS (
     product_id INT NOT NULL,
     allergen_id INT NOT NULL,
     PRIMARY KEY (product_id, allergen_id),
@@ -177,11 +150,7 @@ CREATE TABLE PRODUCTS_NO_INGREDIENTS_ALLERGENS (
     FOREIGN KEY (allergen_id) REFERENCES ALLERGENS(allergen_id) ON DELETE CASCADE
 );
 ```
-
-En esta tabla se almacenan las relaciones entre los productos que no contienen ingredientes con alérgenos.
-
-- **product_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS.
-- **allergen_id**: Identificador único del alérgeno, clave foránea de la tabla ALLERGENS.
+Para productos sin ingredientes pero con alérgenos manuales (bebidas, etc.).
 
 ## Tabla ORDERS
 ```sql
@@ -193,14 +162,7 @@ CREATE TABLE ORDERS (
     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id) ON DELETE CASCADE
 );
 ```
-
-En esta tabla se almacenan los pedidos realizados por los clientes.
-
-- **order_id**: Identificador único del pedido.
-- **user_id**: Identificador único del cliente, clave foránea de la tabla CUSTOMERS.
-- **order_date**: Fecha en la que se realizó el pedido.
-- **order_status**: Estado del pedido. Los estados posibles son: 'pending', 'delivered' y 'cancelled'.
-
+Representa los pedidos realizados por clientes.
 
 ## Tabla ORDER_ITEMS
 ```sql
@@ -210,19 +172,11 @@ CREATE TABLE ORDER_ITEMS (
     product_id INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(5, 2) NOT NULL,
-    -- Price at the time of the order (cant change)
     FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
     FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id)
 );
 ```
-
-En esta tabla se almacenan los productos que forman parte de un pedido.
-
-- **order_item_id**: Identificador único del producto en el pedido.
-- **order_id**: Identificador único del pedido, clave foránea de la tabla ORDERS.
-- **product_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS.
-- **quantity**: Cantidad de unidades del producto en el pedido.
-- **price**: Precio del producto en el momento de realizar el pedido.
+Contiene los productos de cada pedido.
 
 ## Tabla ORDER_ITEMS_INGREDIENTS
 ```sql
@@ -234,41 +188,25 @@ CREATE TABLE ORDER_ITEMS_INGREDIENTS (
     removed BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (order_item_id) REFERENCES ORDER_ITEMS(order_item_id),
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id),
-    CHECK (
-        NOT (
-            extra = TRUE
-            AND removed = TRUE
-        )
-    )
+    CHECK (NOT (extra = TRUE AND removed = TRUE))
 );
 ```
-
-En esta tabla se almacenan los ingredientes extra y eliminados de los productos que forman parte de un pedido.
-
-- **order_item_ingredient_id**: Identificador único del ingrediente en el pedido.
-- **order_item_id**: Identificador único del producto en el pedido, clave foránea de la tabla ORDER_ITEMS.
-- **ingredient_id**: Identificador único del ingrediente, clave foránea de la tabla INGREDIENTS.
-- **extra**: Indica si el ingrediente es extra.
-- **removed**: Indica si el ingrediente ha sido eliminado.
+Almacena los ingredientes personalizados de un producto pedido.
 
 ## Tabla OFFERS
 ```sql
 CREATE TABLE OFFERS(
     offer_id INT PRIMARY KEY AUTO_INCREMENT,
     prod_id INT NOT NULL,
-    cost INT NOT NULL DEFAULT 100,
+    points_required INT NOT NULL DEFAULT 100,
     discount DECIMAL(5, 2) NOT NULL,
-    offer_text TEXT 
+    offer_text TEXT,
+    FOREIGN KEY (prod_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE
 );
-
 ```
-En esta tabla se almacenan las ofertas que se pueden aplicar a los productos.
+Contiene las ofertas disponibles.
 
-- **offer_id**: Identificador único de la oferta.
-- **prod_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS.
-- **cost**: Coste del producto en euros.
-- **discount**: Descuento de la oferta en euros.
-- **offer_text**: Descripción de la oferta.
+- **points_required**: Puntos necesarios para activarla.
 
 ## Tabla CUSTOMERS_OFFERS
 ```sql
@@ -281,12 +219,7 @@ CREATE TABLE CUSTOMERS_OFFERS (
     FOREIGN KEY (offer_id) REFERENCES OFFERS(offer_id) ON DELETE CASCADE
 );
 ```
-
-En esta tabla se almacenan las relaciones entre los clientes y las ofertas que han activado.
-
-- **user_id**: Identificador único del cliente, clave foránea de la tabla CUSTOMERS.
-- **offer_id**: Identificador único de la oferta, clave foránea de la tabla OFFERS.
-- **activation_date**: Fecha en la que se activó la oferta.
+Relaciones entre clientes y ofertas activadas.
 
 ## Tabla REPLENISHMENTS
 ```sql
@@ -297,59 +230,35 @@ CREATE TABLE REPLENISHMENTS (
     FOREIGN KEY (manager_id) REFERENCES MANAGERS(user_id) ON DELETE CASCADE
 );
 ```
-
-En esta tabla se almacenan los reabastecimientos de stock realizados por los managers.
-
-- **replenishment_id**: Identificador único del reabastecimiento.
-- **manager_id**: Identificador único del manager, clave foránea de la tabla MANAGERS.
-ánea de la tabla MANAGERS.
-- **replenishment_date**: Fecha en la que se realizó el reabastecimiento.
+Registra los reabastecimientos realizados por managers.
 
 ## Tabla REPLENISHMENTS_DETAILS
 ```sql
 CREATE TABLE REPLENISHMENTS_DETAILS (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
     replenishment_id INT NOT NULL,
-    ingredient_id INT ,
+    ingredient_id INT,
     prod_id INT,
     quantity INT NOT NULL,
     FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
     FOREIGN KEY (ingredient_id) REFERENCES INGREDIENTS(ingredient_id) ON DELETE CASCADE,
     FOREIGN KEY (prod_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
-    CHECK (
-        ingredient_id IS NOT NULL
-        OR prod_id IS NOT NULL
-    )
+    CHECK (ingredient_id IS NOT NULL OR prod_id IS NOT NULL)
 );
 ```
-
-En esta tabla se almacenan los detalles de los reabastecimientos de stock realizados por los managers.
-
-- **item_id**: Identificador único del detalle del reabastecimiento.
-- **replenishment_id**: Identificador único del reabastecimiento, clave foránea de la tabla REPLENISHMENTS.
-- **ingredient_id**: Identificador único del ingrediente, clave foránea de la tabla INGREDIENTS.
-- **prod_id**: Identificador único del producto, clave foránea de la tabla PRODUCTS.
-- **quantity**: Cantidad de unidades del ingrediente o producto que se reabastece.
+Detalles de los productos/ingredientes reabastecidos.
 
 ## Tabla TRANSACTIONS
 ```sql
 CREATE TABLE TRANSACTIONS (
     transaction_id INT PRIMARY KEY AUTO_INCREMENT,
-    order_id INT NOT NULL,
-    replenishment_id INT NOT NULL,
+    order_id INT,
+    replenishment_id INT,
     transaction_money DECIMAL(5, 2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES ORDERS(order_id) ON DELETE CASCADE,
     FOREIGN KEY (replenishment_id) REFERENCES REPLENISHMENTS(replenishment_id) ON DELETE CASCADE,
-    CHECK (
-        order_id IS NOT NULL
-        OR replenishment_id IS NOT NULL
-    )
+    CHECK (order_id IS NOT NULL OR replenishment_id IS NOT NULL)
 );
 ```
+Registra transacciones monetarias de pedidos o reabastecimientos.
 
-En esta tabla se almacenan las transacciones realizadas por los clientes y los managers.
-
-- **transaction_id**: Identificador único de la transacción.
-- **order_id**: Identificador único del pedido, clave foránea de la tabla ORDERS.
-- **replenishment_id**: Identificador único del reabastecimiento, clave foránea de la tabla REPLENISHMENTS.
-- **transaction_money**: Cantidad de dinero de la transacción.
