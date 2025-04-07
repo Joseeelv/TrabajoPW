@@ -251,4 +251,3 @@ foreach ($_POST['ids'] as $id) {
 }
 $conn->commit();
 ```
-

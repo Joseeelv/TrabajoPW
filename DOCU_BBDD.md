@@ -35,9 +35,6 @@ CREATE TABLE CUSTOMERS (
 ```
 En esta tabla se almacenan los datos de los usuarios que son clientes.
 
-- **user_id**: Identificador único del usuario, clave foránea de la tabla USERS.
-- **customer_address**: Dirección del cliente.
-- **points**: Puntos acumulados por el cliente.
 
 ## Tabla MANAGERS
 ```sql
@@ -48,9 +45,6 @@ CREATE TABLE MANAGERS (
 );
 ```
 En esta tabla se almacenan los datos de los usuarios que son managers.
-
-- **user_id**: Identificador único del usuario, clave foránea de la tabla USERS.
-- **salary**: Salario del manager.
 
 ## Tabla INGREDIENTS
 ```sql
@@ -63,12 +57,6 @@ CREATE TABLE INGREDIENTS (
 );
 ```
 En esta tabla se almacenan los ingredientes que se utilizan en los productos personalizables.
-
-- **ingredient_id**: Identificador único del ingrediente.
-- **ingredient_name**: Nombre del ingrediente.
-- **cost**: Coste del ingrediente en euros.
-- **stock**: Stock del ingrediente (en unidades).
-- **vegan**: Indica si el ingrediente es vegano.
 
 ## Tabla ALLERGENS
 ```sql
@@ -114,19 +102,6 @@ Contiene los productos que se pueden comprar.
 
 - **cost** y **stock** solo aplican a productos no personalizables.
 
-## Tabla MENUS_CONTENTS
-```sql
-CREATE TABLE MENUS_CONTENTS (
-    menu_product_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    PRIMARY KEY (menu_product_id, product_id),
-    FOREIGN KEY (menu_product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES PRODUCTS(product_id) ON DELETE CASCADE,
-    CHECK (menu_product_id != product_id)
-);
-```
-Relaciona menús con los productos que contienen.
 
 ## Tabla PRODUCTS_INGREDIENTS
 ```sql
@@ -261,4 +236,3 @@ CREATE TABLE TRANSACTIONS (
 );
 ```
 Registra transacciones monetarias de pedidos o reabastecimientos.
-
